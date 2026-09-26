@@ -300,6 +300,7 @@ export const App: React.FC = () => {
               loading={loading}
               onNavigate={(v) => setCurrentView(v)}
               onSelectSalon={handleSelectSalonDrilldown}
+              onOpenPrivacyPolicy={openPrivacyPage}
             />
           )}
 

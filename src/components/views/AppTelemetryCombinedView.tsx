@@ -404,7 +404,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             </div>
             <div className="space-y-1.5 text-xs text-neutral-300 light:text-slate-700">
               <div>Framework: <span className="font-mono text-white light:text-slate-900">React Native 0.76 / Expo SDK 52</span></div>
-              <div>Package ID: <span className="font-mono text-[#D9A441]">com.stylefleet.app</span></div>
+              <div>Client Type: <span className="font-mono text-[#D9A441]">StyleFleet Mobile Client</span></div>
               <div>Telemetry Target: <span className="font-mono text-emerald-400">public.telemetry</span></div>
               <div>Status: <span className="text-emerald-400 font-semibold">Active Supabase Sink</span></div>
             </div>

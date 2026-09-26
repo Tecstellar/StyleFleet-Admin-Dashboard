@@ -10,6 +10,7 @@ import {
   Smartphone,
   ChevronRight,
   TrendingUp,
+  Shield,
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { KPICard } from '../common/KPICard';
@@ -33,6 +34,7 @@ interface DashboardViewProps {
   loading?: boolean;
   onNavigate: (view: NavView) => void;
   onSelectSalon?: (shop: Shop) => void;
+  onOpenPrivacyPolicy?: () => void;
 }
 
 const GOLD_PALETTE = ['#D9A441', '#E0C068', '#B8863B', '#8C6239', '#5B4021'];
@@ -50,6 +52,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   loading = false,
   onNavigate,
   onSelectSalon,
+  onOpenPrivacyPolicy,
 }) => {
   const { dateRange } = useDateFilter();
 
@@ -417,6 +420,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Dashboard Bottom Direct Privacy Option */}
+      <div className="pt-6 border-t border-[#2D3154] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-400">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span>StyleFleet Super Admin System • Live Supabase Connected</span>
+        </div>
+        <div className="flex items-center gap-4">
+          {onOpenPrivacyPolicy && (
+            <button
+              onClick={onOpenPrivacyPolicy}
+              className="text-neutral-300 hover:text-[#DFB847] flex items-center gap-1.5 transition-colors cursor-pointer font-medium py-1 px-2 rounded-lg hover:bg-[#1E2136]"
+              title="View Public Privacy Policy"
+            >
+              <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Privacy Policy</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -45,7 +45,7 @@ export const AppVersionsView: React.FC = () => {
               Target: Android 14+ / React Native 0.76 / Expo SDK 52
             </div>
             <div className="text-neutral-400 text-[11px]">
-              Bundle ID: <span className="font-mono text-white">com.stylefleet.app</span>
+              Client: <span className="font-mono text-white">StyleFleet Android</span>
             </div>
           </div>
 

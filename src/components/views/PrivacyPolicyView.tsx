@@ -105,7 +105,7 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
           </h1>
 
           <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-3xl">
-            This Privacy Policy describes how <strong className="text-white">StyleFleet</strong> (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), developed by <strong className="text-white">TecStellar</strong>, collects, processes, stores, and protects information when you use the StyleFleet Mobile Application (<code className="font-mono text-[#D4AF37] bg-black/40 px-1 py-0.5 rounded">com.stylefleet.app</code> for Android and StyleFleet iOS), salon point-of-sale terminals, and the StyleFleet Master Administration Portal.
+            This Privacy Policy describes how <strong className="text-white">StyleFleet</strong> (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), developed by <strong className="text-white">TecStellar</strong>, collects, processes, stores, and protects information when you use the StyleFleet Mobile Application (Android and iOS), salon point-of-sale terminals, and the StyleFleet Master Administration Portal.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-neutral-400 border-t border-[#2D3154]">
@@ -182,7 +182,7 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
                 <strong className="text-neutral-200">Billing &amp; Transaction Invoices:</strong> Invoice sequence numbers, subtotal amounts, discounts applied, taxes, total billed, payment method (Cash, UPI, Card), and payment fulfillment status. <span className="text-amber-300">StyleFleet does not process or retain raw credit card numbers or banking PINs.</span>
               </li>
               <li>
-                <strong className="text-neutral-200">Device Hardware &amp; Telemetry Data:</strong> As recorded in our telemetry system, we collect anonymous hardware identifiers, mobile platform (Android/iOS), OS build version, app version (<code className="font-mono text-[#D4AF37]">com.stylefleet.app</code>), battery charging status, and network connection type to ensure reliable offline-first bill synchronization.
+                <strong className="text-neutral-200">Device Hardware &amp; Telemetry Data:</strong> As recorded in our telemetry system, we collect anonymous hardware identifiers, mobile platform (Android/iOS), OS build version, app build version, battery charging status, and network connection type to ensure reliable offline-first bill synchronization.
               </li>
               <li>
                 <strong className="text-neutral-200">System Logs &amp; Error Diagnostics:</strong> Crash dumps, unhandled exception stack traces, and API latency measurements to diagnose and resolve software bugs.
@@ -319,7 +319,7 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
         <div className="pt-6 border-t border-[#2D3154] text-center text-xs text-neutral-500 space-y-1">
           <p>&copy; {new Date().getFullYear()} StyleFleet. Developed by TecStellar. All rights reserved.</p>
           <p className="text-[11px]">
-            This policy applies to StyleFleet Mobile Application (Package ID: <code className="font-mono text-neutral-400">com.stylefleet.app</code>), Web Dashboard, and POS Services.
+            This policy applies to the StyleFleet Mobile Application, Web Dashboard, and POS Services.
           </p>
         </div>
       </main>
