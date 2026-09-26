@@ -17,6 +17,7 @@ import {
   LogOut,
   Crown,
   Shield,
+  FileText,
 } from 'lucide-react';
 import { NavView } from '../../types/dashboard';
 import { useAuth } from '../../context/AuthContext';
@@ -28,6 +29,7 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
+  onOpenPrivacyPolicy?: () => void;
   salonsCount?: number;
   deletionsCount?: number;
   supportCount?: number;
@@ -48,6 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
   isMobileOpen,
   onCloseMobile,
+  onOpenPrivacyPolicy,
   salonsCount = 3,
   deletionsCount = 5,
   supportCount = 0,
@@ -201,6 +204,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>Governance Settings</span>
             </button>
 
+            {onOpenPrivacyPolicy && (
+              <button
+                onClick={onOpenPrivacyPolicy}
+                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-[#1E2136] transition-colors"
+                title="View StyleFleet Privacy Policy"
+              >
+                <FileText className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>Privacy Policy</span>
+              </button>
+            )}
+
             <button
               onClick={logout}
               className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors border border-rose-500/30"
@@ -216,6 +230,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
               title="Supabase Live"
             />
+            {onOpenPrivacyPolicy && (
+              <button
+                onClick={onOpenPrivacyPolicy}
+                className="p-1.5 rounded hover:bg-[#1E2136] text-[#D4AF37] transition-colors"
+                title="Privacy Policy"
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+            )}
             <button
               onClick={logout}
               className="p-1.5 rounded hover:bg-rose-500/20 text-rose-400 transition-colors"

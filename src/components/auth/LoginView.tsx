@@ -11,7 +11,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const LoginView: React.FC = () => {
+interface LoginViewProps {
+  onOpenPrivacyPolicy?: () => void;
+}
+
+export const LoginView: React.FC<LoginViewProps> = ({ onOpenPrivacyPolicy }) => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -143,14 +147,22 @@ export const LoginView: React.FC = () => {
           </form>
 
           {/* Footer Security Badges */}
-          <div className="pt-4 border-t border-[#2D3256] flex flex-col items-center gap-1.5 text-center text-[11px] text-neutral-400">
+          <div className="pt-4 border-t border-[#2D3256] flex flex-col items-center gap-2 text-center text-[11px] text-neutral-400">
             <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Supabase Production Connected</span>
             </div>
-            <p className="text-[10px] text-neutral-400">
-              StyleFleet System • Protected Administration Access
-            </p>
+            <div className="flex items-center justify-center gap-2 text-[11px] text-neutral-400 flex-wrap">
+              <span>Protected Administration Access</span>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={onOpenPrivacyPolicy}
+                className="text-[#DFB847] hover:text-[#F3D78A] underline cursor-pointer font-medium transition-colors"
+              >
+                Privacy Policy
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import { SystemHealthView } from './components/views/SystemHealthView';
 import { AccountDeletionsView } from './components/views/AccountDeletionsView';
 import { SystemGovernanceCombinedView } from './components/views/SystemGovernanceCombinedView';
 import { LoginView } from './components/auth/LoginView';
+import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
 import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
@@ -42,8 +43,49 @@ import {
 } from './types/database';
 import { NavView } from './types/dashboard';
 
+function checkIsPrivacyUrl(): boolean {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+  const search = window.location.search.toLowerCase();
+  return (
+    path === '/privacy' ||
+    path === '/privacy-policy' ||
+    path === '/privacy-policies' ||
+    path.startsWith('/privacy') ||
+    hash.includes('privacy') ||
+    search.includes('privacy')
+  );
+}
+
 export const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const [isPrivacyRoute, setIsPrivacyRoute] = useState(() => checkIsPrivacyUrl());
+
+  // Listen to popstate and hash change so back/forward or direct URLs work dynamically
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setIsPrivacyRoute(checkIsPrivacyUrl());
+    };
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, []);
+
+  const openPrivacyPage = () => {
+    setIsPrivacyRoute(true);
+    if (!window.location.pathname.includes('privacy')) {
+      window.history.pushState({}, '', '/privacy');
+    }
+  };
+
+  const closePrivacyPage = () => {
+    setIsPrivacyRoute(false);
+    window.history.pushState({}, '', '/');
+  };
 
   // Navigation State — matches 9 options from reference dashboard
   const [currentView, setCurrentView] = useState<NavView>('dashboard');
@@ -179,8 +221,21 @@ export const App: React.FC = () => {
     setCurrentView('salons_360');
   };
 
+  // 1. PUBLIC PRIVACY POLICY PAGE:
+  // Can be accessed directly via URL (e.g. /privacy or /privacy-policy) without typing username & password!
+  if (isPrivacyRoute) {
+    return (
+      <PrivacyPolicyView
+        isPublic={!isAuthenticated}
+        onNavigateToLogin={() => closePrivacyPage()}
+        onBackToDashboard={() => closePrivacyPage()}
+      />
+    );
+  }
+
+  // 2. AUTHENTICATION GATE:
   if (!isAuthenticated) {
-    return <LoginView />;
+    return <LoginView onOpenPrivacyPolicy={openPrivacyPage} />;
   }
 
   return (
@@ -196,6 +251,7 @@ export const App: React.FC = () => {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         isMobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}
+        onOpenPrivacyPolicy={openPrivacyPage}
         salonsCount={shops.length}
         deletionsCount={deletions.length}
         supportCount={supportMessages.filter((m) => m.status === 'open').length}
