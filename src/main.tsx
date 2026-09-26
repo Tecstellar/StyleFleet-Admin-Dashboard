@@ -3,14 +3,17 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { ThemeProvider } from './context/ThemeContext';
 import { DateFilterProvider } from './context/DateFilterContext';
+import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <DateFilterProvider>
-        <App />
-      </DateFilterProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <DateFilterProvider>
+          <App />
+        </DateFilterProvider>
+      </ThemeProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

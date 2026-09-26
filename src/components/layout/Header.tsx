@@ -9,9 +9,11 @@ import {
   Radio,
   ExternalLink,
   X,
+  LogOut,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useDateFilter } from '../../context/DateFilterContext';
+import { useAuth } from '../../context/AuthContext';
 import { performGlobalSearch, SearchResultItem } from '../../services/searchService';
 import { DateFilterOption, NavView } from '../../types/dashboard';
 
@@ -43,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { theme, toggleTheme } = useTheme();
   const { selectedOption, setSelectedOption, dateRange, setCustomRange } = useDateFilter();
+  const { user, logout } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
@@ -298,6 +301,26 @@ export const Header: React.FC<HeaderProps> = ({
             <Moon className="w-4 h-4 text-slate-700" />
           )}
         </button>
+
+        {/* User Pill & Sign Out Button */}
+        <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-[#2D3154] light:border-slate-200">
+          <div className="hidden md:flex flex-col text-right">
+            <span className="text-[11px] font-bold text-white light:text-slate-900 truncate max-w-[130px]">
+              {user?.email || 'Stylefleet@tecstellar.com'}
+            </span>
+            <span className="text-[9px] font-extrabold text-[#D9A441] uppercase tracking-wider">
+              Super Admin
+            </span>
+          </div>
+
+          <button
+            onClick={logout}
+            title="Sign Out of Admin Console"
+            className="p-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-white transition-colors"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+          </button>
+        </div>
       </div>
     </header>
   );

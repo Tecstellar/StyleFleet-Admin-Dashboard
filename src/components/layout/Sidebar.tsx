@@ -19,6 +19,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { NavView } from '../../types/dashboard';
+import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
   currentView: NavView;
@@ -51,6 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   deletionsCount = 5,
   supportCount = 0,
 }) => {
+  const { user, logout } = useAuth();
   // Exactly 9 items matching https://salon-admin-dashboard-lake.vercel.app/
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -113,11 +115,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {(!isCollapsed || isMobileOpen) && (
         <div className="px-4 py-2.5 bg-[#1E2136]/70 light:bg-[#FCF9EE]/60 border-b border-[#D4AF37]/20">
           <div className="flex items-center justify-between text-xs font-bold text-white light:text-[#161826]">
-            <div className="flex items-center gap-2 truncate max-w-[140px]">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="truncate">Master Operator</span>
+            <div className="flex items-center gap-2 truncate max-w-[130px]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+              <span className="truncate text-[11px] font-semibold text-neutral-200 light:text-[#161826]">
+                {user?.email || 'Stylefleet@tecstellar.com'}
+              </span>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs bg-[#161826] text-[#DFB847] border-[#D4AF37]/40">
+            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full border shadow-2xs bg-[#161826] text-[#DFB847] border-[#D4AF37]/40 shrink-0">
               Super Admin
             </span>
           </div>
@@ -196,6 +200,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Governance Settings</span>
             </button>
+
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors border border-rose-500/30"
+              title="Sign Out of Admin Console"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <span>Sign Out</span>
+            </button>
           </>
         ) : (
           <div className="flex flex-col items-center gap-2">
@@ -203,6 +216,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
               title="Supabase Live"
             />
+            <button
+              onClick={logout}
+              className="p-1.5 rounded hover:bg-rose-500/20 text-rose-400 transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
             <button
               onClick={onToggleCollapse}
               className="hidden lg:flex p-1.5 rounded hover:bg-[#1E2136] text-neutral-400 hover:text-white transition-colors"

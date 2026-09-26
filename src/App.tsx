@@ -10,6 +10,8 @@ import { AuditTrailView } from './components/views/AuditTrailView';
 import { SystemHealthView } from './components/views/SystemHealthView';
 import { AccountDeletionsView } from './components/views/AccountDeletionsView';
 import { SystemGovernanceCombinedView } from './components/views/SystemGovernanceCombinedView';
+import { LoginView } from './components/auth/LoginView';
+import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
 import { fetchProfiles, fetchStaff, fetchCustomers } from './services/usersService';
@@ -41,6 +43,8 @@ import {
 import { NavView } from './types/dashboard';
 
 export const App: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   // Navigation State — matches 9 options from reference dashboard
   const [currentView, setCurrentView] = useState<NavView>('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -125,11 +129,15 @@ export const App: React.FC = () => {
 
   // Initial load
   useEffect(() => {
-    loadAllData();
-  }, [loadAllData]);
+    if (isAuthenticated) {
+      loadAllData();
+    }
+  }, [isAuthenticated, loadAllData]);
 
   // Realtime Subscriptions
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const unsubSupport = subscribeToSupportMessages(() => {
       fetchSupportMessages().then((res) => {
         if (res.data) setSupportMessages(res.data);
@@ -159,7 +167,7 @@ export const App: React.FC = () => {
       unsubDeletions();
       unsubTelemetryHealth();
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const handleManualRefresh = () => {
     setIsRefreshing(true);
@@ -170,6 +178,10 @@ export const App: React.FC = () => {
     setSelectedShopForModal(shop);
     setCurrentView('salons_360');
   };
+
+  if (!isAuthenticated) {
+    return <LoginView />;
+  }
 
   return (
     <div className="flex min-h-screen bg-[#161826] light:bg-[#F4F5F9] text-white light:text-slate-900 transition-colors">
