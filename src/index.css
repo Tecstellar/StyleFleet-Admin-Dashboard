@@ -58,4 +58,16 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(217, 164, 65, 0.45);
   }
+
+  /* Ensure input text is never hidden or color-clashed by browser autofill */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: #FFFFFF !important;
+    -webkit-box-shadow: 0 0 0px 1000px #0F111D inset !important;
+    box-shadow: 0 0 0px 1000px #0F111D inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: #FFFFFF !important;
+  }
 }
