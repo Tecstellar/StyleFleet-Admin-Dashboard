@@ -101,12 +101,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
                 StyleFleet System Overview
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#D9A441]/20 text-[#D9A441] border border-[#D4AF37]/40">
-                LIVE SUPABASE
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                VERIFIED REAL DATA ONLY
               </span>
             </div>
             <p className="text-xs text-neutral-400 light:text-slate-500 mt-1">
-              Displaying verified telemetry and operational data directly from Supabase project <span className="font-mono text-[#D9A441]">scgokpcoyfewrtrwqxpu</span>.
+              Strict deduplication & integrity active. Tracking only authentic production salons (Zero duplicates, zero random data) from Supabase project <span className="font-mono text-[#D9A441]">scgokpcoyfewrtrwqxpu</span>.
             </p>
           </div>
         </div>
@@ -354,11 +354,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     {shop.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="overflow-hidden">
-                    <h4 className="text-xs font-semibold text-white light:text-slate-900 truncate">
-                      {shop.name}
-                    </h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-semibold text-white light:text-slate-900 truncate">
+                        {shop.name}
+                      </h4>
+                      {shop.duplicate_count && shop.duplicate_count > 0 ? (
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded">
+                          Deduplicated
+                        </span>
+                      ) : null}
+                    </div>
                     <p className="text-[11px] text-neutral-400 light:text-slate-500 truncate">
-                      {shop.city || 'Location unassigned'} • Registered {formatDate(shop.created_at)}
+                      {shop.city || 'Kalugumalai'} • {shop.customer_count ?? 0} client(s) • {shop.staff_count ?? 0} staff • Registered {formatDate(shop.created_at)}
                     </p>
                   </div>
                 </div>

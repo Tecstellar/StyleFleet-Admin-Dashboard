@@ -6,10 +6,12 @@ export async function fetchBills(): Promise<{ data: Bill[]; error: string | null
     const { data, error } = await supabase
       .from('bills')
       .select('*, shop:shops(id, name), customer:customers(id, name, phone)')
+      .not('shop_id', 'is', null)
       .order('issued_at', { ascending: false });
 
     if (error) throw error;
-    return { data: data || [], error: null };
+    const validBills = (data || []).filter((b) => b.shop != null);
+    return { data: validBills, error: null };
   } catch (err: any) {
     console.error('Error fetching bills:', err);
     return { data: [], error: err.message || 'Unable to load bills' };
@@ -21,10 +23,12 @@ export async function fetchPayments(): Promise<{ data: Payment[]; error: string 
     const { data, error } = await supabase
       .from('payments')
       .select('*, shop:shops(id, name), bill:bills(id, invoice_number, total_minor, status)')
+      .not('shop_id', 'is', null)
       .order('paid_at', { ascending: false });
 
     if (error) throw error;
-    return { data: data || [], error: null };
+    const validPayments = (data || []).filter((p) => p.shop != null);
+    return { data: validPayments, error: null };
   } catch (err: any) {
     console.error('Error fetching payments:', err);
     return { data: [], error: err.message || 'Unable to load payment records' };

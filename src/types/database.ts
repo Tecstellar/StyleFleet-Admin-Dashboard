@@ -29,6 +29,10 @@ export interface Shop {
   updated_at: string;
   // Joined relation fields
   owner_profile?: Profile | null;
+  staff_count?: number;
+  customer_count?: number;
+  bill_count?: number;
+  duplicate_count?: number;
 }
 
 export interface ShopMember {
