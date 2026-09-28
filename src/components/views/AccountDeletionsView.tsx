@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { UserX, AlertTriangle, ShieldAlert, PieChart as PieIcon } from 'lucide-react';
+import { UserX, AlertTriangle, ShieldAlert, PieChart as PieIcon, ExternalLink } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
@@ -12,6 +12,7 @@ import { AccountDeletion } from '../../types/database';
 interface AccountDeletionsViewProps {
   deletions: AccountDeletion[];
   loading?: boolean;
+  onOpenDeleteAccountInstructions?: () => void;
 }
 
 const GOLD_PALETTE = ['#D9A441', '#E0C068', '#B8863B', '#8C6239', '#5B4021'];
@@ -19,6 +20,7 @@ const GOLD_PALETTE = ['#D9A441', '#E0C068', '#B8863B', '#8C6239', '#5B4021'];
 export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
   deletions,
   loading = false,
+  onOpenDeleteAccountInstructions,
 }) => {
   const { dateRange } = useDateFilter();
 
@@ -101,17 +103,30 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
           </p>
         </div>
 
-        <ExportButton
-          data={filteredDeletions}
-          filename="stylefleet_account_deletions"
-          columns={[
-            { key: 'shop_name', label: 'Salon Name' },
-            { key: 'phone', label: 'Phone' },
-            { key: 'reason', label: 'Reason' },
-            { key: 'status', label: 'Status' },
-            { key: 'deleted_at', label: 'Deleted At' },
-          ]}
-        />
+        <div className="flex items-center gap-2 flex-wrap">
+          {onOpenDeleteAccountInstructions && (
+            <button
+              onClick={onOpenDeleteAccountInstructions}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2D3154] light:border-slate-300 bg-[#161826] light:bg-slate-50 text-xs font-semibold text-neutral-300 light:text-slate-700 hover:text-white hover:border-[#D9A441] transition-colors cursor-pointer"
+              title="Open Public Account Deletion Instructions Page"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-[#D9A441]" />
+              <span>Public Deletion Page</span>
+            </button>
+          )}
+
+          <ExportButton
+            data={filteredDeletions}
+            filename="stylefleet_account_deletions"
+            columns={[
+              { key: 'shop_name', label: 'Salon Name' },
+              { key: 'phone', label: 'Phone' },
+              { key: 'reason', label: 'Reason' },
+              { key: 'status', label: 'Status' },
+              { key: 'deleted_at', label: 'Deleted At' },
+            ]}
+          />
+        </div>
       </div>
 
       {/* Analytics Breakdown */}

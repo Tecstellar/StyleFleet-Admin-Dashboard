@@ -21,12 +21,14 @@ interface PrivacyPolicyViewProps {
   isPublic?: boolean;
   onNavigateToLogin?: () => void;
   onBackToDashboard?: () => void;
+  onOpenDeleteAccount?: () => void;
 }
 
 export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
   isPublic = false,
   onNavigateToLogin,
   onBackToDashboard,
+  onOpenDeleteAccount,
 }) => {
   const lastUpdated = 'September 26, 2026';
   const effectiveDate = 'September 1, 2026';
@@ -255,6 +257,17 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
               <p className="text-neutral-400 text-xs">
                 Upon verified submission, your account enters the <strong className="text-white">Account Deletions Lifecycle</strong> (monitored in the Master Admin Dashboard), where personal identity records, profiles, and salon identifiers are permanently redacted and purged within 30 days, subject only to statutory tax record retention obligations.
               </p>
+              {onOpenDeleteAccount && (
+                <div className="pt-2">
+                  <button
+                    onClick={onOpenDeleteAccount}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[#DFB847] hover:bg-[#D4AF37]/25 text-xs font-semibold cursor-pointer transition-colors"
+                  >
+                    <UserX className="w-3.5 h-3.5" />
+                    <span>View Standalone Account Deletion Instructions &rarr;</span>
+                  </button>
+                </div>
+              )}
             </div>
           </section>
 

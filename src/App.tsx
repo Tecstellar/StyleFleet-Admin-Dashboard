@@ -12,6 +12,7 @@ import { AccountDeletionsView } from './components/views/AccountDeletionsView';
 import { SystemGovernanceCombinedView } from './components/views/SystemGovernanceCombinedView';
 import { LoginView } from './components/auth/LoginView';
 import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
+import { DeleteAccountView } from './components/views/DeleteAccountView';
 import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
@@ -58,14 +59,33 @@ function checkIsPrivacyUrl(): boolean {
   );
 }
 
+function checkIsDeleteAccountUrl(): boolean {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+  const search = window.location.search.toLowerCase();
+  return (
+    path === '/delete-account' ||
+    path === '/delete-account/' ||
+    path === '/delete' ||
+    path === '/delete/' ||
+    path === '/account-deletion' ||
+    path.startsWith('/delete-account') ||
+    hash.includes('delete-account') ||
+    search.includes('delete-account')
+  );
+}
+
 export const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [isPrivacyRoute, setIsPrivacyRoute] = useState(() => checkIsPrivacyUrl());
+  const [isDeleteAccountRoute, setIsDeleteAccountRoute] = useState(() => checkIsDeleteAccountUrl());
 
   // Listen to popstate and hash change so back/forward or direct URLs work dynamically
   useEffect(() => {
     const handleUrlChange = () => {
       setIsPrivacyRoute(checkIsPrivacyUrl());
+      setIsDeleteAccountRoute(checkIsDeleteAccountUrl());
     };
     window.addEventListener('popstate', handleUrlChange);
     window.addEventListener('hashchange', handleUrlChange);
@@ -77,6 +97,7 @@ export const App: React.FC = () => {
 
   const openPrivacyPage = () => {
     setIsPrivacyRoute(true);
+    setIsDeleteAccountRoute(false);
     if (!window.location.pathname.includes('privacy')) {
       window.history.pushState({}, '', '/privacy');
     }
@@ -84,6 +105,19 @@ export const App: React.FC = () => {
 
   const closePrivacyPage = () => {
     setIsPrivacyRoute(false);
+    window.history.pushState({}, '', '/');
+  };
+
+  const openDeleteAccountPage = () => {
+    setIsDeleteAccountRoute(true);
+    setIsPrivacyRoute(false);
+    if (!window.location.pathname.includes('delete-account')) {
+      window.history.pushState({}, '', '/delete-account');
+    }
+  };
+
+  const closeDeleteAccountPage = () => {
+    setIsDeleteAccountRoute(false);
     window.history.pushState({}, '', '/');
   };
 
@@ -221,7 +255,20 @@ export const App: React.FC = () => {
     setCurrentView('salons_360');
   };
 
-  // 1. PUBLIC PRIVACY POLICY PAGE:
+  // 1. PUBLIC ACCOUNT DELETION PAGE:
+  // Can be accessed directly via URL (e.g. /delete-account) without typing username & password!
+  if (isDeleteAccountRoute) {
+    return (
+      <DeleteAccountView
+        isPublic={!isAuthenticated}
+        onNavigateToLogin={() => closeDeleteAccountPage()}
+        onBackToDashboard={() => closeDeleteAccountPage()}
+        onOpenPrivacyPolicy={openPrivacyPage}
+      />
+    );
+  }
+
+  // 2. PUBLIC PRIVACY POLICY PAGE:
   // Can be accessed directly via URL (e.g. /privacy or /privacy-policy) without typing username & password!
   if (isPrivacyRoute) {
     return (
@@ -229,13 +276,19 @@ export const App: React.FC = () => {
         isPublic={!isAuthenticated}
         onNavigateToLogin={() => closePrivacyPage()}
         onBackToDashboard={() => closePrivacyPage()}
+        onOpenDeleteAccount={openDeleteAccountPage}
       />
     );
   }
 
-  // 2. AUTHENTICATION GATE:
+  // 3. AUTHENTICATION GATE:
   if (!isAuthenticated) {
-    return <LoginView onOpenPrivacyPolicy={openPrivacyPage} />;
+    return (
+      <LoginView
+        onOpenPrivacyPolicy={openPrivacyPage}
+        onOpenDeleteAccount={openDeleteAccountPage}
+      />
+    );
   }
 
   return (
@@ -252,6 +305,7 @@ export const App: React.FC = () => {
         isMobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}
         onOpenPrivacyPolicy={openPrivacyPage}
+        onOpenDeleteAccount={openDeleteAccountPage}
         salonsCount={shops.length}
         deletionsCount={deletions.length}
         supportCount={supportMessages.filter((m) => m.status === 'open').length}
@@ -301,6 +355,7 @@ export const App: React.FC = () => {
               onNavigate={(v) => setCurrentView(v)}
               onSelectSalon={handleSelectSalonDrilldown}
               onOpenPrivacyPolicy={openPrivacyPage}
+              onOpenDeleteAccount={openDeleteAccountPage}
             />
           )}
 
@@ -377,7 +432,11 @@ export const App: React.FC = () => {
 
           {/* 8. Account Deletions */}
           {currentView === 'account_deletions' && (
-            <AccountDeletionsView deletions={deletions} loading={loading} />
+            <AccountDeletionsView
+              deletions={deletions}
+              loading={loading}
+              onOpenDeleteAccountInstructions={openDeleteAccountPage}
+            />
           )}
 
           {/* 9. System Governance */}

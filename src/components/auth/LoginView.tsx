@@ -13,9 +13,13 @@ import { useAuth } from '../../context/AuthContext';
 
 interface LoginViewProps {
   onOpenPrivacyPolicy?: () => void;
+  onOpenDeleteAccount?: () => void;
 }
 
-export const LoginView: React.FC<LoginViewProps> = ({ onOpenPrivacyPolicy }) => {
+export const LoginView: React.FC<LoginViewProps> = ({
+  onOpenPrivacyPolicy,
+  onOpenDeleteAccount,
+}) => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -162,6 +166,18 @@ export const LoginView: React.FC<LoginViewProps> = ({ onOpenPrivacyPolicy }) => 
               >
                 Privacy Policy
               </button>
+              {onOpenDeleteAccount && (
+                <>
+                  <span>•</span>
+                  <button
+                    type="button"
+                    onClick={onOpenDeleteAccount}
+                    className="text-neutral-400 hover:text-rose-300 underline cursor-pointer font-medium transition-colors"
+                  >
+                    Delete Account
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

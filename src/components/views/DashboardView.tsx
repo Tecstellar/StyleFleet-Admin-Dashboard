@@ -35,6 +35,7 @@ interface DashboardViewProps {
   onNavigate: (view: NavView) => void;
   onSelectSalon?: (shop: Shop) => void;
   onOpenPrivacyPolicy?: () => void;
+  onOpenDeleteAccount?: () => void;
 }
 
 const GOLD_PALETTE = ['#D9A441', '#E0C068', '#B8863B', '#8C6239', '#5B4021'];
@@ -53,6 +54,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   onSelectSalon,
   onOpenPrivacyPolicy,
+  onOpenDeleteAccount,
 }) => {
   const { dateRange } = useDateFilter();
 
@@ -436,7 +438,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <span className="w-2 h-2 rounded-full bg-emerald-400" />
           <span>StyleFleet Super Admin System • Live Supabase Connected</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           {onOpenPrivacyPolicy && (
             <button
               onClick={onOpenPrivacyPolicy}
@@ -445,6 +447,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Privacy Policy</span>
+            </button>
+          )}
+          {onOpenDeleteAccount && (
+            <button
+              onClick={onOpenDeleteAccount}
+              className="text-neutral-300 hover:text-rose-400 flex items-center gap-1.5 transition-colors cursor-pointer font-medium py-1 px-2 rounded-lg hover:bg-[#1E2136]"
+              title="View Public Account Deletion Instructions"
+            >
+              <UserX className="w-3.5 h-3.5 text-rose-400" />
+              <span>Delete Account Info</span>
             </button>
           )}
         </div>

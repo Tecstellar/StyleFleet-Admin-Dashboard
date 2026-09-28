@@ -18,6 +18,7 @@ import {
   Crown,
   Shield,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import { NavView } from '../../types/dashboard';
 import { useAuth } from '../../context/AuthContext';
@@ -30,6 +31,7 @@ interface SidebarProps {
   isMobileOpen: boolean;
   onCloseMobile: () => void;
   onOpenPrivacyPolicy?: () => void;
+  onOpenDeleteAccount?: () => void;
   salonsCount?: number;
   deletionsCount?: number;
   supportCount?: number;
@@ -51,6 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen,
   onCloseMobile,
   onOpenPrivacyPolicy,
+  onOpenDeleteAccount,
   salonsCount = 3,
   deletionsCount = 5,
   supportCount = 0,
@@ -207,7 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onOpenPrivacyPolicy && (
               <button
                 onClick={onOpenPrivacyPolicy}
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-[#1E2136] transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-[#1E2136] transition-colors cursor-pointer"
                 title="View StyleFleet Privacy Policy"
               >
                 <FileText className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -215,9 +218,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             )}
 
+            {onOpenDeleteAccount && (
+              <button
+                onClick={onOpenDeleteAccount}
+                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-rose-300 hover:bg-[#1E2136] transition-colors cursor-pointer"
+                title="View Account Deletion Instructions"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                <span>Delete Account</span>
+              </button>
+            )}
+
             <button
               onClick={logout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors border border-rose-500/30"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors border border-rose-500/30 cursor-pointer"
               title="Sign Out of Admin Console"
             >
               <LogOut className="w-3.5 h-3.5 text-rose-400" />
@@ -233,10 +247,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onOpenPrivacyPolicy && (
               <button
                 onClick={onOpenPrivacyPolicy}
-                className="p-1.5 rounded hover:bg-[#1E2136] text-[#D4AF37] transition-colors"
+                className="p-1.5 rounded hover:bg-[#1E2136] text-[#D4AF37] transition-colors cursor-pointer"
                 title="Privacy Policy"
               >
                 <FileText className="w-4 h-4" />
+              </button>
+            )}
+            {onOpenDeleteAccount && (
+              <button
+                onClick={onOpenDeleteAccount}
+                className="p-1.5 rounded hover:bg-[#1E2136] text-rose-400 transition-colors cursor-pointer"
+                title="Account Deletion Instructions"
+              >
+                <Trash2 className="w-4 h-4" />
               </button>
             )}
             <button
