@@ -8,7 +8,7 @@ interface StatusBadgeProps {
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' }) => {
   if (!status) {
     return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neutral-800 text-neutral-400 border border-neutral-700">
+      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 text-neutral-500 border border-neutral-200">
         Unknown
       </span>
     );
@@ -16,16 +16,16 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' })
 
   const normalized = status.toLowerCase().trim();
 
-  let styles = 'bg-neutral-800/60 text-neutral-300 border-neutral-700';
+  let styles = 'bg-neutral-100 text-neutral-700 border-neutral-200';
 
   if (['active', 'completed', 'paid', 'resolved', 'processed', 'done'].includes(normalized)) {
-    styles = 'bg-emerald-950/40 text-emerald-400 border-emerald-800/50';
+    styles = 'bg-emerald-50 text-emerald-700 border-emerald-200';
   } else if (['pending', 'in_progress', 'open', 'not confirmed'].includes(normalized)) {
-    styles = 'bg-amber-950/40 text-[#D9A441] border-[#D9A441]/40';
+    styles = 'bg-[#FAF7EE] text-[#B8860B] border-[#E8DEC4]';
   } else if (['cancelled', 'closed', 'expired', 'failed', 'deleted'].includes(normalized)) {
-    styles = 'bg-rose-950/40 text-rose-400 border-rose-800/50';
+    styles = 'bg-rose-50 text-rose-700 border-rose-200';
   } else if (['confirmed'].includes(normalized)) {
-    styles = 'bg-blue-950/40 text-blue-400 border-blue-800/50';
+    styles = 'bg-neutral-900 text-white border-neutral-900';
   }
 
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs font-semibold';

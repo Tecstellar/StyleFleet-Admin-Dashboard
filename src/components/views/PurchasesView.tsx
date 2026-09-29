@@ -37,7 +37,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
       key: 'shop',
       header: 'Salon Business',
       render: (p) => (
-        <span className="font-semibold text-white light:text-slate-900">
+        <span className="font-semibold text-neutral-900">
           {p.shop?.name || p.shop_id}
         </span>
       ),
@@ -47,11 +47,11 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
       header: 'Invoice Reference',
       render: (p) => (
         <div>
-          <div className="font-mono text-xs text-neutral-300">
+          <div className="font-mono text-xs text-neutral-700">
             {p.bill?.invoice_number || 'Direct Payment'}
           </div>
           {p.reference && (
-            <div className="text-[11px] text-neutral-400 truncate max-w-xs">{p.reference}</div>
+            <div className="text-[11px] text-neutral-500 truncate max-w-xs">{p.reference}</div>
           )}
         </div>
       ),
@@ -60,7 +60,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
       key: 'amount_minor',
       header: 'Amount (INR)',
       render: (p) => (
-        <span className="font-mono font-bold text-white light:text-slate-900">
+        <span className="font-mono font-bold text-neutral-900">
           {formatCurrency(p.amount_minor)}
         </span>
       ),
@@ -69,7 +69,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
       key: 'method',
       header: 'Payment Method',
       render: (p) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-[#2D3154]/60 text-neutral-300 border border-[#2D3154]">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
           {p.method}
         </span>
       ),
@@ -83,7 +83,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
       key: 'paid_at',
       header: 'Timestamp',
       render: (p) => (
-        <span className="font-mono text-xs text-neutral-400">
+        <span className="font-mono text-xs text-neutral-500">
           {formatDateTime(p.paid_at)}
         </span>
       ),
@@ -96,13 +96,13 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-[#D9A441]" />
-            <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+            <CreditCard className="w-5 h-5 text-[#D4AF37]" />
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               Purchases &amp; Transactions
             </h1>
           </div>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
-            Verified financial transaction records from Supabase table <code className="text-[#D9A441] font-mono">public.payments</code>.
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Verified financial transaction records from Supabase table <code className="text-[#B8860B] font-mono">public.payments</code>.
           </p>
         </div>
 
@@ -129,25 +129,25 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, loading 
 
       {/* Financial Snapshot */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white text-xs">
-          <span className="text-neutral-400 light:text-slate-500">Collected Total:</span>
-          <div className="text-2xl font-bold font-mono text-[#D9A441] mt-1">
+        <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs text-xs">
+          <span className="text-neutral-500">Collected Total:</span>
+          <div className="text-2xl font-bold font-mono text-[#D4AF37] mt-1">
             {formatCurrency(totalAmountMinor)}
           </div>
           <span className="text-[10px] text-neutral-400 mt-1 block">Within active date filter</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white text-xs">
-          <span className="text-neutral-400 light:text-slate-500">Transaction Count:</span>
-          <div className="text-2xl font-bold font-mono text-white light:text-slate-900 mt-1">
+        <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs text-xs">
+          <span className="text-neutral-500">Transaction Count:</span>
+          <div className="text-2xl font-bold font-mono text-neutral-900 mt-1">
             {filteredPayments.length}
           </div>
           <span className="text-[10px] text-neutral-400 mt-1 block">Settled payment entries</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white text-xs">
-          <span className="text-neutral-400 light:text-slate-500">Payment Gateway:</span>
-          <div className="text-lg font-bold font-mono text-emerald-400 mt-1">
+        <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs text-xs">
+          <span className="text-neutral-500">Payment Gateway:</span>
+          <div className="text-lg font-bold font-mono text-emerald-600 mt-1">
             UPI / Direct Transfer
           </div>
           <span className="text-[10px] text-neutral-400 mt-1 block">Recorded in public.payments</span>

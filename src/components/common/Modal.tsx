@@ -55,28 +55,28 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${widthClasses} rounded-2xl border border-[#2D3154] light:border-slate-300 bg-[#1E2136] light:bg-white text-white light:text-slate-900 shadow-2xl shadow-black/60 overflow-hidden z-10 my-8`}
+        className={`relative w-full ${widthClasses} rounded-2xl border border-[#E5E7EB] bg-white text-neutral-900 shadow-2xl shadow-black/10 overflow-hidden z-10 my-8`}
         role="dialog"
         aria-modal="true"
       >
         {/* Top Gold Accent */}
-        <div className="h-1 bg-gradient-to-r from-[#D9A441]/20 via-[#D9A441] to-[#D9A441]/20" />
+        <div className="h-1 bg-gradient-to-r from-[#D4AF37]/20 via-[#D4AF37] to-[#D4AF37]/20" />
 
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#2D3154] light:border-slate-200">
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#E5E7EB]">
           <div>
-            <h3 className="text-base sm:text-lg font-semibold tracking-tight text-white light:text-slate-900">
+            <h3 className="text-base sm:text-lg font-semibold tracking-tight text-neutral-900">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
+              <p className="text-xs text-neutral-500 mt-0.5">
                 {subtitle}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-[#2D3154] light:text-slate-400 light:hover:text-slate-700 light:hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

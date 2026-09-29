@@ -42,28 +42,28 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       render: (shop) => (
         <div className="flex items-center gap-3">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 border border-white/10"
-            style={{ backgroundColor: shop.accent_color || '#D9A441', color: '#161826' }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 border border-[#D4AF37]/30"
+            style={{ backgroundColor: '#FAF7EE', color: '#B8860B' }}
           >
             {shop.name.slice(0, 2).toUpperCase()}
           </div>
           <div>
-            <div className="font-semibold text-white light:text-slate-900 flex items-center gap-1.5 flex-wrap">
+            <div className="font-semibold text-neutral-900 flex items-center gap-1.5 flex-wrap">
               <span>{shop.name}</span>
               {shop.duplicate_count && shop.duplicate_count > 0 ? (
                 <span
-                  className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded"
+                  className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded"
                   title={`${shop.duplicate_count} duplicate registration(s) detected and merged into this canonical active salon record`}
                 >
                   Deduplicated ({shop.duplicate_count} merged)
                 </span>
               ) : (
-                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 rounded">
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded">
                   Verified Real
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-neutral-400 light:text-slate-500 font-mono truncate max-w-[140px]">
+            <div className="text-[11px] text-neutral-500 font-mono truncate max-w-[140px]">
               ID: {shop.id.slice(0, 8)}...
             </div>
           </div>
@@ -76,17 +76,17 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       render: (shop) => {
         if (!shop.owner_profile) {
           return (
-            <span className="text-amber-400 text-xs italic">
+            <span className="text-amber-700 text-xs italic">
               Unassigned
             </span>
           );
         }
         return (
           <div>
-            <div className="font-medium text-white light:text-slate-900">
+            <div className="font-medium text-neutral-900">
               {shop.owner_profile.full_name || 'Profile'}
             </div>
-            <div className="text-[11px] text-neutral-400 light:text-slate-500 font-mono">
+            <div className="text-[11px] text-neutral-500 font-mono">
               {shop.owner_profile.phone || 'No phone'}
             </div>
           </div>
@@ -97,7 +97,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       key: 'phone',
       header: 'Salon Phone',
       render: (shop) => (
-        <span className="font-mono text-xs text-neutral-300 light:text-slate-700">
+        <span className="font-mono text-xs text-neutral-700">
           {shop.phone || '—'}
         </span>
       ),
@@ -107,10 +107,10 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       header: 'Live Clients',
       render: (shop) => (
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-xs text-white light:text-slate-900 font-mono">
+          <span className="font-semibold text-xs text-neutral-900 font-mono">
             {shop.customer_count ?? 0}
           </span>
-          <span className="text-[11px] text-neutral-400 light:text-slate-500">clients</span>
+          <span className="text-[11px] text-neutral-500">clients</span>
         </div>
       ),
     },
@@ -119,10 +119,10 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       header: 'Stylists / Staff',
       render: (shop) => (
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-xs text-white light:text-slate-900 font-mono">
+          <span className="font-semibold text-xs text-neutral-900 font-mono">
             {shop.staff_count ?? 0}
           </span>
-          <span className="text-[11px] text-neutral-400 light:text-slate-500">stylists</span>
+          <span className="text-[11px] text-neutral-500">stylists</span>
         </div>
       ),
     },
@@ -131,10 +131,10 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       header: 'Location',
       render: (shop) => (
         <div>
-          <div className="text-white light:text-slate-900 font-medium">
+          <div className="text-neutral-900 font-medium">
             {shop.city || '—'}
           </div>
-          <div className="text-[11px] text-neutral-400 light:text-slate-500 truncate max-w-[150px]">
+          <div className="text-[11px] text-neutral-500 truncate max-w-[150px]">
             {shop.address || 'No address'}
           </div>
         </div>
@@ -150,7 +150,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       key: 'created_at',
       header: 'Registered',
       render: (shop) => (
-        <span className="text-neutral-300 light:text-slate-700 text-xs font-mono">
+        <span className="text-neutral-700 text-xs font-mono">
           {formatDate(shop.created_at)}
         </span>
       ),
@@ -164,7 +164,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
             e.stopPropagation();
             setInternalSelectedShop(shop);
           }}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-[#2D3154] light:border-slate-300 bg-[#161826] light:bg-slate-50 hover:border-[#D9A441] hover:text-[#D9A441] transition-colors"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-800 hover:border-[#D4AF37] hover:text-[#B8860B] shadow-xs transition-colors"
         >
           <Eye className="w-3.5 h-3.5" />
           <span>Details</span>
@@ -179,11 +179,11 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       {/* Header & Stats */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900">
             Salons Management
           </h1>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
-            Verified salon businesses connected to Supabase table <code className="text-[#D9A441] font-mono">public.shops</code>
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Verified salon businesses connected to Supabase table <code className="text-[#B8860B] font-mono">public.shops</code>
           </p>
         </div>
 
@@ -202,13 +202,13 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       </div>
 
       {/* Real Data Integrity Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-xs">
-        <div className="flex items-center gap-2 text-emerald-300">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs">
+        <div className="flex items-center gap-2 text-emerald-800">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           <span className="font-semibold">Production Data Guarantee:</span>
           <span>Deduplication engine active. Only verified real salons are tracked (Zero duplicates, Zero random/dummy data).</span>
         </div>
-        <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-400">
+        <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-700">
           <span>Active Unique Salons: {filteredShops.length}</span>
         </div>
       </div>

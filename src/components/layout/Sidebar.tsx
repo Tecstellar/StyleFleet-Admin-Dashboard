@@ -84,22 +84,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#161826] light:bg-white border-r-2 border-[#D4AF37]/30 text-white light:text-slate-900 transition-colors select-none">
+    <div className="flex flex-col h-full bg-white border-r border-[#E5E7EB] text-[#111827] transition-colors select-none">
       {/* Brand Header */}
-      <div className="h-16 px-4 flex items-center justify-between border-b-2 border-[#D4AF37]/25 bg-gradient-to-r from-[#161826] via-[#1E2136] to-[#161826] light:from-white light:via-[#FCF9EE] light:to-white">
+      <div className="h-16 px-4 flex items-center justify-between border-b border-[#E5E7EB] bg-white">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-xl bg-black/40 flex items-center justify-center shadow-sm flex-shrink-0 border-2 border-[#D4AF37]/50 overflow-hidden p-1">
+          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center shadow-xs flex-shrink-0 border-2 border-[#D4AF37] overflow-hidden p-1">
             <img src="/stylefleet-logo.png" alt="StyleFleet Logo" className="w-full h-full object-contain" />
           </div>
           {(!isCollapsed || isMobileOpen) && (
             <div className="overflow-hidden transition-all duration-200">
-              <h1 className="text-sm font-bold text-white light:text-[#161826] tracking-wide truncate flex items-center gap-1.5">
+              <h1 className="text-sm font-bold text-neutral-900 tracking-wide truncate flex items-center gap-1.5">
                 <span>STYLE FLEET</span>
-                <span className="text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#D4AF37]/20 text-[#DFB847] light:text-[#161826] light:bg-[#FCF9EE] border border-[#D4AF37]/40 shadow-xs">
+                <span className="text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FCF9EE] text-[#B8860B] border border-[#D4AF37]/40 shadow-xs">
                   SUPER ADMIN
                 </span>
               </h1>
-              <div className="flex items-center gap-1 text-[11px] text-[#D4AF37] font-bold tracking-wide">
+              <div className="flex items-center gap-1 text-[11px] text-[#B8860B] font-bold tracking-wide">
                 <Sparkles className="w-3 h-3 text-[#D4AF37]" />
                 <span>HQ Command</span>
               </div>
@@ -110,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Mobile close button */}
         <button
           onClick={onCloseMobile}
-          className="lg:hidden p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-[#1E2136] light:text-slate-600 light:hover:text-[#161826] light:hover:bg-[#FCF9EE] transition-colors border border-[#D4AF37]/30"
+          className="lg:hidden p-1.5 rounded-lg text-neutral-500 hover:text-black hover:bg-[#F3F4F6] transition-colors border border-neutral-200"
           title="Close Navigation"
         >
           <X className="w-5 h-5" />
@@ -119,15 +119,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* User Card */}
       {(!isCollapsed || isMobileOpen) && (
-        <div className="px-4 py-2.5 bg-[#1E2136]/70 light:bg-[#FCF9EE]/60 border-b border-[#D4AF37]/20">
-          <div className="flex items-center justify-between text-xs font-bold text-white light:text-[#161826]">
+        <div className="px-4 py-2.5 bg-[#F9FAFB] border-b border-[#E5E7EB]">
+          <div className="flex items-center justify-between text-xs font-bold text-neutral-800">
             <div className="flex items-center gap-2 truncate max-w-[130px]">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-              <span className="truncate text-[11px] font-semibold text-neutral-200 light:text-[#161826]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="truncate text-[11px] font-semibold text-neutral-700">
                 {user?.email || 'Stylefleet@tecstellar.com'}
               </span>
             </div>
-            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full border shadow-2xs bg-[#161826] text-[#DFB847] border-[#D4AF37]/40 shrink-0">
+            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full border shadow-2xs bg-[#FCF9EE] text-[#B8860B] border-[#D4AF37]/40 shrink-0">
               Super Admin
             </span>
           </div>
@@ -145,17 +145,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               onClick={() => handleItemClick(item.id)}
               title={isCollapsed && !isMobileOpen ? item.label : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group relative text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group relative text-left cursor-pointer ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                  : 'text-neutral-300 light:text-[#161826] hover:text-white light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE] border border-transparent'
+                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-black shadow-xs border border-[#D4AF37]'
+                  : 'text-neutral-700 hover:text-black hover:bg-[#F3F4F6] border border-transparent'
               }`}
             >
               <Icon
                 className={`w-4 h-4 flex-shrink-0 transition-colors ${
                   isActive
-                    ? 'text-[#161826]'
-                    : 'text-[#D4AF37] light:text-[#161826] group-hover:text-[#D4AF37]'
+                    ? 'text-black'
+                    : 'text-[#B8860B] group-hover:text-black'
                 }`}
               />
 
@@ -166,8 +166,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span
                       className={`ml-2 px-1.5 py-0.5 rounded-md text-[10px] font-mono border ${
                         isActive
-                          ? 'bg-[#161826] text-[#DFB847] border-[#161826]'
-                          : item.badgeColor || 'bg-[#2D3154] text-[#D9A441] border-[#D9A441]/40'
+                          ? 'bg-black text-[#D4AF37] border-black'
+                          : item.badgeColor || 'bg-[#F3F4F6] text-[#B8860B] border-[#D4AF37]/40'
                       }`}
                     >
                       {item.badge}
@@ -181,17 +181,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Footer / Sign Out & Supabase Status */}
-      <div className="p-3 border-t-2 border-[#D4AF37]/20 bg-[#161826]/90 light:bg-[#FCF9EE]/50 space-y-2">
+      <div className="p-3 border-t border-[#E5E7EB] bg-white space-y-2">
         {(!isCollapsed || isMobileOpen) ? (
           <>
             <div className="flex items-center justify-between px-1 text-[11px]">
-              <div className="flex items-center gap-1.5 text-emerald-400 font-semibold font-mono">
+              <div className="flex items-center gap-1.5 text-emerald-600 font-semibold font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Supabase Live</span>
               </div>
               <button
                 onClick={onToggleCollapse}
-                className="hidden lg:flex p-1 rounded hover:bg-[#1E2136] text-neutral-400 hover:text-white transition-colors"
+                className="hidden lg:flex p-1 rounded hover:bg-[#F3F4F6] text-neutral-400 hover:text-neutral-800 transition-colors cursor-pointer"
                 title="Collapse Sidebar"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -200,7 +200,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <button
               onClick={() => onSelectView('system_governance')}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-neutral-300 light:text-[#161826] hover:bg-[#2D3154] light:hover:bg-rose-100 light:hover:text-rose-900 transition-colors border border-[#2D3154] light:border-slate-300"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-neutral-700 hover:text-black hover:bg-[#F3F4F6] transition-colors border border-[#E5E7EB] cursor-pointer"
               title="System Governance & Settings"
             >
               <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -210,7 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onOpenPrivacyPolicy && (
               <button
                 onClick={onOpenPrivacyPolicy}
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-[#1E2136] transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 hover:text-black hover:bg-[#F3F4F6] transition-colors cursor-pointer"
                 title="View StyleFleet Privacy Policy"
               >
                 <FileText className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -221,20 +221,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onOpenDeleteAccount && (
               <button
                 onClick={onOpenDeleteAccount}
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-rose-300 hover:bg-[#1E2136] transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                 title="View Account Deletion Instructions"
               >
-                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
                 <span>Delete Account</span>
               </button>
             )}
 
             <button
               onClick={logout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors border border-rose-500/30 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors border border-rose-200 cursor-pointer"
               title="Sign Out of Admin Console"
             >
-              <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <LogOut className="w-3.5 h-3.5 text-rose-500" />
               <span>Sign Out</span>
             </button>
           </>
@@ -247,7 +247,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onOpenPrivacyPolicy && (
               <button
                 onClick={onOpenPrivacyPolicy}
-                className="p-1.5 rounded hover:bg-[#1E2136] text-[#D4AF37] transition-colors cursor-pointer"
+                className="p-1.5 rounded hover:bg-[#F3F4F6] text-[#D4AF37] transition-colors cursor-pointer"
                 title="Privacy Policy"
               >
                 <FileText className="w-4 h-4" />
@@ -256,7 +256,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onOpenDeleteAccount && (
               <button
                 onClick={onOpenDeleteAccount}
-                className="p-1.5 rounded hover:bg-[#1E2136] text-rose-400 transition-colors cursor-pointer"
+                className="p-1.5 rounded hover:bg-rose-50 text-rose-500 transition-colors cursor-pointer"
                 title="Account Deletion Instructions"
               >
                 <Trash2 className="w-4 h-4" />
@@ -264,14 +264,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
             <button
               onClick={logout}
-              className="p-1.5 rounded hover:bg-rose-500/20 text-rose-400 transition-colors"
+              className="p-1.5 rounded hover:bg-rose-50 text-rose-500 transition-colors cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
             </button>
             <button
               onClick={onToggleCollapse}
-              className="hidden lg:flex p-1.5 rounded hover:bg-[#1E2136] text-neutral-400 hover:text-white transition-colors"
+              className="hidden lg:flex p-1.5 rounded hover:bg-[#F3F4F6] text-neutral-400 hover:text-neutral-800 transition-colors cursor-pointer"
               title="Expand Sidebar"
             >
               <ChevronRight className="w-4 h-4" />

@@ -95,11 +95,11 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       header: 'Device ID / Name',
       render: (r) => (
         <div>
-          <div className="font-mono text-xs font-semibold text-white light:text-slate-900">
+          <div className="font-mono text-xs font-semibold text-neutral-900">
             {r.device_name || r.device_id || 'Unknown Device'}
           </div>
           {r.device_name && (
-            <div className="text-[10px] font-mono text-neutral-400 light:text-slate-500 truncate max-w-[180px]">
+            <div className="text-[10px] font-mono text-neutral-500 truncate max-w-[180px]">
               ID: {r.device_id}
             </div>
           )}
@@ -112,8 +112,8 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       render: (r) => {
         const shopName = r.shop?.name || shops.find((s) => s.id === r.shop_id)?.name || 'HQ / Unassigned';
         return (
-          <div className="flex items-center gap-1.5 text-xs text-neutral-200 light:text-slate-700">
-            <Store className="w-3.5 h-3.5 text-[#D9A441]" />
+          <div className="flex items-center gap-1.5 text-xs text-neutral-700">
+            <Store className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span className="truncate max-w-[140px]">{shopName}</span>
           </div>
         );
@@ -130,16 +130,16 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             <span
               className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border ${
                 isAndroid
-                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                   : isIos
-                  ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
-                  : 'bg-purple-500/15 text-purple-400 border-purple-500/30'
+                  ? 'bg-[#FAF7EE] text-[#B8860B] border-[#E8DEC4]'
+                  : 'bg-neutral-100 text-neutral-700 border-neutral-200'
               }`}
             >
               {r.platform || 'Unknown'}
             </span>
             {r.os_version && (
-              <span className="text-[11px] font-mono text-neutral-400">
+              <span className="text-[11px] font-mono text-neutral-500">
                 v{r.os_version}
               </span>
             )}
@@ -151,7 +151,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       key: 'app_version',
       header: 'App Version',
       render: (r) => (
-        <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#D4AF37]/15 text-[#DFB847] border border-[#D4AF37]/30">
+        <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
           v{r.app_version || '1.0.0'}
         </span>
       ),
@@ -160,23 +160,23 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       key: 'hardware',
       header: 'Battery & Network',
       render: (r) => (
-        <div className="flex items-center gap-3 text-xs text-neutral-300 light:text-slate-600">
+        <div className="flex items-center gap-3 text-xs text-neutral-600">
           {r.battery_level !== null && r.battery_level !== undefined ? (
             <div className="flex items-center gap-1">
               {r.is_charging ? (
-                <BatteryCharging className="w-3.5 h-3.5 text-emerald-400" />
+                <BatteryCharging className="w-3.5 h-3.5 text-emerald-600" />
               ) : (
                 <Battery className="w-3.5 h-3.5 text-neutral-400" />
               )}
               <span className="font-mono text-[11px]">{r.battery_level}%</span>
             </div>
           ) : (
-            <span className="text-neutral-500 text-[11px]">—</span>
+            <span className="text-neutral-400 text-[11px]">—</span>
           )}
 
           {r.network_type && (
-            <div className="flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-400">
-              <Wifi className="w-3 h-3 text-[#D9A441]" />
+            <div className="flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-500">
+              <Wifi className="w-3 h-3 text-[#D4AF37]" />
               <span>{r.network_type}</span>
             </div>
           )}
@@ -187,7 +187,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       key: 'created_at',
       header: 'Recorded At',
       render: (r) => (
-        <span className="font-mono text-xs text-neutral-400">
+        <span className="font-mono text-xs text-neutral-500">
           {formatDateTime(r.created_at)}
         </span>
       ),
@@ -201,9 +201,9 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             e.stopPropagation();
             setSelectedRecord(r);
           }}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#2D3154] bg-[#161826] text-neutral-300 hover:text-white hover:border-[#D9A441] transition-colors"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-700 hover:text-neutral-900 hover:border-[#D4AF37] shadow-xs transition-colors"
         >
-          <Eye className="w-3.5 h-3.5 text-[#D9A441]" />
+          <Eye className="w-3.5 h-3.5 text-[#D4AF37]" />
           <span>Inspect</span>
         </button>
       ),
@@ -217,15 +217,15 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Smartphone className="w-5 h-5 text-[#D9A441]" />
-            <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+            <Smartphone className="w-5 h-5 text-[#D4AF37]" />
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               App Version &amp; Hardware Telemetry
             </h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Supabase public.telemetry
             </span>
           </div>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
+          <p className="text-xs text-neutral-500 mt-0.5">
             Realtime mobile fleet telemetry events, client installations, and version adoption from live Postgres table.
           </p>
         </div>
@@ -234,9 +234,9 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#2D3154] light:border-slate-300 bg-[#1E2136] light:bg-white text-xs font-semibold text-neutral-300 hover:text-white hover:border-[#D9A441] transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-700 hover:text-neutral-900 hover:border-[#D4AF37] shadow-xs transition-colors"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#D9A441] ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-[#D4AF37] ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh Telemetry</span>
             </button>
           )}
@@ -272,14 +272,14 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-between border-b-2 border-[#D4AF37]/30 pb-3 text-xs">
+      <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3 text-xs">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('devices')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'devices'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                : 'text-neutral-400 hover:text-white light:text-slate-600 light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE]'
+                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900 shadow-xs border border-[#D4AF37]'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
             <Activity className="w-4 h-4" />
@@ -290,8 +290,8 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             onClick={() => setActiveTab('versions')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'versions'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                : 'text-neutral-400 hover:text-white light:text-slate-600 light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE]'
+                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900 shadow-xs border border-[#D4AF37]'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
             <GitBranch className="w-4 h-4" />
@@ -302,8 +302,8 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             onClick={() => setActiveTab('clients')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'clients'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                : 'text-neutral-400 hover:text-white light:text-slate-600 light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE]'
+                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900 shadow-xs border border-[#D4AF37]'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -312,15 +312,15 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
         </div>
 
         {activeTab === 'devices' && (
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#161826] border border-[#2D3154] text-xs">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100 border border-[#E5E7EB] text-xs">
             {(['all', 'android', 'ios'] as const).map((plat) => (
               <button
                 key={plat}
                 onClick={() => setPlatformFilter(plat)}
                 className={`px-3 py-1 rounded-lg font-medium capitalize transition-colors ${
                   platformFilter === plat
-                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] font-bold'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-white text-neutral-900 shadow-xs font-bold'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 {plat}
@@ -358,34 +358,34 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
               {versionDistribution.map((v) => (
                 <div
                   key={v.version}
-                  className="p-5 rounded-2xl border border-[#2D3154] bg-[#1E2136] light:bg-white space-y-3"
+                  className="p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm font-bold text-white light:text-slate-900">
+                    <span className="font-mono text-sm font-bold text-neutral-900">
                       Build v{v.version}
                     </span>
-                    <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#D4AF37]/20 text-[#DFB847] border border-[#D4AF37]/40">
+                    <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
                       {v.percentage}%
                     </span>
                   </div>
-                  <div className="w-full bg-[#161826] rounded-full h-2 overflow-hidden border border-[#2D3154]">
+                  <div className="w-full bg-neutral-100 rounded-full h-2 overflow-hidden border border-neutral-200">
                     <div
-                      className="bg-gradient-to-r from-[#D4AF37] to-[#DFB847] h-full rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-[#D4AF37] to-[#C5A059] h-full rounded-full transition-all duration-500"
                       style={{ width: `${v.percentage}%` }}
                     />
                   </div>
-                  <div className="text-xs text-neutral-400">
-                    <span className="text-white light:text-slate-900 font-semibold">{v.count}</span> total telemetry pings recorded
+                  <div className="text-xs text-neutral-500">
+                    <span className="text-neutral-900 font-semibold">{v.count}</span> total telemetry pings recorded
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center rounded-2xl border border-[#2D3154] bg-[#1E2136] space-y-2">
-              <GitBranch className="w-8 h-8 text-neutral-500 mx-auto" />
-              <div className="text-sm font-semibold text-white">No version telemetry recorded yet</div>
-              <p className="text-xs text-neutral-400 max-w-md mx-auto">
-                Once mobile apps upload telemetry to <code className="text-[#D9A441] font-mono">public.telemetry</code>, version adoption percentages will calculate dynamically.
+            <div className="p-8 text-center rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-2">
+              <GitBranch className="w-8 h-8 text-neutral-400 mx-auto" />
+              <div className="text-sm font-semibold text-neutral-900">No version telemetry recorded yet</div>
+              <p className="text-xs text-neutral-500 max-w-md mx-auto">
+                Once mobile apps upload telemetry to <code className="text-[#B8860B] font-mono">public.telemetry</code>, version adoption percentages will calculate dynamically.
               </p>
             </div>
           )}
@@ -395,33 +395,33 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       {/* Tab 3: Workspace Mobile Clients */}
       {activeTab === 'clients' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-3">
+          <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-sm text-white light:text-slate-900">StyleFleet Android Client</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="font-bold text-sm text-neutral-900">StyleFleet Android Client</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
                 Target: Android 14+
               </span>
             </div>
-            <div className="space-y-1.5 text-xs text-neutral-300 light:text-slate-700">
-              <div>Framework: <span className="font-mono text-white light:text-slate-900">React Native 0.76 / Expo SDK 52</span></div>
-              <div>Client Type: <span className="font-mono text-[#D9A441]">StyleFleet Mobile Client</span></div>
-              <div>Telemetry Target: <span className="font-mono text-emerald-400">public.telemetry</span></div>
-              <div>Status: <span className="text-emerald-400 font-semibold">Active Supabase Sink</span></div>
+            <div className="space-y-1.5 text-xs text-neutral-600">
+              <div>Framework: <span className="font-mono text-neutral-900">React Native 0.76 / Expo SDK 52</span></div>
+              <div>Client Type: <span className="font-mono text-[#B8860B]">StyleFleet Mobile Client</span></div>
+              <div>Telemetry Target: <span className="font-mono text-emerald-700">public.telemetry</span></div>
+              <div>Status: <span className="text-emerald-700 font-semibold">Active Supabase Sink</span></div>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-3">
+          <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-sm text-white light:text-slate-900">StyleFleet iOS Client</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="font-bold text-sm text-neutral-900">StyleFleet iOS Client</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
                 Target: iOS 16.0+
               </span>
             </div>
-            <div className="space-y-1.5 text-xs text-neutral-300 light:text-slate-700">
-              <div>Framework: <span className="font-mono text-white light:text-slate-900">Xcode 16 / React Native</span></div>
-              <div>Bundle ID: <span className="font-mono text-[#D9A441]">com.stylefleet.ios</span></div>
-              <div>Telemetry Target: <span className="font-mono text-blue-400">public.telemetry</span></div>
-              <div>Status: <span className="text-blue-400 font-semibold">Ready in Workspace</span></div>
+            <div className="space-y-1.5 text-xs text-neutral-600">
+              <div>Framework: <span className="font-mono text-neutral-900">Xcode 16 / React Native</span></div>
+              <div>Bundle ID: <span className="font-mono text-[#B8860B]">com.stylefleet.ios</span></div>
+              <div>Telemetry Target: <span className="font-mono text-[#B8860B]">public.telemetry</span></div>
+              <div>Status: <span className="text-neutral-900 font-semibold">Ready in Workspace</span></div>
             </div>
           </div>
         </div>
@@ -437,40 +437,40 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       >
         {selectedRecord && (
           <div className="space-y-5 text-xs">
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#2D3154] bg-[#161826]">
+            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#E5E7EB] bg-[#F8F9FA]">
               <div>
-                <span className="text-neutral-400 block text-[11px]">Device ID</span>
-                <span className="font-mono text-white font-semibold">{selectedRecord.device_id}</span>
+                <span className="text-neutral-500 block text-[11px]">Device ID</span>
+                <span className="font-mono text-neutral-900 font-semibold">{selectedRecord.device_id}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Device Name</span>
-                <span className="text-white font-semibold">{selectedRecord.device_name || 'Generic Device'}</span>
+                <span className="text-neutral-500 block text-[11px]">Device Name</span>
+                <span className="text-neutral-900 font-semibold">{selectedRecord.device_name || 'Generic Device'}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Platform</span>
-                <span className="text-[#DFB847] font-semibold uppercase">{selectedRecord.platform}</span>
+                <span className="text-neutral-500 block text-[11px]">Platform</span>
+                <span className="text-[#B8860B] font-semibold uppercase">{selectedRecord.platform}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">App Version</span>
-                <span className="font-mono text-white">v{selectedRecord.app_version}</span>
+                <span className="text-neutral-500 block text-[11px]">App Version</span>
+                <span className="font-mono text-neutral-900">v{selectedRecord.app_version}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Battery Status</span>
-                <span className="text-white">
+                <span className="text-neutral-500 block text-[11px]">Battery Status</span>
+                <span className="text-neutral-900">
                   {selectedRecord.battery_level !== null ? `${selectedRecord.battery_level}%` : 'N/A'}{' '}
                   {selectedRecord.is_charging ? '(Charging)' : ''}
                 </span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Network Type</span>
-                <span className="font-mono text-white uppercase">{selectedRecord.network_type || 'N/A'}</span>
+                <span className="text-neutral-500 block text-[11px]">Network Type</span>
+                <span className="font-mono text-neutral-900 uppercase">{selectedRecord.network_type || 'N/A'}</span>
               </div>
             </div>
 
             {selectedRecord.metadata && (
               <div className="space-y-2">
-                <span className="font-bold text-neutral-300">Raw Metadata JSON:</span>
-                <pre className="p-3 rounded-xl bg-[#161826] border border-[#2D3154] text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-48">
+                <span className="font-bold text-neutral-700">Raw Metadata JSON:</span>
+                <pre className="p-3 rounded-xl bg-[#111827] border border-neutral-800 text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-48">
                   {JSON.stringify(selectedRecord.metadata, null, 2)}
                 </pre>
               </div>

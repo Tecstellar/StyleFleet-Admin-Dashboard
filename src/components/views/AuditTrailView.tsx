@@ -118,10 +118,10 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       key: 'type',
       header: 'Operation Type',
       render: (item) => {
-        let colorClass = 'bg-[#D9A441]/20 text-[#D9A441] border-[#D9A441]/30';
-        if (item.type === 'Payment') colorClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-        if (item.type === 'Deletion') colorClass = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
-        if (item.type === 'Booking') colorClass = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+        let colorClass = 'bg-[#FAF7EE] text-[#B8860B] border-[#E8DEC4]';
+        if (item.type === 'Payment') colorClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        if (item.type === 'Deletion') colorClass = 'bg-rose-50 text-rose-700 border-rose-200';
+        if (item.type === 'Booking') colorClass = 'bg-[#111827] text-white border-[#111827]';
 
         return (
           <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono border font-semibold ${colorClass}`}>
@@ -134,7 +134,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       key: 'entity',
       header: 'Associated Entity',
       render: (item) => (
-        <span className="font-semibold text-white light:text-slate-900">
+        <span className="font-semibold text-neutral-900">
           {item.entity}
         </span>
       ),
@@ -143,7 +143,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       key: 'description',
       header: 'Audit Description',
       render: (item) => (
-        <span className="text-neutral-300 light:text-slate-700">
+        <span className="text-neutral-700">
           {item.description}
         </span>
       ),
@@ -157,7 +157,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       key: 'timestamp',
       header: 'Timestamp',
       render: (item) => (
-        <span className="font-mono text-xs text-neutral-400">
+        <span className="font-mono text-xs text-neutral-500">
           {formatDateTime(item.timestamp)}
         </span>
       ),
@@ -169,12 +169,12 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-[#D9A441]" />
-            <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+            <History className="w-5 h-5 text-[#B8860B]" />
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               Platform Audit Trail
             </h1>
           </div>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
+          <p className="text-xs text-neutral-500 mt-0.5">
             Verified chronological log of transactional mutations, registrations, payments, and account deletions.
           </p>
         </div>

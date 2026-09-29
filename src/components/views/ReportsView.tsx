@@ -72,12 +72,12 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <FileBarChart className="w-5 h-5 text-[#D9A441]" />
-            <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+            <FileBarChart className="w-5 h-5 text-[#B8860B]" />
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               Audit &amp; Intelligence Reports
             </h1>
           </div>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
+          <p className="text-xs text-neutral-500 mt-0.5">
             Strictly compiled from real Supabase records within the active date filter ({dateRange.label}).
           </p>
         </div>
@@ -107,7 +107,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
       </div>
 
       {/* Report Categories Navigation */}
-      <div className="flex items-center gap-2 border-b border-[#2D3154] light:border-slate-200 pb-3 overflow-x-auto text-xs">
+      <div className="flex items-center gap-2 border-b border-[#E5E7EB] pb-3 overflow-x-auto text-xs">
         {[
           { id: 'salons', label: `Salon Registrations (${filteredShops.length})`, icon: Store },
           { id: 'financial', label: `Billing & Revenue (${filteredBills.length})`, icon: CreditCard },
@@ -123,11 +123,11 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
               onClick={() => setReportType(tab.id as any)}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-medium transition-colors shrink-0 ${
                 isActive
-                  ? 'bg-[#D9A441] text-[#161826] font-semibold shadow-sm'
-                  : 'text-neutral-400 hover:text-white light:hover:text-slate-900 hover:bg-[#1E2136] light:hover:bg-slate-100'
+                  ? 'bg-[#111827] text-white font-semibold shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>{tab.label}</span>
             </button>
           );
@@ -137,16 +137,16 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
       {/* REPORT CONTENT */}
       {reportType === 'salons' && (
         <div className="space-y-4">
-          <div className="rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white overflow-hidden text-xs">
-            <div className="p-4 border-b border-[#2D3154] flex justify-between items-center">
-              <h3 className="font-semibold text-white light:text-slate-900">
+          <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden text-xs shadow-xs">
+            <div className="p-4 border-b border-[#E5E7EB] flex justify-between items-center">
+              <h3 className="font-semibold text-neutral-900">
                 Salon Registration Log
               </h3>
-              <span className="font-mono text-neutral-400">{filteredShops.length} records in range</span>
+              <span className="font-mono text-neutral-500">{filteredShops.length} records in range</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-[#161826]/70 light:bg-slate-50 border-b border-[#2D3154] text-neutral-400 uppercase text-[10px]">
+                <thead className="bg-[#F8F9FA] border-b border-[#E5E7EB] text-neutral-500 uppercase text-[10px]">
                   <tr>
                     <th className="px-4 py-3">Salon</th>
                     <th className="px-4 py-3">Phone</th>
@@ -155,21 +155,21 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                     <th className="px-4 py-3">Registration Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2D3154]/40">
+                <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredShops.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-neutral-400">
+                      <td colSpan={5} className="p-8 text-center text-neutral-500">
                         No salon registrations in this date window.
                       </td>
                     </tr>
                   ) : (
                     filteredShops.map((s) => (
-                      <tr key={s.id} className="hover:bg-[#20243b]/40">
-                        <td className="px-4 py-3 font-semibold text-white light:text-slate-900">{s.name}</td>
-                        <td className="px-4 py-3 font-mono text-neutral-300">{s.phone || '—'}</td>
-                        <td className="px-4 py-3 text-neutral-300">{s.city || '—'}</td>
-                        <td className="px-4 py-3 text-neutral-400 truncate max-w-xs">{s.address || '—'}</td>
-                        <td className="px-4 py-3 font-mono text-neutral-400">{formatDateTime(s.created_at)}</td>
+                      <tr key={s.id} className="hover:bg-[#FAF7EE] transition-colors">
+                        <td className="px-4 py-3 font-semibold text-neutral-900">{s.name}</td>
+                        <td className="px-4 py-3 font-mono text-neutral-700">{s.phone || '—'}</td>
+                        <td className="px-4 py-3 text-neutral-700">{s.city || '—'}</td>
+                        <td className="px-4 py-3 text-neutral-500 truncate max-w-xs">{s.address || '—'}</td>
+                        <td className="px-4 py-3 font-mono text-neutral-500">{formatDateTime(s.created_at)}</td>
                       </tr>
                     ))
                   )}
@@ -182,16 +182,16 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
 
       {reportType === 'financial' && (
         <div className="space-y-4">
-          <div className="rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white overflow-hidden text-xs">
-            <div className="p-4 border-b border-[#2D3154] flex justify-between items-center">
-              <h3 className="font-semibold text-white light:text-slate-900">
+          <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden text-xs shadow-xs">
+            <div className="p-4 border-b border-[#E5E7EB] flex justify-between items-center">
+              <h3 className="font-semibold text-neutral-900">
                 Salon Invoice Activity Report
               </h3>
-              <span className="font-mono text-neutral-400">{filteredBills.length} invoices in range</span>
+              <span className="font-mono text-neutral-500">{filteredBills.length} invoices in range</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-[#161826]/70 light:bg-slate-50 border-b border-[#2D3154] text-neutral-400 uppercase text-[10px]">
+                <thead className="bg-[#F8F9FA] border-b border-[#E5E7EB] text-neutral-500 uppercase text-[10px]">
                   <tr>
                     <th className="px-4 py-3">Invoice Number</th>
                     <th className="px-4 py-3">Salon</th>
@@ -200,23 +200,23 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                     <th className="px-4 py-3">Date Issued</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2D3154]/40">
+                <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredBills.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-neutral-400">
+                      <td colSpan={5} className="p-8 text-center text-neutral-500">
                         No billing records in this date window.
                       </td>
                     </tr>
                   ) : (
                     filteredBills.map((b) => (
-                      <tr key={b.id} className="hover:bg-[#20243b]/40">
-                        <td className="px-4 py-3 font-mono font-semibold text-[#D9A441]">{b.invoice_number}</td>
-                        <td className="px-4 py-3 text-white light:text-slate-900">{b.shop?.name || b.shop_id}</td>
-                        <td className="px-4 py-3 font-mono font-semibold text-white light:text-slate-900">
+                      <tr key={b.id} className="hover:bg-[#FAF7EE] transition-colors">
+                        <td className="px-4 py-3 font-mono font-semibold text-[#B8860B]">{b.invoice_number}</td>
+                        <td className="px-4 py-3 text-neutral-900">{b.shop?.name || b.shop_id}</td>
+                        <td className="px-4 py-3 font-mono font-semibold text-neutral-900">
                           {formatCurrency(b.total_minor)}
                         </td>
-                        <td className="px-4 py-3 uppercase text-[11px] font-mono text-neutral-300">{b.status}</td>
-                        <td className="px-4 py-3 font-mono text-neutral-400">{formatDateTime(b.issued_at)}</td>
+                        <td className="px-4 py-3 uppercase text-[11px] font-mono text-neutral-700">{b.status}</td>
+                        <td className="px-4 py-3 font-mono text-neutral-500">{formatDateTime(b.issued_at)}</td>
                       </tr>
                     ))
                   )}
@@ -229,16 +229,16 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
 
       {reportType === 'appointments' && (
         <div className="space-y-4">
-          <div className="rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white overflow-hidden text-xs">
-            <div className="p-4 border-b border-[#2D3154] flex justify-between items-center">
-              <h3 className="font-semibold text-white light:text-slate-900">
+          <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden text-xs shadow-xs">
+            <div className="p-4 border-b border-[#E5E7EB] flex justify-between items-center">
+              <h3 className="font-semibold text-neutral-900">
                 Salon Bookings &amp; Appointments Report
               </h3>
-              <span className="font-mono text-neutral-400">{filteredAppts.length} bookings in range</span>
+              <span className="font-mono text-neutral-500">{filteredAppts.length} bookings in range</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-[#161826]/70 light:bg-slate-50 border-b border-[#2D3154] text-neutral-400 uppercase text-[10px]">
+                <thead className="bg-[#F8F9FA] border-b border-[#E5E7EB] text-neutral-500 uppercase text-[10px]">
                   <tr>
                     <th className="px-4 py-3">Scheduled Time</th>
                     <th className="px-4 py-3">Salon</th>
@@ -247,21 +247,21 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                     <th className="px-4 py-3">Duration</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2D3154]/40">
+                <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredAppts.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-neutral-400">
+                      <td colSpan={5} className="p-8 text-center text-neutral-500">
                         No appointments booked in this date window.
                       </td>
                     </tr>
                   ) : (
                     filteredAppts.map((a) => (
-                      <tr key={a.id} className="hover:bg-[#20243b]/40">
-                        <td className="px-4 py-3 font-mono text-white">{formatDateTime(a.starts_at)}</td>
-                        <td className="px-4 py-3 text-neutral-300">{a.shop?.name || a.shop_id}</td>
-                        <td className="px-4 py-3 text-neutral-300">{a.customer?.name || 'Walk-in'}</td>
-                        <td className="px-4 py-3 text-neutral-300">{a.status}</td>
-                        <td className="px-4 py-3 font-mono text-neutral-400">{a.duration_minutes} mins</td>
+                      <tr key={a.id} className="hover:bg-[#FAF7EE] transition-colors">
+                        <td className="px-4 py-3 font-mono text-neutral-900">{formatDateTime(a.starts_at)}</td>
+                        <td className="px-4 py-3 text-neutral-700">{a.shop?.name || a.shop_id}</td>
+                        <td className="px-4 py-3 text-neutral-700">{a.customer?.name || 'Walk-in'}</td>
+                        <td className="px-4 py-3 text-neutral-700">{a.status}</td>
+                        <td className="px-4 py-3 font-mono text-neutral-500">{a.duration_minutes} mins</td>
                       </tr>
                     ))
                   )}
@@ -274,16 +274,16 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
 
       {reportType === 'deletions' && (
         <div className="space-y-4">
-          <div className="rounded-xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white overflow-hidden text-xs">
-            <div className="p-4 border-b border-[#2D3154] flex justify-between items-center">
-              <h3 className="font-semibold text-white light:text-slate-900">
+          <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden text-xs shadow-xs">
+            <div className="p-4 border-b border-[#E5E7EB] flex justify-between items-center">
+              <h3 className="font-semibold text-neutral-900">
                 Account Deletion &amp; Churn Report
               </h3>
-              <span className="font-mono text-rose-400">{filteredDeletions.length} deletions in range</span>
+              <span className="font-mono text-rose-600 font-semibold">{filteredDeletions.length} deletions in range</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-[#161826]/70 light:bg-slate-50 border-b border-[#2D3154] text-neutral-400 uppercase text-[10px]">
+                <thead className="bg-[#F8F9FA] border-b border-[#E5E7EB] text-neutral-500 uppercase text-[10px]">
                   <tr>
                     <th className="px-4 py-3">Salon Name</th>
                     <th className="px-4 py-3">Phone</th>
@@ -292,21 +292,21 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                     <th className="px-4 py-3">Date Processed</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2D3154]/40">
+                <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredDeletions.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-neutral-400">
+                      <td colSpan={5} className="p-8 text-center text-neutral-500">
                         No account deletion records in this date window.
                       </td>
                     </tr>
                   ) : (
                     filteredDeletions.map((d) => (
-                      <tr key={d.id} className="hover:bg-[#20243b]/40">
-                        <td className="px-4 py-3 font-semibold text-white light:text-slate-900">{d.shop_name || '—'}</td>
-                        <td className="px-4 py-3 font-mono text-neutral-300">{d.phone || '—'}</td>
-                        <td className="px-4 py-3 text-rose-300">{d.reason || 'Unspecified'}</td>
-                        <td className="px-4 py-3 font-mono uppercase text-[11px] text-neutral-300">{d.status}</td>
-                        <td className="px-4 py-3 font-mono text-neutral-400">{formatDateTime(d.deleted_at)}</td>
+                      <tr key={d.id} className="hover:bg-[#FAF7EE] transition-colors">
+                        <td className="px-4 py-3 font-semibold text-neutral-900">{d.shop_name || '—'}</td>
+                        <td className="px-4 py-3 font-mono text-neutral-700">{d.phone || '—'}</td>
+                        <td className="px-4 py-3 text-rose-700 font-medium">{d.reason || 'Unspecified'}</td>
+                        <td className="px-4 py-3 font-mono uppercase text-[11px] text-neutral-700">{d.status}</td>
+                        <td className="px-4 py-3 font-mono text-neutral-500">{formatDateTime(d.deleted_at)}</td>
                       </tr>
                     ))
                   )}

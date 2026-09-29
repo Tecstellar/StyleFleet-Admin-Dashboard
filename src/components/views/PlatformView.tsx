@@ -7,12 +7,12 @@ export const PlatformView: React.FC = () => {
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-2">
-          <Smartphone className="w-5 h-5 text-[#D9A441]" />
-          <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+          <Smartphone className="w-5 h-5 text-[#D4AF37]" />
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900">
             Platform &amp; Device Ecosystem
           </h1>
         </div>
-        <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
+        <p className="text-xs text-neutral-500 mt-0.5">
           Real-time operating system breakdown, hardware fragmentation, and device support.
         </p>
       </div>
@@ -26,62 +26,62 @@ export const PlatformView: React.FC = () => {
 
       {/* Target Platforms from verified codebase */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-3">
+        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-sm">
               🤖
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white light:text-slate-900">
+              <h3 className="text-sm font-semibold text-neutral-900">
                 Android Ecosystem
               </h3>
-              <p className="text-xs text-neutral-400 light:text-slate-500">
+              <p className="text-xs text-neutral-500">
                 Primary production mobile app
               </p>
             </div>
           </div>
-          <div className="space-y-1.5 text-xs text-neutral-300 light:text-slate-700">
+          <div className="space-y-1.5 text-xs text-neutral-700">
             <div className="flex justify-between">
-              <span className="text-neutral-400">Framework:</span>
-              <span className="font-mono">React Native / Expo SDK 52</span>
+              <span className="text-neutral-500">Framework:</span>
+              <span className="font-mono text-neutral-900">React Native / Expo SDK 52</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-400">Architecture:</span>
-              <span className="font-mono">Android Gradle / Kotlin</span>
+              <span className="text-neutral-500">Architecture:</span>
+              <span className="font-mono text-neutral-900">Android Gradle / Kotlin</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-400">SMS Verification:</span>
-              <span className="font-mono">2Factor SMS Integration</span>
+              <span className="text-neutral-500">SMS Verification:</span>
+              <span className="font-mono text-neutral-900">2Factor SMS Integration</span>
             </div>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-3">
+        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">
+            <div className="w-9 h-9 rounded-xl bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4] flex items-center justify-center font-bold text-sm">
               <Apple className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white light:text-slate-900">
+              <h3 className="text-sm font-semibold text-neutral-900">
                 iOS Ecosystem
               </h3>
-              <p className="text-xs text-neutral-400 light:text-slate-500">
+              <p className="text-xs text-neutral-500">
                 Apple iPhone &amp; iPad client
               </p>
             </div>
           </div>
-          <div className="space-y-1.5 text-xs text-neutral-300 light:text-slate-700">
+          <div className="space-y-1.5 text-xs text-neutral-700">
             <div className="flex justify-between">
-              <span className="text-neutral-400">Framework:</span>
-              <span className="font-mono">React Native / Xcode Workspace</span>
+              <span className="text-neutral-500">Framework:</span>
+              <span className="font-mono text-neutral-900">React Native / Xcode Workspace</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-400">Target OS:</span>
-              <span className="font-mono">iOS 16.0+</span>
+              <span className="text-neutral-500">Target OS:</span>
+              <span className="font-mono text-neutral-900">iOS 16.0+</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-400">Biometrics:</span>
-              <span className="font-mono">Face ID / Touch ID Ready</span>
+              <span className="text-neutral-500">Biometrics:</span>
+              <span className="font-mono text-neutral-900">Face ID / Touch ID Ready</span>
             </div>
           </div>
         </div>

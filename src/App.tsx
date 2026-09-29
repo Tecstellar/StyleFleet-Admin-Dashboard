@@ -292,7 +292,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#161826] light:bg-[#F4F5F9] text-white light:text-slate-900 transition-colors">
+    <div className="flex min-h-screen bg-[#F8F9FA] text-[#111827] transition-colors">
       {/* Left Sidebar — Exact 9 options */}
       <Sidebar
         currentView={currentView}

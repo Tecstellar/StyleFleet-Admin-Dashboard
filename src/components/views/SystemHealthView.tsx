@@ -82,8 +82,8 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       key: 'component',
       header: 'Component / Service',
       render: (r) => (
-        <div className="font-semibold text-white light:text-slate-900 flex items-center gap-2">
-          <Server className="w-3.5 h-3.5 text-[#D9A441]" />
+        <div className="font-semibold text-neutral-900 flex items-center gap-2">
+          <Server className="w-3.5 h-3.5 text-[#B8860B]" />
           <span>{r.component}</span>
         </div>
       ),
@@ -98,15 +98,15 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border ${
               isOp
-                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                 : isDegraded
-                ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-rose-50 text-rose-700 border-rose-200'
             }`}
           >
             <span
               className={`w-1.5 h-1.5 rounded-full ${
-                isOp ? 'bg-emerald-400' : isDegraded ? 'bg-amber-400' : 'bg-rose-400'
+                isOp ? 'bg-emerald-500' : isDegraded ? 'bg-amber-500' : 'bg-rose-500'
               }`}
             />
             <span>{r.status || 'unknown'}</span>
@@ -120,8 +120,8 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       render: (r) => {
         const shopName = r.shop?.name || shops.find((s) => s.id === r.shop_id)?.name || 'Global System';
         return (
-          <div className="flex items-center gap-1.5 text-xs text-neutral-300 light:text-slate-600">
-            <Store className="w-3 h-3 text-[#D9A441]" />
+          <div className="flex items-center gap-1.5 text-xs text-neutral-700">
+            <Store className="w-3 h-3 text-[#B8860B]" />
             <span className="truncate max-w-[140px]">{shopName}</span>
           </div>
         );
@@ -131,7 +131,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       key: 'latency_ms',
       header: 'Latency',
       render: (r) => (
-        <span className="font-mono text-xs text-neutral-300">
+        <span className="font-mono text-xs text-neutral-700">
           {r.latency_ms !== null && r.latency_ms !== undefined ? `${r.latency_ms} ms` : '—'}
         </span>
       ),
@@ -140,7 +140,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       key: 'created_at',
       header: 'Last Checked',
       render: (r) => (
-        <span className="font-mono text-xs text-neutral-400">
+        <span className="font-mono text-xs text-neutral-500">
           {formatDateTime(r.timestamp || r.created_at)}
         </span>
       ),
@@ -154,9 +154,9 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
             e.stopPropagation();
             setSelectedHealth(r);
           }}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#2D3154] bg-[#161826] text-neutral-300 hover:text-white hover:border-[#D9A441] transition-colors"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-800 hover:border-[#D4AF37] hover:text-[#B8860B] shadow-xs transition-colors"
         >
-          <Eye className="w-3.5 h-3.5 text-[#D9A441]" />
+          <Eye className="w-3.5 h-3.5 text-[#B8860B]" />
           <span>Inspect</span>
         </button>
       ),
@@ -177,10 +177,10 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
           <span
             className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider border ${
               isErr
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                ? 'bg-rose-50 text-rose-700 border-rose-200'
                 : isWarn
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-[#FAF7EE] text-[#B8860B] border-[#E8DEC4]'
             }`}
           >
             {lvl}
@@ -192,7 +192,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       key: 'tag',
       header: 'Tag / Domain',
       render: (l) => (
-        <span className="font-mono text-xs font-semibold text-[#D9A441]">
+        <span className="font-mono text-xs font-semibold text-[#B8860B]">
           {l.tag || 'SYSTEM'}
         </span>
       ),
@@ -201,7 +201,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       key: 'message',
       header: 'Log Message',
       render: (l) => (
-        <div className="text-xs text-neutral-200 light:text-slate-800 font-mono truncate max-w-md">
+        <div className="text-xs text-neutral-800 font-mono truncate max-w-md">
           {l.message}
         </div>
       ),
@@ -212,8 +212,8 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       render: (l) => {
         const shopName = l.shop?.name || shops.find((s) => s.id === l.shop_id)?.name;
         return (
-          <div className="text-[11px] text-neutral-400">
-            {shopName && <div className="text-white truncate max-w-[120px]">{shopName}</div>}
+          <div className="text-[11px] text-neutral-500">
+            {shopName && <div className="text-neutral-900 truncate max-w-[120px]">{shopName}</div>}
             {l.device_id && <div className="font-mono truncate max-w-[120px]">Dev: {l.device_id.slice(0, 8)}</div>}
             {!shopName && !l.device_id && <span>Global Server</span>}
           </div>
@@ -224,7 +224,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       key: 'created_at',
       header: 'Timestamp',
       render: (l) => (
-        <span className="font-mono text-xs text-neutral-400">
+        <span className="font-mono text-xs text-neutral-500">
           {formatDateTime(l.created_at)}
         </span>
       ),
@@ -238,9 +238,9 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
             e.stopPropagation();
             setSelectedLog(l);
           }}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#2D3154] bg-[#161826] text-neutral-300 hover:text-white hover:border-[#D9A441] transition-colors"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-800 hover:border-[#D4AF37] hover:text-[#B8860B] shadow-xs transition-colors"
         >
-          <Eye className="w-3.5 h-3.5 text-[#D9A441]" />
+          <Eye className="w-3.5 h-3.5 text-[#B8860B]" />
           <span>Inspect</span>
         </button>
       ),
@@ -254,15 +254,15 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               System Health &amp; Infrastructure
             </h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Supabase public.system_health &amp; logs
             </span>
           </div>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
+          <p className="text-xs text-neutral-500 mt-0.5">
             Realtime database connectivity, operational component statuses, and application exception logs.
           </p>
         </div>
@@ -275,9 +275,9 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
                 onRefresh();
               }}
               disabled={isChecking || loading}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#2D3154] light:border-slate-300 bg-[#1E2136] light:bg-white text-xs font-semibold text-neutral-200 light:text-slate-700 hover:border-[#D9A441] transition-colors"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-800 hover:border-[#D4AF37] hover:text-[#B8860B] transition-colors shadow-xs"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#D9A441] ${isChecking || loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-[#B8860B] ${isChecking || loading ? 'animate-spin' : ''}`} />
               <span>Ping &amp; Refresh</span>
             </button>
           )}
@@ -286,63 +286,63 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
 
       {/* Live Health Gauges */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-2">
+        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-neutral-400">Database Status</span>
+            <span className="text-xs font-semibold uppercase text-neutral-500">Database Status</span>
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
           </div>
-          <div className="text-xl font-bold text-white light:text-slate-900 font-mono flex items-center gap-2">
+          <div className="text-xl font-bold text-neutral-900 font-mono flex items-center gap-2">
             <span>Operational</span>
           </div>
-          <p className="text-[11px] text-neutral-400 truncate">Postgres Cluster (scgokpcoyfewrtrwqxpu)</p>
+          <p className="text-[11px] text-neutral-500 truncate">Postgres Cluster (scgokpcoyfewrtrwqxpu)</p>
         </div>
 
-        <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-2">
+        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-neutral-400">REST API Latency</span>
-            <Wifi className="w-4 h-4 text-[#D9A441]" />
+            <span className="text-xs font-semibold uppercase text-neutral-500">REST API Latency</span>
+            <Wifi className="w-4 h-4 text-[#B8860B]" />
           </div>
-          <div className="text-xl font-bold text-[#D9A441] font-mono">
+          <div className="text-xl font-bold text-[#B8860B] font-mono">
             {latency !== null ? `${latency} ms` : 'Testing...'}
           </div>
-          <p className="text-[11px] text-neutral-400">Round-trip REST API response</p>
+          <p className="text-[11px] text-neutral-500">Round-trip REST API response</p>
         </div>
 
-        <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-2">
+        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-neutral-400">Monitored Components</span>
-            <Server className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs font-semibold uppercase text-neutral-500">Monitored Components</span>
+            <Server className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-xl font-bold text-white light:text-slate-900 font-mono">
+          <div className="text-xl font-bold text-neutral-900 font-mono">
             {healthRecords.length}
           </div>
-          <p className="text-[11px] text-neutral-400">Records in public.system_health</p>
+          <p className="text-[11px] text-neutral-500">Records in public.system_health</p>
         </div>
 
-        <div className="p-5 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white space-y-2">
+        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-neutral-400">Exceptions &amp; Errors</span>
-            <AlertCircle className={`w-4 h-4 ${errorLogsCount > 0 ? 'text-rose-400' : 'text-neutral-400'}`} />
+            <span className="text-xs font-semibold uppercase text-neutral-500">Exceptions &amp; Errors</span>
+            <AlertCircle className={`w-4 h-4 ${errorLogsCount > 0 ? 'text-rose-500' : 'text-neutral-400'}`} />
           </div>
-          <div className={`text-xl font-bold font-mono ${errorLogsCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-            {errorLogsCount} <span className="text-xs font-normal text-neutral-400">/ {logs.length} total logs</span>
+          <div className={`text-xl font-bold font-mono ${errorLogsCount > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+            {errorLogsCount} <span className="text-xs font-normal text-neutral-500">/ {logs.length} total logs</span>
           </div>
-          <p className="text-[11px] text-neutral-400">Recorded in public.system_logs</p>
+          <p className="text-[11px] text-neutral-500">Recorded in public.system_logs</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-between border-b-2 border-[#D4AF37]/30 pb-3 text-xs">
+      <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3 text-xs">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('components')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'components'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                : 'text-neutral-400 hover:text-white light:text-slate-600 light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE]'
+                ? 'bg-[#111827] text-white shadow-xs border border-[#111827]'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
             }`}
           >
-            <Server className="w-4 h-4" />
+            <Server className="w-4 h-4 text-[#D4AF37]" />
             <span>Health Components ({healthRecords.length})</span>
           </button>
 
@@ -350,11 +350,11 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
             onClick={() => setActiveTab('logs')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'logs'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                : 'text-neutral-400 hover:text-white light:text-slate-600 light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE]'
+                ? 'bg-[#111827] text-white shadow-xs border border-[#111827]'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
             }`}
           >
-            <Activity className="w-4 h-4" />
+            <Activity className="w-4 h-4 text-[#D4AF37]" />
             <span>System Logs &amp; Exceptions ({filteredLogs.length})</span>
           </button>
 
@@ -362,25 +362,25 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
             onClick={() => setActiveTab('nodes')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'nodes'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] shadow-sm border border-[#D4AF37]'
-                : 'text-neutral-400 hover:text-white light:text-slate-600 light:hover:text-[#161826] hover:bg-[#1E2136] light:hover:bg-[#FCF9EE]'
+                ? 'bg-[#111827] text-white shadow-xs border border-[#111827]'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
             }`}
           >
-            <Layers className="w-4 h-4" />
+            <Layers className="w-4 h-4 text-[#D4AF37]" />
             <span>Infrastructure Nodes</span>
           </button>
         </div>
 
         {activeTab === 'logs' && (
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#161826] border border-[#2D3154] text-xs">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100 border border-neutral-200 text-xs">
             {(['all', 'error', 'warn', 'info'] as const).map((lvl) => (
               <button
                 key={lvl}
                 onClick={() => setLogLevelFilter(lvl)}
                 className={`px-3 py-1 rounded-lg font-medium capitalize transition-colors ${
                   logLevelFilter === lvl
-                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-[#161826] font-bold'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-[#111827] text-white font-bold shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
                 {lvl}
@@ -432,43 +432,43 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
 
       {/* Tab 3: Infrastructure Nodes */}
       {activeTab === 'nodes' && (
-        <div className="rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-6 space-y-4 shadow-sm">
-          <h3 className="text-sm font-semibold text-white light:text-slate-900">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 space-y-4 shadow-xs">
+          <h3 className="text-sm font-semibold text-neutral-900">
             Connected Supabase Infrastructure Nodes
           </h3>
-          <div className="divide-y divide-[#2D3154] light:divide-slate-100 text-xs">
+          <div className="divide-y divide-[#E5E7EB] text-xs">
             <div className="py-3 flex items-center justify-between">
               <div>
-                <span className="font-semibold text-white light:text-slate-900">PostgreSQL Primary Cluster</span>
-                <p className="text-[11px] text-neutral-400 light:text-slate-500 font-mono truncate max-w-md">
+                <span className="font-semibold text-neutral-900">PostgreSQL Primary Cluster</span>
+                <p className="text-[11px] text-neutral-500 font-mono truncate max-w-md">
                   {SUPABASE_URL}
                 </p>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
                 ACTIVE • 200 OK
               </span>
             </div>
 
             <div className="py-3 flex items-center justify-between">
               <div>
-                <span className="font-semibold text-white light:text-slate-900">PostgREST API Gateway</span>
-                <p className="text-[11px] text-neutral-400 light:text-slate-500">
+                <span className="font-semibold text-neutral-900">PostgREST API Gateway</span>
+                <p className="text-[11px] text-neutral-500">
                   Auto-generated OpenAPI v3 endpoints with instant schema synchronization.
                 </p>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
                 HEALTHY
               </span>
             </div>
 
             <div className="py-3 flex items-center justify-between">
               <div>
-                <span className="font-semibold text-white light:text-slate-900">Supabase Realtime Engine</span>
-                <p className="text-[11px] text-neutral-400 light:text-slate-500">
+                <span className="font-semibold text-neutral-900">Supabase Realtime Engine</span>
+                <p className="text-[11px] text-neutral-500">
                   WebSocket postgres_changes replication for support messages, deletions, and telemetry.
                 </p>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
                 CONNECTED
               </span>
             </div>
@@ -486,29 +486,29 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       >
         {selectedHealth && (
           <div className="space-y-4 text-xs">
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#2D3154] bg-[#161826]">
+            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#E5E7EB] bg-[#FAF7EE]">
               <div>
-                <span className="text-neutral-400 block text-[11px]">Component Name</span>
-                <span className="font-semibold text-white">{selectedHealth.component}</span>
+                <span className="text-neutral-500 block text-[11px]">Component Name</span>
+                <span className="font-semibold text-neutral-900">{selectedHealth.component}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Status</span>
-                <span className="text-emerald-400 font-bold uppercase">{selectedHealth.status}</span>
+                <span className="text-neutral-500 block text-[11px]">Status</span>
+                <span className="text-emerald-700 font-bold uppercase">{selectedHealth.status}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Latency</span>
-                <span className="font-mono text-white">{selectedHealth.latency_ms ?? 'N/A'} ms</span>
+                <span className="text-neutral-500 block text-[11px]">Latency</span>
+                <span className="font-mono text-neutral-900">{selectedHealth.latency_ms ?? 'N/A'} ms</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Error Count</span>
-                <span className="font-mono text-white">{selectedHealth.error_count ?? 0}</span>
+                <span className="text-neutral-500 block text-[11px]">Error Count</span>
+                <span className="font-mono text-neutral-900">{selectedHealth.error_count ?? 0}</span>
               </div>
             </div>
 
             {selectedHealth.details && (
               <div className="space-y-2">
-                <span className="font-bold text-neutral-300">Component Details:</span>
-                <pre className="p-3 rounded-xl bg-[#161826] border border-[#2D3154] text-[11px] font-mono text-neutral-200 overflow-x-auto max-h-48">
+                <span className="font-bold text-neutral-700">Component Details:</span>
+                <pre className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[11px] font-mono text-neutral-800 overflow-x-auto max-h-48 shadow-xs">
                   {typeof selectedHealth.details === 'object'
                     ? JSON.stringify(selectedHealth.details, null, 2)
                     : selectedHealth.details}
@@ -529,30 +529,30 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       >
         {selectedLog && (
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-xl border border-[#2D3154] bg-[#161826] space-y-2">
-              <span className="text-neutral-400 block text-[11px]">Log Message</span>
-              <div className="text-white font-mono leading-relaxed whitespace-pre-wrap">
+            <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#FAF7EE] space-y-2">
+              <span className="text-neutral-500 block text-[11px]">Log Message</span>
+              <div className="text-neutral-900 font-mono leading-relaxed whitespace-pre-wrap">
                 {selectedLog.message}
               </div>
             </div>
 
             {selectedLog.stack_trace && (
               <div className="space-y-2">
-                <span className="font-bold text-rose-400">Stack Trace:</span>
-                <pre className="p-3 rounded-xl bg-[#161826] border border-rose-500/30 text-[11px] font-mono text-rose-300 overflow-x-auto max-h-56 whitespace-pre-wrap">
+                <span className="font-bold text-rose-700">Stack Trace:</span>
+                <pre className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-[11px] font-mono text-rose-800 overflow-x-auto max-h-56 whitespace-pre-wrap">
                   {selectedLog.stack_trace}
                 </pre>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#2D3154] bg-[#161826]">
+            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs">
               <div>
-                <span className="text-neutral-400 block text-[11px]">Device ID</span>
-                <span className="font-mono text-white">{selectedLog.device_id || 'N/A'}</span>
+                <span className="text-neutral-500 block text-[11px]">Device ID</span>
+                <span className="font-mono text-neutral-900">{selectedLog.device_id || 'N/A'}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[11px]">Shop ID</span>
-                <span className="font-mono text-white">{selectedLog.shop_id || 'Global'}</span>
+                <span className="text-neutral-500 block text-[11px]">Shop ID</span>
+                <span className="font-mono text-neutral-900">{selectedLog.shop_id || 'Global'}</span>
               </div>
             </div>
           </div>

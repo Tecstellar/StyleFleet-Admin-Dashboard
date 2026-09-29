@@ -19,16 +19,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed border-[#2D3154] bg-[#1E2136]/30 dark:bg-[#1E2136]/30 light:bg-slate-50 light:border-slate-200 ${className}`}>
-      <div className="w-12 h-12 rounded-xl bg-[#2D3154]/50 flex items-center justify-center text-[#D9A441] mb-3.5 shadow-inner">
+    <div className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed border-[#E5E7EB] bg-white ${className}`}>
+      <div className="w-12 h-12 rounded-xl bg-[#FAF7EE] border border-[#E8DEC4] flex items-center justify-center text-[#B8860B] mb-3.5 shadow-xs">
         <Icon className="w-6 h-6 stroke-[1.75]" />
       </div>
-      <h3 className="text-sm font-semibold text-white light:text-slate-900 mb-1">{title}</h3>
-      <p className="text-xs text-neutral-400 light:text-slate-500 max-w-sm mb-4 leading-relaxed">{description}</p>
+      <h3 className="text-sm font-semibold text-neutral-900 mb-1">{title}</h3>
+      <p className="text-xs text-neutral-500 max-w-sm mb-4 leading-relaxed">{description}</p>
       {actionText && onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#D9A441] text-[#161826] hover:bg-[#E0C068] transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#111827] text-white hover:bg-[#D4AF37] hover:text-[#111827] transition-colors shadow-xs"
         >
           {actionText}
         </button>

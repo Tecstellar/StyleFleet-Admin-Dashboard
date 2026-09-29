@@ -26,16 +26,16 @@ export const ExportButton = <T extends Record<string, any>>({
       onClick={handleExport}
       disabled={disabled || data.length === 0}
       title={data.length === 0 ? 'No records to export' : `Export ${data.length} real record(s) to CSV`}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[#2D3154] light:border-slate-300 bg-[#1E2136] light:bg-white text-white light:text-slate-800 transition-colors ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-800 shadow-xs transition-colors ${
         disabled || data.length === 0
           ? 'opacity-40 cursor-not-allowed'
-          : 'hover:border-[#D9A441] hover:text-[#D9A441] hover:bg-[#232742]'
+          : 'hover:border-[#D4AF37] hover:text-[#B8860B] hover:bg-[#FAF7EE]'
       }`}
     >
-      <Download className="w-3.5 h-3.5 text-[#D9A441]" />
+      <Download className="w-3.5 h-3.5 text-[#B8860B]" />
       <span>{label}</span>
       {data.length > 0 && (
-        <span className="ml-1 px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#2D3154]/80 text-[#D9A441]">
+        <span className="ml-1 px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
           {data.length}
         </span>
       )}

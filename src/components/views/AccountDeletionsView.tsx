@@ -43,10 +43,10 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       header: 'Salon Name',
       render: (d) => (
         <div>
-          <div className="font-semibold text-white light:text-slate-900">
+          <div className="font-semibold text-neutral-900">
             {d.shop_name || 'Unspecified Salon'}
           </div>
-          <div className="text-[11px] text-neutral-400 font-mono">
+          <div className="text-[11px] text-neutral-500 font-mono">
             {d.phone || 'No phone'}
           </div>
         </div>
@@ -56,7 +56,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       key: 'reason',
       header: 'Deletion Reason',
       render: (d) => (
-        <span className="font-medium text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 text-xs">
+        <span className="font-medium text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 text-xs">
           {d.reason || 'No reason specified'}
         </span>
       ),
@@ -70,7 +70,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       key: 'platform',
       header: 'Platform / Version',
       render: () => (
-        <span className="text-[11px] text-neutral-500 italic">
+        <span className="text-[11px] text-neutral-400 italic">
           Unavailable (No telemetry field)
         </span>
       ),
@@ -80,7 +80,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       key: 'deleted_at',
       header: 'Deleted Date',
       render: (d) => (
-        <span className="font-mono text-xs text-neutral-400">
+        <span className="font-mono text-xs text-neutral-600">
           {formatDateTime(d.deleted_at || d.created_at)}
         </span>
       ),
@@ -93,13 +93,13 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <UserX className="w-5 h-5 text-rose-400" />
-            <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+            <UserX className="w-5 h-5 text-rose-500" />
+            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               Account Deletions &amp; Churn Analytics
             </h1>
           </div>
-          <p className="text-xs text-neutral-400 light:text-slate-500 mt-0.5">
-            Verified account deletion requests from Supabase table <code className="text-[#D9A441] font-mono">public.account_deletions</code>.
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Verified account deletion requests from Supabase table <code className="text-[#B8860B] font-mono">public.account_deletions</code>.
           </p>
         </div>
 
@@ -107,10 +107,10 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
           {onOpenDeleteAccountInstructions && (
             <button
               onClick={onOpenDeleteAccountInstructions}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2D3154] light:border-slate-300 bg-[#161826] light:bg-slate-50 text-xs font-semibold text-neutral-300 light:text-slate-700 hover:text-white hover:border-[#D9A441] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-800 hover:text-[#B8860B] hover:border-[#D4AF37] transition-colors cursor-pointer shadow-xs"
               title="Open Public Account Deletion Instructions Page"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-[#D9A441]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#B8860B]" />
               <span>Public Deletion Page</span>
             </button>
           )}
@@ -132,12 +132,12 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       {/* Analytics Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Reasons Distribution Table */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-5 space-y-4 shadow-sm">
+        <div className="lg:col-span-2 rounded-2xl border border-[#E5E7EB] bg-white p-5 space-y-4 shadow-xs">
           <div>
-            <h3 className="text-sm font-semibold text-white light:text-slate-900">
+            <h3 className="text-sm font-semibold text-neutral-900">
               Exact Reasons Analysis
             </h3>
-            <p className="text-xs text-neutral-400 light:text-slate-500">
+            <p className="text-xs text-neutral-500">
               Calculated exclusively from verified database rows. No synthetic categories.
             </p>
           </div>
@@ -146,15 +146,15 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
             {reasonStats.map((item, idx) => (
               <div key={idx} className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="font-medium text-white light:text-slate-900">
+                  <span className="font-medium text-neutral-900">
                     {item.reason}
                   </span>
-                  <span className="font-mono text-neutral-300 light:text-slate-600 font-semibold">
+                  <span className="font-mono text-neutral-700 font-semibold">
                     {item.count} ({item.percentage}%)
                   </span>
                 </div>
                 {/* Progress bar */}
-                <div className="w-full h-2 rounded-full bg-[#161826] overflow-hidden">
+                <div className="w-full h-2 rounded-full bg-neutral-100 overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
@@ -169,8 +169,8 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
         </div>
 
         {/* Donut Chart */}
-        <div className="rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-5 flex flex-col items-center justify-center shadow-sm">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2 self-start">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 flex flex-col items-center justify-center shadow-xs">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2 self-start">
             Reason Breakdown
           </h4>
           {pieData.length > 0 ? (
@@ -193,10 +193,12 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#161826',
-                      borderColor: '#D9A441',
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#D4AF37',
                       borderRadius: '8px',
                       fontSize: '11px',
+                      color: '#111827',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     }}
                   />
                 </PieChart>

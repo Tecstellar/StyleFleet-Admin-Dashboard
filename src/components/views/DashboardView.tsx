@@ -93,22 +93,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl border-2 border-[#D4AF37]/30 bg-gradient-to-r from-[#1E2136] via-[#1E2136] to-[#161826] light:from-white light:via-[#FCF9EE] light:to-white shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl border border-[#D4AF37]/40 bg-white shadow-xs">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-black/40 border-2 border-[#D4AF37]/50 flex items-center justify-center p-1.5 shadow-md flex-shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-[#FAF7EE] border border-[#D4AF37] flex items-center justify-center p-1.5 shadow-xs flex-shrink-0">
             <img src="/stylefleet-logo.png" alt="StyleFleet" className="w-full h-full object-contain" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white light:text-slate-900">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900">
                 StyleFleet System Overview
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 VERIFIED REAL DATA ONLY
               </span>
             </div>
-            <p className="text-xs text-neutral-400 light:text-slate-500 mt-1">
-              Strict deduplication & integrity active. Tracking only authentic production salons (Zero duplicates, zero random data) from Supabase project <span className="font-mono text-[#D9A441]">scgokpcoyfewrtrwqxpu</span>.
+            <p className="text-xs text-neutral-500 mt-1">
+              Strict deduplication & integrity active. Tracking only authentic production salons (Zero duplicates, zero random data) from Supabase project <span className="font-mono text-[#B8860B]">scgokpcoyfewrtrwqxpu</span>.
             </p>
           </div>
         </div>
@@ -116,7 +116,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => onNavigate('system_governance')}
-            className="px-3.5 py-1.5 rounded-xl border border-[#2D3154] light:border-slate-300 bg-[#161826] light:bg-white text-xs font-bold text-neutral-300 light:text-slate-700 hover:text-white hover:border-[#D9A441] transition-colors"
+            className="px-3.5 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-bold text-neutral-800 hover:text-[#B8860B] hover:border-[#D4AF37] transition-colors shadow-xs"
           >
             System Health &amp; Schema
           </button>
@@ -201,17 +201,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Real Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Salon Growth Chart */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-5 space-y-4 shadow-sm">
+        <div className="lg:col-span-2 rounded-2xl border border-[#E5E7EB] bg-white p-5 space-y-4 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white light:text-slate-900">
+              <h3 className="text-sm font-semibold text-neutral-900">
                 Salon Registration Timeline
               </h3>
-              <p className="text-xs text-neutral-400 light:text-slate-500">
-                Real shop creation timestamps from <code className="text-[#D9A441] font-mono">public.shops</code>
+              <p className="text-xs text-neutral-500">
+                Real shop creation timestamps from <code className="text-[#B8860B] font-mono">public.shops</code>
               </p>
             </div>
-            <span className="text-xs font-mono font-medium text-[#D9A441]">
+            <span className="text-xs font-mono font-semibold text-[#B8860B]">
               {shops.length} Total Salons
             </span>
           </div>
@@ -220,19 +220,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {salonGrowthData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={salonGrowthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2D3154" opacity={0.4} />
-                  <XAxis dataKey="date" stroke="#8E94B3" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#8E94B3" fontSize={11} allowDecimals={false} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.6} />
+                  <XAxis dataKey="date" stroke="#9CA3AF" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#9CA3AF" fontSize={11} allowDecimals={false} tickLine={false} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#161826',
-                      borderColor: '#D9A441',
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#D4AF37',
                       borderRadius: '8px',
                       fontSize: '12px',
-                      color: '#FFFFFF',
+                      color: '#111827',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     }}
                   />
-                  <Bar dataKey="salons" fill="#D9A441" radius={[4, 4, 0, 0]} name="New Salons" />
+                  <Bar dataKey="salons" fill="#D4AF37" radius={[4, 4, 0, 0]} name="New Salons" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -244,17 +245,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Deletion Reasons Chart */}
-        <div className="rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-5 space-y-4 shadow-sm">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 space-y-4 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white light:text-slate-900">
+              <h3 className="text-sm font-semibold text-neutral-900">
                 Account Deletion Reasons
               </h3>
-              <p className="text-xs text-neutral-400 light:text-slate-500">
-                From real <code className="text-[#D9A441] font-mono">account_deletions</code>
+              <p className="text-xs text-neutral-500">
+                From real <code className="text-[#B8860B] font-mono">account_deletions</code>
               </p>
             </div>
-            <span className="text-xs font-mono font-medium text-rose-400">
+            <span className="text-xs font-mono font-semibold text-rose-600">
               {deletions.length} Requests
             </span>
           </div>
@@ -280,22 +281,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#161826',
-                        borderColor: '#D9A441',
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#D4AF37',
                         borderRadius: '8px',
                         fontSize: '11px',
-                        color: '#FFFFFF',
+                        color: '#111827',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-[#2D3154]/50 text-xs">
+              <div className="space-y-2 pt-2 border-t border-[#E5E7EB] text-xs">
                 {deletionReasonsData.map((entry, idx) => {
                   const pct = Math.round((entry.value / deletions.length) * 100);
                   return (
-                    <div key={idx} className="flex items-center justify-between text-neutral-300 light:text-slate-700">
+                    <div key={idx} className="flex items-center justify-between text-neutral-700">
                       <div className="flex items-center gap-2 truncate pr-2">
                         <span
                           className="w-2.5 h-2.5 rounded-full shrink-0"
@@ -303,7 +305,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         />
                         <span className="truncate">{entry.name}</span>
                       </div>
-                      <span className="font-mono text-xs font-semibold text-white light:text-slate-900 shrink-0">
+                      <span className="font-mono text-xs font-semibold text-neutral-900 shrink-0">
                         {entry.value} ({pct}%)
                       </span>
                     </div>
@@ -322,51 +324,51 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Bottom Section: Active Salons List & Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Real Salons Snapshot */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-5 space-y-4 shadow-sm">
+        <div className="lg:col-span-2 rounded-2xl border border-[#E5E7EB] bg-white p-5 space-y-4 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white light:text-slate-900">
+              <h3 className="text-sm font-semibold text-neutral-900">
                 Connected Salons
               </h3>
-              <p className="text-xs text-neutral-400 light:text-slate-500">
+              <p className="text-xs text-neutral-500">
                 Registered salon businesses in Supabase
               </p>
             </div>
             <button
               onClick={() => onNavigate('salons_360')}
-              className="inline-flex items-center gap-1 text-xs font-medium text-[#D9A441] hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-[#B8860B] hover:underline"
             >
               View All ({shops.length})
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="divide-y divide-[#2D3154]/50 light:divide-slate-100">
+          <div className="divide-y divide-[#F0F0F0]">
             {shops.map((shop) => (
               <div
                 key={shop.id}
                 onClick={() => onSelectSalon ? onSelectSalon(shop) : onNavigate('salons_360')}
-                className="py-3 flex items-center justify-between gap-4 hover:bg-[#232742]/40 light:hover:bg-slate-50 px-2 rounded-lg cursor-pointer transition-colors"
+                className="py-3 flex items-center justify-between gap-4 hover:bg-[#FAF7EE] px-2 rounded-lg cursor-pointer transition-colors"
               >
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 border border-white/10"
-                    style={{ backgroundColor: shop.accent_color || '#D9A441', color: '#161826' }}
+                    className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 border border-[#D4AF37]/30"
+                    style={{ backgroundColor: '#FAF7EE', color: '#B8860B' }}
                   >
                     {shop.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-semibold text-white light:text-slate-900 truncate">
+                      <h4 className="text-xs font-semibold text-neutral-900 truncate">
                         {shop.name}
                       </h4>
                       {shop.duplicate_count && shop.duplicate_count > 0 ? (
-                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded">
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded">
                           Deduplicated
                         </span>
                       ) : null}
                     </div>
-                    <p className="text-[11px] text-neutral-400 light:text-slate-500 truncate">
+                    <p className="text-[11px] text-neutral-500 truncate">
                       {shop.city || 'Kalugumalai'} • {shop.customer_count ?? 0} client(s) • {shop.staff_count ?? 0} staff • Registered {formatDate(shop.created_at)}
                     </p>
                   </div>
@@ -374,7 +376,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                 <div className="flex items-center gap-3 shrink-0">
                   <StatusBadge status="active" />
-                  <ChevronRight className="w-4 h-4 text-neutral-500" />
+                  <ChevronRight className="w-4 h-4 text-neutral-400" />
                 </div>
               </div>
             ))}
@@ -382,48 +384,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Recent Real Events Feed */}
-        <div className="rounded-2xl border border-[#2D3154] light:border-slate-200 bg-[#1E2136] light:bg-white p-5 space-y-4 shadow-sm">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 space-y-4 shadow-xs">
           <div>
-            <h3 className="text-sm font-semibold text-white light:text-slate-900">
+            <h3 className="text-sm font-semibold text-neutral-900">
               Live Database Activity
             </h3>
-            <p className="text-xs text-neutral-400 light:text-slate-500">
+            <p className="text-xs text-neutral-500">
               Recent mutations &amp; records across operational tables
             </p>
           </div>
 
           <div className="space-y-3">
             {deletions.slice(0, 2).map((del) => (
-              <div key={del.id} className="p-3 rounded-xl bg-rose-500/5 border border-rose-500/20 text-xs space-y-1">
-                <div className="flex items-center justify-between text-[11px] text-rose-300">
+              <div key={del.id} className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs space-y-1">
+                <div className="flex items-center justify-between text-[11px] text-rose-700">
                   <span className="font-semibold">Account Deletion</span>
                   <span>{formatDateTime(del.deleted_at || del.created_at)}</span>
                 </div>
-                <p className="text-neutral-300 light:text-slate-700">
+                <p className="text-neutral-700">
                   {del.shop_name || 'Salon'} requested deletion. Reason: <span className="italic">"{del.reason}"</span>
                 </p>
               </div>
             ))}
 
             {payments.slice(0, 2).map((pay) => (
-              <div key={pay.id} className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs space-y-1">
-                <div className="flex items-center justify-between text-[11px] text-emerald-400">
+              <div key={pay.id} className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-1">
+                <div className="flex items-center justify-between text-[11px] text-emerald-700">
                   <span className="font-semibold">Payment Received</span>
                   <span>{formatDateTime(pay.paid_at)}</span>
                 </div>
-                <p className="text-neutral-300 light:text-slate-700">
+                <p className="text-neutral-700">
                   {formatCurrency(pay.amount_minor)} via {pay.method} (Ref: {pay.reference || 'Billing'})
                 </p>
               </div>
             ))}
 
             {appointments.slice(0, 2).map((appt) => (
-              <div key={appt.id} className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-xs space-y-1">
-                <div className="flex items-center justify-between text-[11px] text-blue-400">
+              <div key={appt.id} className="p-3 rounded-xl bg-[#FAF7EE] border border-[#E8DEC4] text-xs space-y-1">
+                <div className="flex items-center justify-between text-[11px] text-[#B8860B]">
                   <span className="font-semibold">Appointment Booked</span>
                   <span>{formatDateTime(appt.starts_at)}</span>
                 </div>
-                <p className="text-neutral-300 light:text-slate-700">
+                <p className="text-neutral-700">
                   Status: {appt.status} • Duration: {appt.duration_minutes} mins
                 </p>
               </div>
@@ -433,16 +435,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* Dashboard Bottom Direct Privacy Option */}
-      <div className="pt-6 border-t border-[#2D3154] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-400">
+      <div className="pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span>StyleFleet Super Admin System • Live Supabase Connected</span>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           {onOpenPrivacyPolicy && (
             <button
               onClick={onOpenPrivacyPolicy}
-              className="text-neutral-300 hover:text-[#DFB847] flex items-center gap-1.5 transition-colors cursor-pointer font-medium py-1 px-2 rounded-lg hover:bg-[#1E2136]"
+              className="text-neutral-600 hover:text-[#B8860B] flex items-center gap-1.5 transition-colors cursor-pointer font-medium py-1 px-2 rounded-lg hover:bg-[#FAF7EE]"
               title="View Public Privacy Policy"
             >
               <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -452,10 +454,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {onOpenDeleteAccount && (
             <button
               onClick={onOpenDeleteAccount}
-              className="text-neutral-300 hover:text-rose-400 flex items-center gap-1.5 transition-colors cursor-pointer font-medium py-1 px-2 rounded-lg hover:bg-[#1E2136]"
+              className="text-neutral-600 hover:text-rose-600 flex items-center gap-1.5 transition-colors cursor-pointer font-medium py-1 px-2 rounded-lg hover:bg-rose-50"
               title="View Public Account Deletion Instructions"
             >
-              <UserX className="w-3.5 h-3.5 text-rose-400" />
+              <UserX className="w-3.5 h-3.5 text-rose-600" />
               <span>Delete Account Info</span>
             </button>
           )}
