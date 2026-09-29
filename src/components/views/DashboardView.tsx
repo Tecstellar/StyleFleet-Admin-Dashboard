@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import {
   Store,
   Users,
+  Scissors,
   CreditCard,
   CalendarCheck,
   UserX,
@@ -31,12 +32,15 @@ interface DashboardViewProps {
   appointments: Appointment[];
   deletions: AccountDeletion[];
   supportMessages: SupportMessage[];
+  subscriptions?: any[];
   loading?: boolean;
   onNavigate: (view: NavView) => void;
   onSelectSalon?: (shop: Shop) => void;
+  onNavigateToStylists?: () => void;
   onOpenPrivacyPolicy?: () => void;
   onOpenDeleteAccount?: () => void;
 }
+
 
 const GOLD_PALETTE = ['#D9A441', '#E0C068', '#B8863B', '#8C6239', '#5B4021'];
 
@@ -50,12 +54,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   appointments,
   deletions,
   supportMessages,
+  subscriptions = [],
   loading = false,
   onNavigate,
   onSelectSalon,
+  onNavigateToStylists,
   onOpenPrivacyPolicy,
   onOpenDeleteAccount,
 }) => {
+
   const { dateRange } = useDateFilter();
 
   // Date-filtered records
@@ -135,12 +142,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         />
 
         <KPICard
-          title="User Profiles"
-          value={formatNumber(profiles.length)}
-          subtitle={`${staff.length} staff stylists assigned`}
+          title="Team Stylists"
+          value={formatNumber(staff.length)}
+          subtitle={`${staff.filter((s) => s.invitation_status === 'active').length} app active · ${staff.filter((s) => s.invitation_status === 'invited').length} invited`}
           isDateFilterable={false}
-          icon={Users}
-          onClick={() => onNavigate('salons_360')}
+          icon={Scissors}
+          onClick={() => (onNavigateToStylists ? onNavigateToStylists() : onNavigate('salons_360'))}
         />
 
         <KPICard
@@ -180,23 +187,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         />
 
         <KPICard
-          title="App Telemetry / Installs"
-          value="—"
-          isUnavailable={true}
-          unavailableReason="table 'public.telemetry' not found"
-          icon={Smartphone}
-          onClick={() => onNavigate('app_telemetry')}
+          title="User Profiles"
+          value={formatNumber(profiles.length)}
+          subtitle={`${shops.length} salon owners registered`}
+          isDateFilterable={false}
+          icon={Users}
+          onClick={() => onNavigate('salons_360')}
         />
 
         <KPICard
-          title="Trial Subscriptions"
-          value="—"
-          isUnavailable={true}
-          unavailableReason="table 'public.trials' not found"
+          title="Subscriptions & Trials"
+          value={subscriptions ? formatNumber(subscriptions.length) : '0'}
+          subtitle={
+            subscriptions && subscriptions.length > 0
+              ? `${subscriptions.filter((s) => s.status === 'trial').length} on 7-day trial`
+              : '0 active subscriptions in Supabase'
+          }
+          isDateFilterable={false}
           icon={Sparkles}
-          onClick={() => onNavigate('app_telemetry')}
+          onClick={() => onNavigate('reports_bi')}
         />
       </div>
+
 
       {/* Real Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -17,8 +17,9 @@ import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
 import { fetchProfiles, fetchStaff, fetchCustomers } from './services/usersService';
-import { fetchBills, fetchPayments } from './services/billingService';
+import { fetchBills, fetchPayments, fetchSubscriptions } from './services/billingService';
 import { fetchAppointments } from './services/appointmentsService';
+
 import { fetchSupportMessages, subscribeToSupportMessages } from './services/supportService';
 import { fetchAccountDeletions, subscribeToAccountDeletions } from './services/deletionsService';
 import {
@@ -123,6 +124,7 @@ export const App: React.FC = () => {
 
   // Navigation State — matches 9 options from reference dashboard
   const [currentView, setCurrentView] = useState<NavView>('dashboard');
+  const [salonsTab, setSalonsTab] = useState<'directory' | 'stylists' | 'ecosystem_360'>('directory');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [selectedShopForModal, setSelectedShopForModal] = useState<Shop | null>(null);
@@ -137,6 +139,7 @@ export const App: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [deletions, setDeletions] = useState<AccountDeletion[]>([]);
   const [supportMessages, setSupportMessages] = useState<SupportMessage[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
   // Newly Added Real Tables from Supabase
   const [telemetryRecords, setTelemetryRecords] = useState<TelemetryRecord[]>([]);
@@ -162,6 +165,7 @@ export const App: React.FC = () => {
         apptsRes,
         deletionsRes,
         supportRes,
+        subsRes,
         telemetryRes,
         healthRes,
         logsRes,
@@ -175,6 +179,7 @@ export const App: React.FC = () => {
         fetchAppointments(),
         fetchAccountDeletions(),
         fetchSupportMessages(),
+        fetchSubscriptions(),
         fetchTelemetryRecords(),
         fetchSystemHealthRecords(),
         fetchSystemLogs(),
@@ -191,6 +196,7 @@ export const App: React.FC = () => {
       setAppointments(apptsRes.data);
       setDeletions(deletionsRes.data);
       setSupportMessages(supportRes.data);
+      setSubscriptions(subsRes.data || []);
       setTelemetryRecords(telemetryRes.data);
       setSystemHealthRecords(healthRes.data);
       setSystemLogs(logsRes.data);
@@ -252,8 +258,16 @@ export const App: React.FC = () => {
 
   const handleSelectSalonDrilldown = (shop: Shop) => {
     setSelectedShopForModal(shop);
+    setSalonsTab('directory');
     setCurrentView('salons_360');
   };
+
+  const handleNavigateToStylists = () => {
+    setSelectedShopForModal(null);
+    setSalonsTab('stylists');
+    setCurrentView('salons_360');
+  };
+
 
   // 1. PUBLIC ACCOUNT DELETION PAGE:
   // Can be accessed directly via URL (e.g. /delete-account) without typing username & password!
@@ -351,9 +365,11 @@ export const App: React.FC = () => {
               appointments={appointments}
               deletions={deletions}
               supportMessages={supportMessages}
+              subscriptions={subscriptions}
               loading={loading}
               onNavigate={(v) => setCurrentView(v)}
               onSelectSalon={handleSelectSalonDrilldown}
+              onNavigateToStylists={handleNavigateToStylists}
               onOpenPrivacyPolicy={openPrivacyPage}
               onOpenDeleteAccount={openDeleteAccountPage}
             />
@@ -374,8 +390,11 @@ export const App: React.FC = () => {
               loading={loading}
               selectedShop={selectedShopForModal}
               onClearSelectedShop={() => setSelectedShopForModal(null)}
+              onRefresh={handleManualRefresh}
+              initialTab={salonsTab}
             />
           )}
+
 
           {/* 3. Reports & BI */}
           {currentView === 'reports_bi' && (

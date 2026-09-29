@@ -533,14 +533,15 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
         ) : filteredStaff.length === 0 ? (
           <EmptyState
             title="No Stylists Found"
-            message={
+            description={
               searchQuery || selectedShopFilter !== 'all' || inviteStatusFilter !== 'all'
                 ? 'No stylists match the selected filter criteria. Try adjusting your filters or search query.'
                 : 'No stylists currently registered. Click "+ Add Stylist" to add the first stylist.'
             }
-            actionLabel="+ Add First Stylist"
+            actionText="+ Add First Stylist"
             onAction={handleOpenAdd}
           />
+
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">

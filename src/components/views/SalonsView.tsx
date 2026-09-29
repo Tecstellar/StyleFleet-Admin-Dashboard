@@ -13,6 +13,7 @@ interface SalonsViewProps {
   loading?: boolean;
   selectedShop?: Shop | null;
   onClearSelectedShop?: () => void;
+  onStaffChange?: () => void;
 }
 
 export const SalonsView: React.FC<SalonsViewProps> = ({
@@ -20,6 +21,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
   loading = false,
   selectedShop: externalSelectedShop,
   onClearSelectedShop,
+  onStaffChange,
 }) => {
   const { dateRange } = useDateFilter();
   const [internalSelectedShop, setInternalSelectedShop] = useState<Shop | null>(null);
@@ -232,7 +234,9 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
         shop={activeModalShop}
         isOpen={!!activeModalShop}
         onClose={handleCloseModal}
+        onStaffChange={onStaffChange}
       />
     </div>
   );
 };
+

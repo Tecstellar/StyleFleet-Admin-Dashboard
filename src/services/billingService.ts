@@ -49,3 +49,19 @@ export async function fetchExpenses(): Promise<{ data: Expense[]; error: string 
     return { data: [], error: err.message || 'Unable to load expenses' };
   }
 }
+
+export async function fetchSubscriptions(): Promise<{ data: any[]; error: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('*, shop:shops(id, name)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return { data: data || [], error: null };
+  } catch (err: any) {
+    console.error('Error fetching subscriptions:', err);
+    return { data: [], error: err.message || 'Unable to load subscriptions' };
+  }
+}
+

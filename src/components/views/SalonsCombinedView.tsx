@@ -96,8 +96,10 @@ export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
             setModalShop(null);
             onClearSelectedShop?.();
           }}
+          onStaffChange={onRefresh}
         />
       )}
+
 
       {activeTab === 'stylists' && (
         <StylistsView

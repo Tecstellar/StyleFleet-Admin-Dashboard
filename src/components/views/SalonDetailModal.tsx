@@ -15,26 +15,130 @@ import {
   ShieldAlert,
   RefreshCw,
   Shield,
+  MessageCircle,
+  Plus,
+  Trash2,
+  CheckCircle2,
 } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
 import { UnavailableBanner } from '../common/UnavailableBanner';
 import { fetchSalonDetails, updateStaffPermissions, SalonDetailedView } from '../../services/salonsService';
+import {
+  createStaff,
+  updateStaffInvitationStatus,
+  deleteStaff,
+} from '../../services/usersService';
 import { Shop, Staff, StylistPermissions, DEFAULT_STYLIST_PERMISSIONS } from '../../types/database';
 import { formatDateTime, formatDate } from '../../utils/dateUtils';
 import { formatCurrency } from '../../utils/formatters';
+
+const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.stylefleet.app&pcampaignid=web_share';
 
 interface SalonDetailModalProps {
   shop: Shop | null;
   isOpen: boolean;
   onClose: () => void;
+  onStaffChange?: () => void;
 }
 
-export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen, onClose }) => {
+export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen, onClose, onStaffChange }) => {
   const [details, setDetails] = useState<SalonDetailedView | null>(null);
   const [loading, setLoading] = useState(false);
   const [savingStaffId, setSavingStaffId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry'>('overview');
+
+  // Add Stylist state
+  const [isAddingStaff, setIsAddingStaff] = useState(false);
+  const [newStaffName, setNewStaffName] = useState('');
+  const [newStaffPhone, setNewStaffPhone] = useState('');
+  const [newStaffRole, setNewStaffRole] = useState('Stylist');
+  const [newStaffLoading, setNewStaffLoading] = useState(false);
+  const [staffActionMsg, setStaffActionMsg] = useState<string | null>(null);
+
+  const handleSendWhatsAppInvite = async (st: Staff) => {
+    if (!st.phone || !shop) return;
+    const cleanPhone = st.phone.replace(/[^0-9]/g, '').slice(-10);
+    const message = encodeURIComponent(
+      `Hello ${st.name}! You have been invited to join ${shop.name} on StyleFleet.\n\n` +
+      `Download the StyleFleet app from Google Play Store to manage appointments, bills, and clients:\n` +
+      `${PLAY_STORE_URL}\n\n` +
+      `Log in using your registered mobile number: +91 ${cleanPhone}`
+    );
+    const waUrl = `https://wa.me/91${cleanPhone}?text=${message}`;
+
+    setDetails((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        staff: prev.staff.map((s) =>
+          s.id === st.id ? { ...s, invitation_status: 'invited', invited_at: new Date().toISOString() } : s
+        ),
+      };
+    });
+
+    await updateStaffInvitationStatus(st.id, 'invited', new Date().toISOString());
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    onStaffChange?.();
+  };
+
+  const handleCreateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shop || !newStaffName.trim()) return;
+
+    setNewStaffLoading(true);
+    const res = await createStaff({
+      shop_id: shop.id,
+      name: newStaffName.trim(),
+      phone: newStaffPhone.trim() || null,
+      role: newStaffRole.trim() || 'Stylist',
+      is_active: true,
+      permissions: DEFAULT_STYLIST_PERMISSIONS,
+      invitation_status: 'not_invited',
+    });
+    setNewStaffLoading(false);
+
+    if (res.data) {
+      setDetails((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          staff: [res.data!, ...prev.staff],
+        };
+      });
+      setNewStaffName('');
+      setNewStaffPhone('');
+      setNewStaffRole('Stylist');
+      setIsAddingStaff(false);
+      setStaffActionMsg(`Stylist ${res.data.name} added successfully!`);
+      setTimeout(() => setStaffActionMsg(null), 3000);
+      onStaffChange?.();
+    }
+  };
+
+  const handleDeleteStaff = async (staffId: string, staffName: string) => {
+    if (!window.confirm(`Are you sure you want to remove stylist "${staffName}" from this salon?`)) {
+      return;
+    }
+
+    setSavingStaffId(staffId);
+    const res = await deleteStaff(staffId);
+    setSavingStaffId(null);
+
+    if (res.success) {
+      setDetails((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          staff: prev.staff.filter((s) => s.id !== staffId),
+        };
+      });
+      setStaffActionMsg(`Stylist ${staffName} removed.`);
+      setTimeout(() => setStaffActionMsg(null), 3000);
+      onStaffChange?.();
+    }
+  };
 
   const handleTogglePermission = async (st: Staff, key: keyof StylistPermissions) => {
     if (!details) return;
@@ -55,6 +159,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
     setSavingStaffId(st.id);
     await updateStaffPermissions(st.id, updatedPerms);
     setSavingStaffId(null);
+    onStaffChange?.();
   };
 
   const handleToggleAllPermissions = async (st: Staff, grant: boolean) => {
@@ -81,7 +186,9 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
     setSavingStaffId(st.id);
     await updateStaffPermissions(st.id, updatedPerms);
     setSavingStaffId(null);
+    onStaffChange?.();
   };
+
 
   useEffect(() => {
     if (!shop || !isOpen) return;
@@ -262,7 +369,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
           {/* TAB 2: STAFF & STYLIST PERMISSIONS */}
           {activeTab === 'staff' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-1">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-[#F0F0F0]">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800">
                     Stylist Access & Module Permissions
@@ -271,13 +378,104 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
                     Company admin controls which modules each stylist can access inside the StyleFleet mobile app.
                   </p>
                 </div>
-                {savingStaffId && (
-                  <span className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 animate-pulse font-medium">
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Saving to Supabase...</span>
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {savingStaffId && (
+                    <span className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 animate-pulse font-medium">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingStaff(!isAddingStaff)}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#111827] text-white hover:bg-black text-xs font-bold transition-all shadow-xs cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>{isAddingStaff ? 'Cancel' : 'Add Stylist'}</span>
+                  </button>
+                </div>
               </div>
+
+              {staffActionMsg && (
+                <div className="p-2.5 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>{staffActionMsg}</span>
+                </div>
+              )}
+
+              {/* Collapsible Add Stylist Form */}
+              {isAddingStaff && (
+                <form
+                  onSubmit={handleCreateStaff}
+                  className="p-4 rounded-xl border border-[#D4AF37]/50 bg-[#FAF7EE]/60 space-y-3"
+                >
+                  <div className="font-bold text-xs text-neutral-900 flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5 text-[#B8860B]" />
+                    <span>Add Stylist to {shop.name}</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div>
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
+                        Stylist Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newStaffName}
+                        onChange={(e) => setNewStaffName(e.target.value)}
+                        placeholder="e.g. Priya Sharma"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E7EB] bg-white text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
+                        Mobile Number
+                      </label>
+                      <input
+                        type="tel"
+                        maxLength={10}
+                        value={newStaffPhone}
+                        onChange={(e) => setNewStaffPhone(e.target.value)}
+                        placeholder="10-digit phone"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E7EB] bg-white text-neutral-900 font-mono focus:outline-none focus:border-[#D4AF37]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
+                        Role / Designation
+                      </label>
+                      <input
+                        type="text"
+                        value={newStaffRole}
+                        onChange={(e) => setNewStaffRole(e.target.value)}
+                        placeholder="e.g. Senior Stylist"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E7EB] bg-white text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingStaff(false)}
+                      className="px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-xs font-semibold text-neutral-700 hover:bg-neutral-50 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={newStaffLoading}
+                      className="px-4 py-1.5 rounded-lg bg-[#111827] text-white hover:bg-black text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {newStaffLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#D4AF37]" />}
+                      <span>Save Stylist</span>
+                    </button>
+                  </div>
+                </form>
+              )}
 
               {details?.staff && details.staff.length > 0 ? (
                 <div className="space-y-3">
@@ -315,6 +513,19 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
                           </div>
 
                           <div className="flex items-center gap-2">
+                            {/* WhatsApp Invite Action */}
+                            {st.phone && (
+                              <button
+                                type="button"
+                                onClick={() => handleSendWhatsAppInvite(st)}
+                                className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 flex items-center gap-1 transition-colors cursor-pointer"
+                                title={st.invitation_status === 'invited' ? 'Resend WhatsApp Invite' : 'Send WhatsApp Invite'}
+                              >
+                                <MessageCircle className="w-3 h-3 text-emerald-600" />
+                                <span>{st.invitation_status === 'invited' ? 'Resend Invite' : 'WhatsApp Invite'}</span>
+                              </button>
+                            )}
+
                             {/* Invitation Status */}
                             {st.invitation_status === 'active' ? (
                               <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -333,8 +544,19 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
                               </span>
                             )}
                             <StatusBadge status={st.is_active ? 'active' : 'inactive'} />
+
+                            {/* Delete Stylist Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteStaff(st.id, st.name)}
+                              className="p-1 rounded text-neutral-400 hover:text-rose-600 transition-colors"
+                              title="Delete stylist"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
+
 
                         {/* Permissions Grid */}
                         <div className="space-y-2">
