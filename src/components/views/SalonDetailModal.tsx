@@ -13,12 +13,14 @@ import {
   AlertTriangle,
   ExternalLink,
   ShieldAlert,
+  RefreshCw,
+  Shield,
 } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
 import { UnavailableBanner } from '../common/UnavailableBanner';
-import { fetchSalonDetails, SalonDetailedView } from '../../services/salonsService';
-import { Shop } from '../../types/database';
+import { fetchSalonDetails, updateStaffPermissions, SalonDetailedView } from '../../services/salonsService';
+import { Shop, Staff, StylistPermissions, DEFAULT_STYLIST_PERMISSIONS } from '../../types/database';
 import { formatDateTime, formatDate } from '../../utils/dateUtils';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -31,7 +33,55 @@ interface SalonDetailModalProps {
 export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen, onClose }) => {
   const [details, setDetails] = useState<SalonDetailedView | null>(null);
   const [loading, setLoading] = useState(false);
+  const [savingStaffId, setSavingStaffId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry'>('overview');
+
+  const handleTogglePermission = async (st: Staff, key: keyof StylistPermissions) => {
+    if (!details) return;
+    const currentPerms = st.permissions || DEFAULT_STYLIST_PERMISSIONS;
+    const updatedPerms: StylistPermissions = {
+      ...currentPerms,
+      [key]: !currentPerms[key],
+    };
+
+    setDetails((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        staff: prev.staff.map((s) => (s.id === st.id ? { ...s, permissions: updatedPerms } : s)),
+      };
+    });
+
+    setSavingStaffId(st.id);
+    await updateStaffPermissions(st.id, updatedPerms);
+    setSavingStaffId(null);
+  };
+
+  const handleToggleAllPermissions = async (st: Staff, grant: boolean) => {
+    if (!details) return;
+    const updatedPerms: StylistPermissions = {
+      customers: grant,
+      sales: grant,
+      appointments: grant,
+      reminders: grant,
+      expenses: grant,
+      reports: grant,
+      team: grant,
+      profile: grant,
+    };
+
+    setDetails((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        staff: prev.staff.map((s) => (s.id === st.id ? { ...s, permissions: updatedPerms } : s)),
+      };
+    });
+
+    setSavingStaffId(st.id);
+    await updateStaffPermissions(st.id, updatedPerms);
+    setSavingStaffId(null);
+  };
 
   useEffect(() => {
     if (!shop || !isOpen) return;
@@ -209,22 +259,146 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
             </div>
           )}
 
-          {/* TAB 2: STAFF */}
+          {/* TAB 2: STAFF & STYLIST PERMISSIONS */}
           {activeTab === 'staff' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-1">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800">
+                    Stylist Access & Module Permissions
+                  </h4>
+                  <p className="text-[11px] text-neutral-500 mt-0.5">
+                    Company admin controls which modules each stylist can access inside the StyleFleet mobile app.
+                  </p>
+                </div>
+                {savingStaffId && (
+                  <span className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 animate-pulse font-medium">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Saving to Supabase...</span>
+                  </span>
+                )}
+              </div>
+
               {details?.staff && details.staff.length > 0 ? (
-                <div className="divide-y divide-[#E5E7EB] border border-[#E5E7EB] rounded-xl overflow-hidden shadow-xs">
-                  {details.staff.map((st) => (
-                    <div key={st.id} className="p-3.5 flex items-center justify-between text-xs bg-white">
-                      <div>
-                        <div className="font-semibold text-neutral-900">{st.name}</div>
-                        <div className="text-[11px] text-neutral-500">
-                          Role: {st.role} • Phone: {st.phone || 'No phone'}
+                <div className="space-y-3">
+                  {details.staff.map((st) => {
+                    const perms: StylistPermissions =
+                      st.permissions || DEFAULT_STYLIST_PERMISSIONS;
+                    const isSavingThis = savingStaffId === st.id;
+
+                    const moduleKeys: { key: keyof StylistPermissions; label: string; icon: string }[] = [
+                      { key: 'customers', label: 'Customers', icon: '👥' },
+                      { key: 'sales', label: 'Sales & Billing', icon: '🧾' },
+                      { key: 'appointments', label: 'Appointments', icon: '📅' },
+                      { key: 'reminders', label: 'Reminders', icon: '🔔' },
+                      { key: 'expenses', label: 'Expenses', icon: '💰' },
+                      { key: 'reports', label: 'Reports', icon: '📊' },
+                      { key: 'team', label: 'Team', icon: '✂️' },
+                      { key: 'profile', label: 'Profile', icon: '⚙️' },
+                    ];
+
+                    return (
+                      <div
+                        key={st.id}
+                        className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-3.5"
+                      >
+                        {/* Header: Stylist Info & Status Badges */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0F0F0] pb-2.5">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-neutral-900 text-xs">{st.name}</span>
+                              <span className="text-[11px] font-medium text-neutral-500">({st.role})</span>
+                            </div>
+                            <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
+                              Phone: {st.phone ? `+91 ${st.phone}` : '—'}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {/* Invitation Status */}
+                            {st.invitation_status === 'active' ? (
+                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                App Active
+                              </span>
+                            ) : st.invitation_status === 'invited' ? (
+                              <span
+                                className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                                title={st.invited_at ? `Invited on ${formatDateTime(st.invited_at)}` : 'Invited via WhatsApp'}
+                              >
+                                Invited {st.invited_at ? `(${formatDate(st.invited_at)})` : ''}
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200">
+                                Not Invited
+                              </span>
+                            )}
+                            <StatusBadge status={st.is_active ? 'active' : 'inactive'} />
+                          </div>
+                        </div>
+
+                        {/* Permissions Grid */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                              Module Permissions:
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleAllPermissions(st, true)}
+                                disabled={isSavingThis}
+                                className="text-[10px] font-bold text-[#B8860B] hover:underline cursor-pointer"
+                              >
+                                Grant All
+                              </button>
+                              <span className="text-neutral-300">|</span>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleAllPermissions(st, false)}
+                                disabled={isSavingThis}
+                                className="text-[10px] font-bold text-neutral-500 hover:underline cursor-pointer"
+                              >
+                                Revoke All
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            {moduleKeys.map(({ key, label, icon }) => {
+                              const isGranted = perms[key];
+                              return (
+                                <button
+                                  key={key}
+                                  type="button"
+                                  onClick={() => handleTogglePermission(st, key)}
+                                  disabled={isSavingThis}
+                                  className={`flex items-center justify-between p-2 rounded-lg border text-xs transition-all text-left ${
+                                    isGranted
+                                      ? 'border-[#D4AF37] bg-[#FAF7EE] text-neutral-900 font-semibold shadow-xs'
+                                      : 'border-neutral-200 bg-neutral-50/50 text-neutral-400 font-normal hover:border-neutral-300'
+                                  }`}
+                                >
+                                  <span className="flex items-center gap-1.5 truncate">
+                                    <span className="text-xs">{icon}</span>
+                                    <span className="text-[11px]">{label}</span>
+                                  </span>
+                                  <span
+                                    className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold shrink-0 ${
+                                      isGranted
+                                        ? 'bg-[#B8860B] text-white'
+                                        : 'bg-neutral-200 text-neutral-500'
+                                    }`}
+                                  >
+                                    {isGranted ? '✓' : ''}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
-                      <StatusBadge status={st.is_active ? 'active' : 'inactive'} />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="p-6 text-center text-xs text-neutral-500 border border-dashed border-[#E5E7EB] rounded-xl bg-white">

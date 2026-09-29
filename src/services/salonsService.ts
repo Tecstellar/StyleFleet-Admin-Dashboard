@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Shop, Staff, Customer, Service, ServiceCategory, Bill, Payment, ShopSettings, SupportMessage, AccountDeletion } from '../types/database';
+import { Shop, Staff, Customer, Service, ServiceCategory, Bill, Payment, ShopSettings, SupportMessage, AccountDeletion, StylistPermissions } from '../types/database';
 
 export interface SalonWithRelations extends Shop {
   staffCount?: number;
@@ -232,5 +232,29 @@ export async function fetchSalonDetails(shopId: string): Promise<{ data: SalonDe
   } catch (err: any) {
     console.error('Error fetching salon details:', err);
     return { data: null, error: err.message || 'Unable to load salon details' };
+  }
+}
+
+/**
+ * Company Admin Panel: Updates module permissions for a stylist directly in Supabase
+ */
+export async function updateStaffPermissions(
+  staffId: string,
+  permissions: StylistPermissions
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { error } = await supabase
+      .from('staff')
+      .update({
+        permissions,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', staffId);
+
+    if (error) throw error;
+    return { success: true, error: null };
+  } catch (err: any) {
+    console.error('Error updating staff permissions:', err);
+    return { success: false, error: err.message || 'Failed to update stylist permissions' };
   }
 }

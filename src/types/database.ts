@@ -46,6 +46,28 @@ export interface ShopMember {
   shop?: Shop;
 }
 
+export interface StylistPermissions {
+  customers: boolean;
+  sales: boolean;
+  appointments: boolean;
+  expenses: boolean;
+  reports: boolean;
+  team: boolean;
+  reminders: boolean;
+  profile: boolean;
+}
+
+export const DEFAULT_STYLIST_PERMISSIONS: StylistPermissions = {
+  customers: true,
+  sales: true,
+  appointments: true,
+  expenses: false,
+  reports: false,
+  team: false,
+  reminders: true,
+  profile: false,
+};
+
 export interface Staff {
   id: string;
   shop_id: string;
@@ -55,6 +77,9 @@ export interface Staff {
   phone: string | null;
   is_active: boolean;
   target_amount_minor: number;
+  permissions?: StylistPermissions;
+  invitation_status?: 'not_invited' | 'invited' | 'active' | string;
+  invited_at?: string | null;
   created_at: string;
   updated_at: string;
   shop?: Shop;
