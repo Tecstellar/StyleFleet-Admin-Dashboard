@@ -236,9 +236,10 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-colors shrink-0 ${
                 isActive
-                  ? 'bg-[#111827] text-white font-semibold shadow-xs'
+                  ? 'bg-[#22396f] text-white font-semibold shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
               }`}
+
             >
               <Icon className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>{tab.label}</span>
@@ -388,7 +389,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
                   <button
                     type="button"
                     onClick={() => setIsAddingStaff(!isAddingStaff)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#111827] text-white hover:bg-black text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#22396f] text-white hover:bg-[#1a2d59] text-xs font-bold transition-all shadow-xs cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-[#D4AF37]" />
                     <span>{isAddingStaff ? 'Cancel' : 'Add Stylist'}</span>
@@ -468,7 +469,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
                     <button
                       type="submit"
                       disabled={newStaffLoading}
-                      className="px-4 py-1.5 rounded-lg bg-[#111827] text-white hover:bg-black text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="px-4 py-1.5 rounded-lg bg-[#22396f] text-white hover:bg-[#1a2d59] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       {newStaffLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#D4AF37]" />}
                       <span>Save Stylist</span>
@@ -476,6 +477,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({ shop, isOpen
                   </div>
                 </form>
               )}
+
 
               {details?.staff && details.staff.length > 0 ? (
                 <div className="space-y-3">

@@ -54,7 +54,7 @@ export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
           onClick={() => setActiveTab('directory')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${
             activeTab === 'directory'
-              ? 'bg-[#111827] text-white shadow-xs font-bold border border-[#111827]'
+              ? 'bg-[#22396f] text-white shadow-xs font-bold border border-[#22396f]'
               : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
           }`}
         >
@@ -66,7 +66,7 @@ export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
           onClick={() => setActiveTab('stylists')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${
             activeTab === 'stylists'
-              ? 'bg-[#111827] text-white shadow-xs font-bold border border-[#111827]'
+              ? 'bg-[#22396f] text-white shadow-xs font-bold border border-[#22396f]'
               : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
           }`}
         >
@@ -78,7 +78,7 @@ export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
           onClick={() => setActiveTab('ecosystem_360')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${
             activeTab === 'ecosystem_360'
-              ? 'bg-[#111827] text-white shadow-xs font-bold border border-[#111827]'
+              ? 'bg-[#22396f] text-white shadow-xs font-bold border border-[#22396f]'
               : 'text-neutral-600 hover:text-neutral-900 hover:bg-[#FAF7EE]'
           }`}
         >
@@ -86,6 +86,7 @@ export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
           <span>360° Ecosystem Lineage</span>
         </button>
       </div>
+
 
       {activeTab === 'directory' && (
         <SalonsView
