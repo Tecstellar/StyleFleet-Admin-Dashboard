@@ -80,7 +80,7 @@ export async function performGlobalSearch(query: string): Promise<SearchResultIt
           title: st.name,
           subtitle: `Role: ${st.role} • Phone: ${st.phone || 'N/A'}`,
           badge: 'Staff',
-          targetView: 'salons_360',
+          targetView: 'staff_access',
           rawRecord: st,
         });
       });

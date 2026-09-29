@@ -19,6 +19,7 @@ import {
   Shield,
   FileText,
   Trash2,
+  UserCheck,
 } from 'lucide-react';
 import { NavView } from '../../types/dashboard';
 import { useAuth } from '../../context/AuthContext';
@@ -33,6 +34,7 @@ interface SidebarProps {
   onOpenPrivacyPolicy?: () => void;
   onOpenDeleteAccount?: () => void;
   salonsCount?: number;
+  staffCount?: number;
   deletionsCount?: number;
   supportCount?: number;
 }
@@ -55,14 +57,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenPrivacyPolicy,
   onOpenDeleteAccount,
   salonsCount = 3,
+  staffCount = 0,
   deletionsCount = 5,
   supportCount = 0,
 }) => {
   const { user, logout } = useAuth();
-  // Exactly 9 items matching https://salon-admin-dashboard-lake.vercel.app/
+  
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'salons_360', label: 'Salons & 360°', icon: Store, badge: salonsCount },
+    { id: 'staff_access', label: 'Staff Access Control', icon: UserCheck, badge: staffCount },
     { id: 'reports_bi', label: 'Reports & BI', icon: BarChart3 },
     { id: 'support_messages', label: 'Support Messages', icon: MessageSquare, badge: supportCount },
     { id: 'app_telemetry', label: 'App Version & Telemetry', icon: Smartphone },

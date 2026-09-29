@@ -3,6 +3,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { DashboardView } from './components/views/DashboardView';
 import { SalonsCombinedView } from './components/views/SalonsCombinedView';
+import { StylistsView } from './components/views/StylistsView';
 import { ReportsView } from './components/views/ReportsView';
 import { SupportMessagesView } from './components/views/SupportMessagesView';
 import { AppTelemetryCombinedView } from './components/views/AppTelemetryCombinedView';
@@ -264,8 +265,7 @@ export const App: React.FC = () => {
 
   const handleNavigateToStylists = () => {
     setSelectedShopForModal(null);
-    setSalonsTab('stylists');
-    setCurrentView('salons_360');
+    setCurrentView('staff_access');
   };
 
 
@@ -321,6 +321,7 @@ export const App: React.FC = () => {
         onOpenPrivacyPolicy={openPrivacyPage}
         onOpenDeleteAccount={openDeleteAccountPage}
         salonsCount={shops.length}
+        staffCount={staff.length}
         deletionsCount={deletions.length}
         supportCount={supportMessages.filter((m) => m.status === 'open').length}
       />
@@ -395,8 +396,18 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* 3. Staff Access Control */}
+          {currentView === 'staff_access' && (
+            <StylistsView
+              staff={staff}
+              shops={shops}
+              loading={loading}
+              onRefresh={handleManualRefresh}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
 
-          {/* 3. Reports & BI */}
+          {/* 4. Reports & BI */}
           {currentView === 'reports_bi' && (
             <ReportsView
               shops={shops}

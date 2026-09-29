@@ -414,13 +414,13 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
           <span className="text-[11px] text-emerald-600 mt-0.5 block">Logged in to mobile app</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-blue-200 bg-blue-50/40 shadow-xs">
+        <div className="p-4 rounded-xl border border-[#E8DEC4] bg-[#FAF7EE] shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-700">Invited via WhatsApp</span>
-            <MessageCircle className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-semibold text-[#B8860B]">Invited via WhatsApp</span>
+            <MessageCircle className="w-4 h-4 text-[#D4AF37]" />
           </div>
-          <div className="text-2xl font-bold text-blue-900 mt-2 font-mono">{metrics.invited}</div>
-          <span className="text-[11px] text-blue-600 mt-0.5 block">Invite link delivered</span>
+          <div className="text-2xl font-bold text-neutral-900 mt-2 font-mono">{metrics.invited}</div>
+          <span className="text-[11px] text-[#B8860B] mt-0.5 block">Invite link delivered</span>
         </div>
 
         <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/80 shadow-xs">
@@ -640,10 +640,10 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                           </span>
                         ) : isInvited ? (
                           <span
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]"
                             title={st.invited_at ? `Invited on ${formatDateTime(st.invited_at)}` : 'Invited'}
                           >
-                            <MessageCircle className="w-3.5 h-3.5 text-blue-600" />
+                            <MessageCircle className="w-3.5 h-3.5 text-[#D4AF37]" />
                             <span>Invited {st.invited_at ? `(${formatDate(st.invited_at)})` : ''}</span>
                           </span>
                         ) : (

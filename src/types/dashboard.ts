@@ -19,6 +19,7 @@ export interface DateRange {
 export type NavView =
   | 'dashboard'
   | 'salons_360'
+  | 'staff_access'
   | 'reports_bi'
   | 'support_messages'
   | 'app_telemetry'
