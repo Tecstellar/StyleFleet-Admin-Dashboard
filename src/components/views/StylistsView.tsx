@@ -516,11 +516,12 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
           <button
             onClick={handleOpenAdd}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#22396f] text-white hover:bg-[#1a2d59] text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0D1C42] text-white hover:bg-[#08122B] text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4 text-[#D4AF37]" />
             <span>Add Stylist</span>
           </button>
+
 
         </div>
       </div>
@@ -865,10 +866,11 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               <button
                 type="button"
                 onClick={() => setPermissionModalStaff(null)}
-                className="px-4 py-2 rounded-xl bg-[#22396f] text-white hover:bg-[#1a2d59] font-bold text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#0D1C42] text-white hover:bg-[#08122B] font-bold text-xs transition-colors cursor-pointer"
               >
                 Done
               </button>
+
 
             </div>
           </div>
@@ -1001,11 +1003,12 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="px-5 py-2 rounded-xl bg-[#22396f] text-white hover:bg-[#1a2d59] font-bold text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-[#0D1C42] text-white hover:bg-[#08122B] font-bold text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
               >
                 {actionLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#D4AF37]" />}
                 <span>{editingStaff ? 'Update Stylist' : 'Save Stylist'}</span>
               </button>
+
 
             </div>
           </form>
