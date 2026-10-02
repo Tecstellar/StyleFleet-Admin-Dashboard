@@ -78,10 +78,39 @@ function checkIsDeleteAccountUrl(): boolean {
   );
 }
 
+function getBillRedirectId(): string | null {
+  if (typeof window === 'undefined') return null;
+  const path = window.location.pathname;
+  const match = path.match(/^\/(?:b|bill|invoice)\/([a-zA-Z0-9_-]+)/i);
+  return match ? match[1] : null;
+}
+
 export const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const [billRedirectId] = useState(() => getBillRedirectId());
+  const [billRedirectLoading, setBillRedirectLoading] = useState(() => !!getBillRedirectId());
   const [isPrivacyRoute, setIsPrivacyRoute] = useState(() => checkIsPrivacyUrl());
   const [isDeleteAccountRoute, setIsDeleteAccountRoute] = useState(() => checkIsDeleteAccountUrl());
+
+  useEffect(() => {
+    if (billRedirectId) {
+      supabase
+        .from('bills')
+        .select('pdf_url')
+        .or(`id.eq.${billRedirectId},invoice_number.eq.${billRedirectId}`)
+        .single()
+        .then(({ data }) => {
+          if (data?.pdf_url) {
+            window.location.replace(data.pdf_url);
+          } else {
+            setBillRedirectLoading(false);
+          }
+        })
+        .catch(() => {
+          setBillRedirectLoading(false);
+        });
+    }
+  }, [billRedirectId]);
 
   // Listen to popstate and hash change so back/forward or direct URLs work dynamically
   useEffect(() => {
@@ -268,6 +297,17 @@ export const App: React.FC = () => {
     setCurrentView('staff_access');
   };
 
+
+  // 0. PUBLIC BILL / INVOICE REDIRECT:
+  if (billRedirectId && billRedirectLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0B1F44] text-white p-6 flex-col gap-4">
+        <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <h2 className="text-lg font-semibold tracking-wide">Loading StyleFleet Invoice...</h2>
+        <p className="text-xs text-white/60">Redirecting to your verified PDF invoice</p>
+      </div>
+    );
+  }
 
   // 1. PUBLIC ACCOUNT DELETION PAGE:
   // Can be accessed directly via URL (e.g. /delete-account) without typing username & password!

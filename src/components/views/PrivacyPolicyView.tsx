@@ -107,7 +107,7 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
           </h1>
 
           <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed max-w-3xl">
-            This Privacy Policy describes how <strong className="text-neutral-900">StyleFleet</strong> (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), developed by <strong className="text-neutral-900">TecStellar</strong>, collects, processes, stores, and protects information when you use the StyleFleet Mobile Application (Android and iOS), salon point-of-sale terminals, and the StyleFleet Master Administration Portal.
+            This Privacy Policy describes how <strong className="text-neutral-900">StyleFleet</strong> (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), developed and operated by <strong className="text-neutral-900">TECSTELLAR SOLUTIONS LLP</strong>, collects, processes, stores, and protects information when you use the StyleFleet Mobile Application (Android and iOS), salon point-of-sale terminals, and the StyleFleet Master Administration Portal.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-neutral-500 border-t border-[#E5E7EB]">
@@ -121,7 +121,7 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
             </div>
             <div className="flex items-center gap-1.5">
               <Building className="w-3.5 h-3.5 text-[#B8860B]" />
-              <span>Operating Entity: <strong className="text-neutral-900 font-medium">StyleFleet by TecStellar</strong></span>
+              <span>Operating Legal Entity: <strong className="text-neutral-900 font-medium">TECSTELLAR SOLUTIONS LLP</strong></span>
             </div>
           </div>
         </div>
@@ -318,19 +318,19 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
             </p>
             <div className="p-4 rounded-xl bg-[#FAF7EE] border border-[#E8DEC4] space-y-1.5 text-xs">
               <div className="font-bold text-neutral-900 text-sm">StyleFleet Data Protection Officer</div>
-              <div className="text-neutral-700">Entity: <strong className="text-neutral-900">StyleFleet / TecStellar</strong></div>
+              <div className="text-neutral-700">Legal Entity: <strong className="text-neutral-900">TECSTELLAR SOLUTIONS LLP</strong></div>
               <div className="flex items-center gap-1.5 text-[#B8860B] font-mono">
                 <Mail className="w-3.5 h-3.5" />
                 <span>{contactEmail}</span>
               </div>
-              <div className="text-neutral-500">Address: India</div>
+              <div className="text-neutral-600">Registered Office: 60, Subramaniam Rd, R.S. Puram, Coimbatore, Tamil Nadu 641002, India</div>
             </div>
           </section>
         </div>
 
         {/* Footer Notice */}
         <div className="pt-6 border-t border-[#E5E7EB] text-center text-xs text-neutral-500 space-y-1">
-          <p>&copy; {new Date().getFullYear()} StyleFleet. Developed by TecStellar. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} StyleFleet. Owned &amp; Operated by <strong>TECSTELLAR SOLUTIONS LLP</strong>. All rights reserved.</p>
           <p className="text-[11px]">
             This policy applies to the StyleFleet Mobile Application, Web Dashboard, and POS Services.
           </p>

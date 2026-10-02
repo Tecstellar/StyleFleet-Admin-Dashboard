@@ -124,7 +124,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
 
           {/* Intro Description */}
           <p className="text-sm sm:text-base leading-relaxed mb-8 text-neutral-600">
-            This page explains how to delete your account in the <strong>StyleFleet</strong> app (developed and operated by <strong>TecStellar</strong>) and what happens to your data. You can use either option below.
+            This page explains how to delete your account in the <strong>StyleFleet</strong> app (developed and operated by <strong>TECSTELLAR SOLUTIONS LLP</strong>) and what happens to your data. You can use either option below.
           </p>
 
           {/* Option 1: In-App Deletion */}
@@ -249,7 +249,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           <div className="pt-6 border-t border-[#E5E7EB] text-xs text-neutral-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>StyleFleet • TecStellar Business Technologies</span>
+              <span>StyleFleet • Owned &amp; Operated by <strong>TECSTELLAR SOLUTIONS LLP</strong></span>
             </div>
             {onOpenPrivacyPolicy && (
               <button
