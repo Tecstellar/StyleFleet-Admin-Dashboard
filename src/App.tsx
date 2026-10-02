@@ -102,7 +102,14 @@ export const App: React.FC = () => {
     if (!id) return;
 
     if (directFile) {
-      const storageUrl = `https://xukjtwpmluugcxoixxww.supabase.co/storage/v1/object/public/invoices/${directFile}`;
+      const storageUrl = `https://scgokpcoyfewrtrwqxpu.supabase.co/storage/v1/object/public/invoices/${directFile}`;
+      setResolvedPdfUrl(storageUrl);
+      window.location.replace(storageUrl);
+      return;
+    }
+
+    if (id.toLowerCase().endsWith('.pdf')) {
+      const storageUrl = `https://scgokpcoyfewrtrwqxpu.supabase.co/storage/v1/object/public/invoices/${id}`;
       setResolvedPdfUrl(storageUrl);
       window.location.replace(storageUrl);
       return;
@@ -124,10 +131,15 @@ export const App: React.FC = () => {
           setResolvedPdfUrl(data.pdf_url);
           window.location.replace(data.pdf_url);
         } else {
-          setBillRedirectLoading(false);
+          // Fallback direct storage file attempt
+          const fallbackUrl = `https://scgokpcoyfewrtrwqxpu.supabase.co/storage/v1/object/public/invoices/${id}.pdf`;
+          setResolvedPdfUrl(fallbackUrl);
+          window.location.replace(fallbackUrl);
         }
       } catch {
-        setBillRedirectLoading(false);
+        const fallbackUrl = `https://scgokpcoyfewrtrwqxpu.supabase.co/storage/v1/object/public/invoices/${id}.pdf`;
+        setResolvedPdfUrl(fallbackUrl);
+        window.location.replace(fallbackUrl);
       }
     };
 

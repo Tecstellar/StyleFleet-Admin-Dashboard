@@ -2,6 +2,14 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/b/:file(.*\\.pdf)",
+      "destination": "https://scgokpcoyfewrtrwqxpu.supabase.co/storage/v1/object/public/invoices/:file"
+    },
+    {
+      "source": "/b/:path*",
+      "destination": "/api/b?path=:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
