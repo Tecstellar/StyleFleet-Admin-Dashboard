@@ -78,39 +78,56 @@ function checkIsDeleteAccountUrl(): boolean {
   );
 }
 
-function getBillRedirectId(): string | null {
-  if (typeof window === 'undefined') return null;
+function getBillRedirectInfo(): { id: string | null; directFile: string | null } {
+  if (typeof window === 'undefined') return { id: null, directFile: null };
   const path = window.location.pathname;
-  const match = path.match(/^\/(?:b|bill|invoice)\/([a-zA-Z0-9_-]+)/i);
-  return match ? match[1] : null;
+  const match = path.match(/^\/(?:b|bill|invoice)\/([a-zA-Z0-9_.-]+)/i);
+  const id = match ? match[1] : null;
+  const params = new URLSearchParams(window.location.search);
+  const directFile = params.get('f') || params.get('file');
+  return { id, directFile };
 }
 
 export const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const [billRedirectId] = useState(() => getBillRedirectId());
-  const [billRedirectLoading, setBillRedirectLoading] = useState(() => !!getBillRedirectId());
+  const [billRedirectInfo] = useState(() => getBillRedirectInfo());
+  const [resolvedPdfUrl, setResolvedPdfUrl] = useState<string | null>(null);
+  const [billRedirectLoading, setBillRedirectLoading] = useState(() => !!billRedirectInfo.id);
   const [isPrivacyRoute, setIsPrivacyRoute] = useState(() => checkIsPrivacyUrl());
   const [isDeleteAccountRoute, setIsDeleteAccountRoute] = useState(() => checkIsDeleteAccountUrl());
 
   useEffect(() => {
-    if (billRedirectId) {
-      supabase
-        .from('bills')
-        .select('pdf_url')
-        .or(`id.eq.${billRedirectId},invoice_number.eq.${billRedirectId}`)
-        .single()
-        .then(({ data }) => {
-          if (data?.pdf_url) {
-            window.location.replace(data.pdf_url);
-          } else {
-            setBillRedirectLoading(false);
-          }
-        })
-        .catch(() => {
-          setBillRedirectLoading(false);
-        });
+    const { id, directFile } = billRedirectInfo;
+    if (!id) return;
+
+    if (directFile) {
+      const storageUrl = `https://xukjtwpmluugcxoixxww.supabase.co/storage/v1/object/public/invoices/${directFile}`;
+      setResolvedPdfUrl(storageUrl);
+      window.location.replace(storageUrl);
+      return;
     }
-  }, [billRedirectId]);
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    let q = supabase.from('bills').select('pdf_url');
+    if (isUuid) {
+      q = q.eq('id', id);
+    } else {
+      q = q.eq('invoice_number', id);
+    }
+
+    q.maybeSingle()
+      .then(({ data }) => {
+        if (data?.pdf_url) {
+          setResolvedPdfUrl(data.pdf_url);
+          window.location.replace(data.pdf_url);
+        } else {
+          setBillRedirectLoading(false);
+        }
+      })
+      .catch(() => {
+        setBillRedirectLoading(false);
+      });
+  }, [billRedirectInfo]);
 
   // Listen to popstate and hash change so back/forward or direct URLs work dynamically
   useEffect(() => {
@@ -299,12 +316,36 @@ export const App: React.FC = () => {
 
 
   // 0. PUBLIC BILL / INVOICE REDIRECT:
-  if (billRedirectId && billRedirectLoading) {
+  if (billRedirectInfo.id) {
+    if (billRedirectLoading) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[#0B1F44] text-white p-6 flex-col gap-4 text-center">
+          <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <h2 className="text-lg font-semibold tracking-wide">Opening StyleFleet Invoice...</h2>
+          <p className="text-xs text-white/60">Redirecting to your verified salon PDF invoice</p>
+        </div>
+      );
+    }
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B1F44] text-white p-6 flex-col gap-4">
-        <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
-        <h2 className="text-lg font-semibold tracking-wide">Loading StyleFleet Invoice...</h2>
-        <p className="text-xs text-white/60">Redirecting to your verified PDF invoice</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#0B1F44] text-white p-6 flex-col gap-4 text-center">
+        <h2 className="text-xl font-bold tracking-wide">StyleFleet Invoice</h2>
+        <p className="text-xs text-white/70 max-w-sm">
+          Your invoice document is ready. Click below to view or download.
+        </p>
+        {resolvedPdfUrl ? (
+          <a
+            href={resolvedPdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 font-semibold text-black text-sm transition-colors"
+          >
+            View / Download Invoice PDF
+          </a>
+        ) : (
+          <p className="text-xs text-amber-300">
+            Invoice not found or expired. Please contact your salon for assistance.
+          </p>
+        )}
       </div>
     );
   }
