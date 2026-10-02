@@ -20,6 +20,7 @@ import { fetchShops } from './services/salonsService';
 import { fetchProfiles, fetchStaff, fetchCustomers } from './services/usersService';
 import { fetchBills, fetchPayments, fetchSubscriptions } from './services/billingService';
 import { fetchAppointments } from './services/appointmentsService';
+import { supabase } from './services/supabase';
 
 import { fetchSupportMessages, subscribeToSupportMessages } from './services/supportService';
 import { fetchAccountDeletions, subscribeToAccountDeletions } from './services/deletionsService';
@@ -107,26 +108,30 @@ export const App: React.FC = () => {
       return;
     }
 
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-    let q = supabase.from('bills').select('pdf_url');
-    if (isUuid) {
-      q = q.eq('id', id);
-    } else {
-      q = q.eq('invoice_number', id);
-    }
+    const resolveBill = async () => {
+      try {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        let q = supabase.from('bills').select('pdf_url');
+        if (isUuid) {
+          q = q.eq('id', id);
+        } else {
+          q = q.eq('invoice_number', id);
+        }
 
-    q.maybeSingle()
-      .then(({ data }) => {
+        const res = await q.maybeSingle();
+        const data = res.data as { pdf_url?: string } | null;
         if (data?.pdf_url) {
           setResolvedPdfUrl(data.pdf_url);
           window.location.replace(data.pdf_url);
         } else {
           setBillRedirectLoading(false);
         }
-      })
-      .catch(() => {
+      } catch {
         setBillRedirectLoading(false);
-      });
+      }
+    };
+
+    resolveBill();
   }, [billRedirectInfo]);
 
   // Listen to popstate and hash change so back/forward or direct URLs work dynamically
