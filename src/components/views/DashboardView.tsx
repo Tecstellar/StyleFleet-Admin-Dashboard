@@ -589,137 +589,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* DOMAIN SECTION 1: LIVE SALON ACTIVITY */}
-      <div className="overview-section overview-section--live">
-        <div className="flex items-center justify-between">
-          <span className="overview-section-title">Live Salon Activity</span>
-          <span className="text-[11px] font-mono font-medium text-neutral-600">Real-time sync</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          <KPICard
-            title="Active Salons"
-            value={formatNumber(filteredShops.length)}
-            subtitle={`${shops.length} registered partner salons`}
-            tone="usage"
-            icon={Store}
-            onClick={() => onNavigate('salons_360')}
-          />
-          <KPICard
-            title="Sales Put In"
-            value={formatNumber(scopedBills.length)}
-            subtitle={`${activeSalonsWithBillsCount} active salon(s) generating sales`}
-            tone="order-good"
-            icon={Receipt}
-            onClick={() => setActiveTab('daily_ledger')}
-          />
-          <KPICard
-            title="Customer Base"
-            value={formatNumber(customers.length)}
-            subtitle="Verified client records in directory"
-            tone="signup"
-            icon={Users}
-            onClick={() => onNavigate('customer_tracking')}
-          />
-          <KPICard
-            title="Stylists On Fleet"
-            value={formatNumber(scopedStaff.length)}
-            subtitle={`${scopedStaff.filter((s) => s.invitation_status === 'active').length} active stylists`}
-            tone="neutral"
-            icon={Scissors}
-            onClick={() => onNavigate('staff_access')}
-          />
-        </div>
-      </div>
-
-      {/* DOMAIN SECTION 2: SALES & BILLING MOMENTUM */}
-      <div className="overview-section overview-section--revenue">
-        <div className="flex items-center justify-between">
-          <span className="overview-section-title">Sales &amp; Billing Momentum</span>
-          <span className="text-[11px] font-mono font-medium text-emerald-800">Invoiced &amp; Settled Sales</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          <KPICard
-            title="Invoiced Sales Volume"
-            value={formatCurrency(totalBilledMinor)}
-            subtitle={`${scopedBills.length} sale invoice(s) generated`}
-            tone="revenue"
-            icon={DollarSign}
-            onClick={() => setActiveTab('all_bills')}
-          />
-          <KPICard
-            title="Settled Collections"
-            value={formatCurrency(totalPaidMinor)}
-            subtitle={`${scopedPayments.length} verified payment txns`}
-            tone="brand"
-            icon={Wallet}
-            onClick={() => setActiveTab('subscription_revenue')}
-          />
-          <KPICard
-            title="Average Ticket Size"
-            value={formatCurrency(avgTicketMinor)}
-            subtitle="Average value per sale transaction"
-            tone="conversion"
-            icon={TrendingUp}
-            onClick={() => setActiveTab('overview')}
-          />
-          <KPICard
-            title="Pending Receivables"
-            value={formatCurrency(pendingAmountMinor)}
-            subtitle={`${pendingBills.length} invoice(s) awaiting payment`}
-            tone="order-warn"
-            icon={Clock}
-            onClick={() => {
-              setBillStatusFilter('pending');
-              setActiveTab('all_bills');
-            }}
-          />
-        </div>
-      </div>
-
-      {/* DOMAIN SECTION 3: 100 FREE SALES QUOTA & PRO UPGRADE TRACKER */}
-      <div className="overview-section overview-section--subscriptions">
-        <div className="flex items-center justify-between">
-          <span className="overview-section-title">100 Free Sales Quota &amp; Pro Upgrade Tracker</span>
-          <span className="text-[11px] font-mono font-medium text-neutral-600">100 free sales from registration</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          <KPICard
-            title="In 100 Free Sales Trial"
-            value={salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
-            subtitle="< 50 sales completed"
-            tone="trial"
-            icon={CheckCircle2}
-            onClick={() => onNavigate('subscription_plans')}
-          />
-          <KPICard
-            title="Nearing 100 Limit"
-            value={salonTierLedger.filter((s) => s.billsCount >= 50 && s.billsCount < 100).length}
-            subtitle="50 to 99 sales (Upgrade alert)"
-            tone="order-warn"
-            icon={Clock}
-            onClick={() => onNavigate('subscription_plans')}
-          />
-          <KPICard
-            title="Limit Reached (100+)"
-            value={salonTierLedger.filter((s) => s.billsCount >= 100).length}
-            subtitle="Mandatory Pro upgrade required"
-            tone="order-risk"
-            icon={Receipt}
-            onClick={() => onNavigate('subscription_plans')}
-          />
-          <KPICard
-            title="Pro Upgrades &amp; Revenue"
-            value={formatCurrency(
-              salonTierLedger
-                .filter((s) => s.tier !== 'Free Trial')
-                .reduce((acc, s) => acc + s.collectedMinor, 0)
-            )}
-            subtitle={`${salonTierLedger.filter((s) => s.tier !== 'Free Trial').length} salons on Pro (₹1,499 / ₹2,799 / ₹4,999)`}
-            tone="revenue"
-            icon={CreditCard}
-            onClick={() => onNavigate('subscription_plans')}
-          />
-        </div>
+      {/* FOUNDER EXECUTIVE PULSE - COMPACT SQUARE KPI TILES */}
+      <div className="flex flex-wrap gap-2.5">
+        <KPICard
+          title="Invoiced Sales"
+          value={formatCurrency(totalBilledMinor)}
+          subtitle={`${scopedBills.length} sale invoice(s)`}
+          tone="revenue"
+          icon={DollarSign}
+          onClick={() => setActiveTab('all_bills')}
+        />
+        <KPICard
+          title="Settled Collections"
+          value={formatCurrency(totalPaidMinor)}
+          subtitle={`${scopedPayments.length} verified payment(s)`}
+          tone="brand"
+          icon={Wallet}
+          onClick={() => setActiveTab('subscription_revenue')}
+        />
+        <KPICard
+          title="Sales Put In"
+          value={formatNumber(scopedBills.length)}
+          subtitle={`${activeSalonsWithBillsCount} active salon(s)`}
+          tone="order-good"
+          icon={Receipt}
+          onClick={() => setActiveTab('daily_ledger')}
+        />
+        <KPICard
+          title="Active Salons"
+          value={formatNumber(filteredShops.length)}
+          subtitle={`${shops.length} partner salon(s)`}
+          tone="usage"
+          icon={Store}
+          onClick={() => onNavigate('salons_360')}
+        />
+        <KPICard
+          title="Stylists On Fleet"
+          value={formatNumber(scopedStaff.length)}
+          subtitle={`${scopedStaff.filter((s) => s.invitation_status === 'active').length} active stylists`}
+          tone="neutral"
+          icon={Scissors}
+          onClick={() => onNavigate('staff_access')}
+        />
       </div>
 
       {/* MASTER MULTI-ATTRIBUTE FILTER PANEL (IRON DROBE STYLE) */}
@@ -1449,7 +1360,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {activeTab === 'subscription_revenue' && (
         <div className="space-y-6">
           {/* Top KPI Cards for Subscription & Revenue in IronDrobe Tones */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <div className="flex flex-wrap gap-2.5">
             <div className="metric-card metric-tone-revenue">
               <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
                 <span className="font-bold uppercase tracking-wider text-[10px]">Total Settled Revenue</span>

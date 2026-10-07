@@ -84,14 +84,22 @@ body {
   background: rgba(148, 163, 184, 0.6);
 }
 
-/* IronDrobe Metric Card Tones - Compact Small Cards */
+/* Metric Card Tones - Compact Square Cards */
 .metric-card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   box-shadow: var(--shadow-xs);
   transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 165px;
+  min-width: 130px;
+  box-sizing: border-box;
 }
 .metric-card:hover {
   box-shadow: var(--shadow-sm);

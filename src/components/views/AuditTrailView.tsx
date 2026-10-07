@@ -378,56 +378,56 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
         />
       </div>
 
-      {/* Snapshot Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+      {/* Snapshot Cards - Compact Square Tiles */}
+      <div className="flex flex-wrap gap-2.5">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Audit Records</span>
-            <History className="w-3.5 h-3.5 text-[#1c1f26]" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Audit Records</span>
+            <History className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {filteredItems.length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Events matching filter</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Events in filter</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Active Filter Scope</span>
-            <Building2 className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Active Scope</span>
+            <Building2 className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-sm font-bold text-[#1c1f26] truncate mt-1">
+          <div className="my-auto py-1 text-xs sm:text-sm font-bold text-[#1c1f26] truncate">
             {salonFilter !== 'all'
               ? shopMap.get(salonFilter)?.name || '1 Salon'
               : cityFilter !== 'all'
-              ? `${cityFilter} Region`
-              : 'All Salons & Cities'}
+              ? `${cityFilter}`
+              : 'All Salons'}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">
-            {exactDate ? `Date: ${exactDate}` : 'Filtered time window'}
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">
+            {exactDate ? `${exactDate}` : 'All window'}
           </span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Payments Recorded</span>
-            <CreditCard className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Payments</span>
+            <CreditCard className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {filteredItems.filter((i) => i.type === 'Payment').length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Settled transactions</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Settled txns</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Invoices Issued</span>
-            <FileSpreadsheet className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Invoices</span>
+            <FileSpreadsheet className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {filteredItems.filter((i) => i.type === 'Invoice').length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Bills in active scope</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Issued bills</span>
         </div>
       </div>
 

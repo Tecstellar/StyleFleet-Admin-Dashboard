@@ -329,57 +329,57 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         </button>
       </div>
 
-      {/* 4 IronDrobe Metric KPI Cards strictly with live Supabase data (Compact Small Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+      {/* 4 Metric KPI Cards - Compact Square Tiles */}
+      <div className="flex flex-wrap gap-2.5">
         {/* CARD 1: TOTAL USERS */}
-        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-2.5 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between aspect-square w-full max-w-[165px] min-w-[130px] flex-1">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono truncate">
             TOTAL USERS
           </div>
-          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-[#1c1f26] font-mono tracking-tight truncate">
             {formatNumber(totalUsersCount)}
           </div>
-          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
-            as of {latestDateString} • all dates
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 font-medium truncate">
+            as of {latestDateString}
           </div>
         </div>
 
         {/* CARD 2: NEW SUBSCRIBERS */}
-        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-2.5 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between aspect-square w-full max-w-[165px] min-w-[130px] flex-1">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono truncate">
             NEW SUBSCRIBERS
           </div>
-          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-[#1c1f26] font-mono tracking-tight truncate">
             {newSubscribersCount}
           </div>
-          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
-            first payments • all dates
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 font-medium truncate">
+            first payments
           </div>
         </div>
 
         {/* CARD 3: TOTAL SUBSCRIBERS */}
-        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-2.5 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between aspect-square w-full max-w-[165px] min-w-[130px] flex-1">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono truncate">
             TOTAL SUBSCRIBERS
           </div>
-          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-[#1c1f26] font-mono tracking-tight truncate">
             {totalSubscribersCount}
           </div>
-          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 font-medium truncate">
             as of {latestDateString}
           </div>
         </div>
 
         {/* CARD 4: USER GROWTH */}
-        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-2.5 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between aspect-square w-full max-w-[165px] min-w-[130px] flex-1">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono truncate">
             USER GROWTH
           </div>
-          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-[#1c1f26] font-mono tracking-tight truncate">
             {growthPercentage}
           </div>
-          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
-            over loaded date range
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 font-medium truncate">
+            loaded range
           </div>
         </div>
       </div>

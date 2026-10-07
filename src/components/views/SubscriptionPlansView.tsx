@@ -361,56 +361,56 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         <Crown className="absolute -right-8 -bottom-10 w-56 h-56 text-white/5 pointer-events-none" />
       </div>
 
-      {/* KPI Cards in IronDrobe Tones */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
+      {/* KPI Cards in IronDrobe Tones - Compact Square Tiles */}
+      <div className="flex flex-wrap gap-2.5">
         {/* Total Salons */}
-        <div className="metric-card metric-tone-usage flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Registered Salons</span>
-            <Building2 className="w-3.5 h-3.5 text-[#0d9488]" />
+        <div className="metric-card metric-tone-usage aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Salons</span>
+            <Building2 className="w-3.5 h-3.5 text-[#0d9488] shrink-0" />
           </div>
-          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight">{totalSalons}</div>
-          <div className="text-[10px] font-medium text-slate-500 mt-0.5">Unique salons registered</div>
+          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">{totalSalons}</div>
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">Registered</div>
         </div>
 
         {/* Free Tier Active */}
-        <div className="metric-card metric-tone-trial flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Free Tier Active</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#d97706]" />
+        <div className="metric-card metric-tone-trial aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Free Active</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#d97706] shrink-0" />
           </div>
-          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight">{freeActiveCount}</div>
-          <div className="text-[10px] font-medium text-slate-500 mt-0.5">&lt; 50 sales completed</div>
+          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">{freeActiveCount}</div>
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">&lt; 50 sales</div>
         </div>
 
         {/* Nearing Limit (High Usage) */}
-        <div className="metric-card metric-tone-order-warn flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600">Nearing 100 Limit</span>
-            <Clock className="w-3.5 h-3.5 text-[#ea580c]" />
+        <div className="metric-card metric-tone-order-warn aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 truncate">Near Limit</span>
+            <Clock className="w-3.5 h-3.5 text-[#ea580c] shrink-0" />
           </div>
-          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-orange-600">{nearingLimitCount}</div>
-          <div className="text-[10px] font-medium text-slate-500 mt-0.5">50 to 99 sales (Alert zone)</div>
+          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-orange-600 truncate">{nearingLimitCount}</div>
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">50-99 sales</div>
         </div>
 
         {/* Pro Required */}
-        <div className="metric-card metric-tone-order-risk flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">Pro Required</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-[#dc2626]" />
+        <div className="metric-card metric-tone-order-risk aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 truncate">Pro Required</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-[#dc2626] shrink-0" />
           </div>
-          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-rose-600">{proRequiredCount}</div>
-          <div className="text-[10px] font-medium text-slate-500 mt-0.5">100+ sales completed</div>
+          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-rose-600 truncate">{proRequiredCount}</div>
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">100+ sales</div>
         </div>
 
         {/* Platform Total Sales Done */}
-        <div className="metric-card metric-tone-revenue flex flex-col justify-between col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between text-slate-500 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Total Sales Billed</span>
-            <Receipt className="w-3.5 h-3.5 text-[#059669]" />
+        <div className="metric-card metric-tone-revenue aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Sales Billed</span>
+            <Receipt className="w-3.5 h-3.5 text-[#059669] shrink-0" />
           </div>
-          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight">{totalPlatformSalesDone}</div>
-          <div className="text-[10px] font-medium text-slate-500 mt-0.5">Invoices in database</div>
+          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">{totalPlatformSalesDone}</div>
+          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">In database</div>
         </div>
       </div>
 

@@ -238,41 +238,41 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, shops = 
         message="StyleFleet SaaS tier subscription purchases (App Store / Google Play / Razorpay SaaS) are not stored in the connected Supabase database. Displaying verified salon customer payments and billing settlements recorded in public.payments."
       />
 
-      {/* Financial Snapshot - High-Contrast KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+      {/* Financial Snapshot - High-Contrast KPI Cards (Compact Square Tiles) */}
+      <div className="flex flex-wrap gap-2.5">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Collected Total</span>
-            <span className="font-mono font-bold text-[#1c1f26] text-[11px]">{filteredPayments.length} txns</span>
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Collected</span>
+            <span className="font-mono font-bold text-[#1c1f26] text-[10px] shrink-0">{filteredPayments.length} txns</span>
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {formatCurrency(totalAmountMinor)}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">
-            {exactDate ? `Exact date: ${exactDate}` : 'Filtered period total'}
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">
+            {exactDate ? `Date: ${exactDate}` : 'Filtered total'}
           </span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Completed Status</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Completed</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {completedCount}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Settled without errors</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Settled clean</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Pending / Other</span>
-            <Clock className="w-3.5 h-3.5 text-neutral-500" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Pending</span>
+            <Clock className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {pendingCount}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Processing or unpaid entries</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Processing</span>
         </div>
       </div>
 

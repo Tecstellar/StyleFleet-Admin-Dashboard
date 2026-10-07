@@ -394,51 +394,51 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
         </div>
       )}
 
-      {/* Top Banner & KPI Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+      {/* Top Banner & KPI Stat Cards - Compact Square Tiles */}
+      <div className="flex flex-wrap gap-2.5">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Total Stylists</span>
-            <Scissors className="w-3.5 h-3.5 text-[#1c1f26]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 truncate">Total Stylists</span>
+            <Scissors className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold text-neutral-900 mt-1 font-mono tracking-tight">{metrics.total}</div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Across {shops.length} salons</span>
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.total}</div>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Across {shops.length} salons</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">App Active</span>
-            <Smartphone className="w-3.5 h-3.5 text-neutral-900" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">App Active</span>
+            <Smartphone className="w-3.5 h-3.5 text-neutral-900 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold text-neutral-900 mt-1 font-mono tracking-tight">{metrics.appActive}</div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Logged in to mobile app</span>
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.appActive}</div>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Logged in app</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-neutral-700 bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-neutral-700 bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Invited via WhatsApp</span>
-            <MessageCircle className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">WA Invited</span>
+            <MessageCircle className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold text-neutral-900 mt-1 font-mono tracking-tight">{metrics.invited}</div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Invite link delivered</span>
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.invited}</div>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Invite delivered</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-neutral-400 bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-neutral-400 bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Pending Invite</span>
-            <Users className="w-3.5 h-3.5 text-neutral-400" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">Pending Invite</span>
+            <Users className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold text-neutral-700 mt-1 font-mono tracking-tight">{metrics.notInvited}</div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Needs WhatsApp invite</span>
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-700 font-mono tracking-tight truncate">{metrics.notInvited}</div>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Needs invite</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Active Roster</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#1c1f26]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">Active Roster</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold text-neutral-900 mt-1 font-mono tracking-tight">{metrics.activeAccounts}</div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Enabled for salon work</span>
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.activeAccounts}</div>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Enabled work</span>
         </div>
       </div>
 

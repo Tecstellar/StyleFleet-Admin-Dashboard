@@ -464,57 +464,57 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         </span>
       </div>
 
-      {/* True KPI Cards (Compact Small Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+      {/* True KPI Cards - Compact Square Tiles */}
+      <div className="flex flex-wrap gap-2.5">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Total Real Revenue</span>
-            <DollarSign className="w-3.5 h-3.5 text-black" />
+            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Real Revenue</span>
+            <DollarSign className="w-3.5 h-3.5 text-black shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
             {formatCurrency(totalRevenueCollectedMinor)}
           </div>
-          <span className="text-[10px] text-neutral-400 mt-0.5 block">
-            Completed payment settlements
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
+            Settled payments
           </span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Transactions Settled</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-800" />
+            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Txns Settled</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
             {totalCompletedTransactions}
           </div>
-          <span className="text-[10px] text-neutral-400 mt-0.5 block">
-            Verified records in public.payments
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
+            Verified records
           </span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Contributing Salons</span>
-            <Building2 className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Contributing</span>
+            <Building2 className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
             {activeContributingSalons}
           </div>
-          <span className="text-[10px] text-neutral-400 mt-0.5 block">
-            Salons with completed settlements
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
+            Salons settled
           </span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px]">Average Settlement</span>
-            <TrendingUp className="w-3.5 h-3.5 text-neutral-900" />
+            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Avg Settlement</span>
+            <TrendingUp className="w-3.5 h-3.5 text-neutral-900 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
             {formatCurrency(avgTransactionAmountMinor)}
           </div>
-          <span className="text-[10px] text-neutral-400 mt-0.5 block">
-            Average per transaction
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
+            Per transaction
           </span>
         </div>
       </div>

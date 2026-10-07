@@ -20,12 +20,12 @@ export const KPICard: React.FC<KPICardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`metric-card relative overflow-hidden transition-all duration-200 group ${toneClass} ${
+      className={`metric-card relative overflow-hidden transition-all duration-200 group flex flex-col justify-between aspect-square w-full max-w-[165px] min-w-[130px] flex-1 ${toneClass} ${
         onClick ? 'cursor-pointer hover:shadow-sm hover:-translate-y-0.5' : ''
       }`}
     >
       {/* Top row: Label and Icon */}
-      <div className="flex items-center justify-between gap-2 mb-1.5">
+      <div className="flex items-center justify-between gap-1.5 mb-1">
         <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase truncate">
           {title}
         </span>
@@ -37,33 +37,33 @@ export const KPICard: React.FC<KPICardProps> = ({
       </div>
 
       {/* Main Metric Value */}
-      <div className="flex items-baseline gap-1.5 mb-1.5">
+      <div className="my-auto py-1">
         {isUnavailable ? (
-          <div className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-            Data Unavailable
+          <div className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+            Unavailable
           </div>
         ) : (
-          <div className="metric-value text-lg sm:text-xl font-bold tracking-tight font-mono">
+          <div className="metric-value text-base sm:text-lg lg:text-xl font-bold tracking-tight font-mono text-[#1c1f26] truncate" title={String(value)}>
             {value}
           </div>
         )}
       </div>
 
       {/* Footer: Subtitle and Trend */}
-      <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-neutral-100 text-[10.5px]">
+      <div className="pt-1 border-t border-neutral-100 flex items-center justify-between gap-1 text-[9.5px]">
         {isUnavailable ? (
-          <span className="text-neutral-400 truncate text-[10px]">
-            {unavailableReason || 'Source table not configured'}
+          <span className="text-neutral-400 truncate text-[9.5px]">
+            {unavailableReason || 'Source unavailable'}
           </span>
         ) : (
           <>
-            <span className="text-neutral-500 truncate text-[10px] font-medium">
-              {subtitle || (isDateFilterable ? 'Filtered period' : 'All-time total')}
+            <span className="text-neutral-500 truncate text-[9.5px] font-medium" title={subtitle}>
+              {subtitle || (isDateFilterable ? 'Filtered' : 'All-time')}
             </span>
 
             {change && (
               <div
-                className={`inline-flex items-center gap-0.5 font-semibold px-1.5 py-0.2 rounded-full text-[9.5px] shrink-0 ${
+                className={`inline-flex items-center gap-0.5 font-semibold px-1 py-0.2 rounded text-[8.5px] shrink-0 ${
                   changeType === 'positive'
                     ? 'bg-neutral-100 text-neutral-900 border border-neutral-200'
                     : changeType === 'negative'
@@ -80,13 +80,6 @@ export const KPICard: React.FC<KPICardProps> = ({
           </>
         )}
       </div>
-
-      {!isDateFilterable && !isUnavailable && (
-        <div className="mt-1 flex items-center gap-1 text-[9px] text-neutral-400 font-medium">
-          <Info className="w-2.5 h-2.5 shrink-0" />
-          <span>Metric is not date-filterable</span>
-        </div>
-      )}
     </div>
   );
 };

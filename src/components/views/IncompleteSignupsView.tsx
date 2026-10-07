@@ -268,50 +268,50 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
         />
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+      {/* KPI Cards - Compact Square Tiles */}
+      <div className="flex flex-wrap gap-2.5">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Incomplete Salons</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-[#1c1f26]" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Incomplete</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {incompleteShops.length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Require onboarding outreach</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Needs outreach</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Zero Staff Added</span>
-            <Users className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Zero Staff</span>
+            <Users className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {deduplicatedShops.filter((s) => (s.staff_count ?? 0) === 0).length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Awaiting team invitation</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Needs team</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Awaiting 1st Bill</span>
-            <Receipt className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Zero Bills</span>
+            <Receipt className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {deduplicatedShops.filter((s) => (s.bill_count ?? 0) === 0).length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Ready to start billing</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Awaiting 1st</span>
         </div>
 
-        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
+        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px]">Fully Onboarded</span>
-            <CheckCircle className="w-3.5 h-3.5 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Onboarded</span>
+            <CheckCircle className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
           </div>
-          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
+          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
             {deduplicatedShops.filter((s) => (s.staff_count ?? 0) > 0 && (s.bill_count ?? 0) > 0).length}
           </div>
-          <span className="text-[10px] text-neutral-500 mt-0.5 block">Staff + billing active</span>
+          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Staff + billing</span>
         </div>
       </div>
 
