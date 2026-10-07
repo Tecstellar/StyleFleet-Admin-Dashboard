@@ -84,17 +84,17 @@ body {
   background: rgba(148, 163, 184, 0.6);
 }
 
-/* IronDrobe Metric Card Tones */
+/* IronDrobe Metric Card Tones - Compact Small Cards */
 .metric-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
+  border-radius: 10px;
+  padding: 10px 14px;
   box-shadow: var(--shadow-xs);
   transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 .metric-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
@@ -110,7 +110,7 @@ body {
 .metric-tone-order-risk {
   background: #ffffff;
   border-color: #e4e4e7;
-  border-left: 4px solid #1c1f26;
+  border-left: 3px solid #1c1f26;
 }
 .metric-tone-revenue .metric-value,
 .metric-tone-usage .metric-value,
@@ -130,7 +130,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 20px 22px;
+  padding: 16px 18px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -138,8 +138,8 @@ body {
 .overview-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 16px;
+  gap: 8px;
+  padding: 10px 14px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background: var(--surface);

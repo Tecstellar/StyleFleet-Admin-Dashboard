@@ -269,7 +269,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Window: <strong className="text-neutral-900">{dateRange.label}</strong> (Real-time Supabase sync)
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
           <KPICard
             title="Connected Salons"
             value={formatNumber(shops.length)}
@@ -313,7 +313,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Window: <strong className="text-neutral-900">{dateRange.label}</strong>
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
           <KPICard
             title="Invoiced Sales"
             value={formatCurrency(totalBilledMinor)}

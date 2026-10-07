@@ -238,41 +238,41 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, shops = 
         message="StyleFleet SaaS tier subscription purchases (App Store / Google Play / Razorpay SaaS) are not stored in the connected Supabase database. Displaying verified salon customer payments and billing settlements recorded in public.payments."
       />
 
-      {/* Financial Snapshot - High-Contrast B&W KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+      {/* Financial Snapshot - High-Contrast KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Collected Total</span>
-            <span className="font-mono font-bold text-black text-xs">{filteredPayments.length} txns</span>
+            <span className="font-bold uppercase tracking-wider text-[10px]">Collected Total</span>
+            <span className="font-mono font-bold text-[#1c1f26] text-[11px]">{filteredPayments.length} txns</span>
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {formatCurrency(totalAmountMinor)}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">
             {exactDate ? `Exact date: ${exactDate}` : 'Filtered period total'}
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Completed Status</span>
-            <CheckCircle2 className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Completed Status</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {completedCount}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Settled without errors</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Settled without errors</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Pending / Other</span>
-            <Clock className="w-4 h-4 text-neutral-500" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Pending / Other</span>
+            <Clock className="w-3.5 h-3.5 text-neutral-500" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {pendingCount}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Processing or unpaid entries</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Processing or unpaid entries</span>
         </div>
       </div>
 

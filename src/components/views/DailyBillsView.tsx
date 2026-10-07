@@ -412,52 +412,52 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         />
       </div>
 
-      {/* KPI Cards in IronDrobe Tone Palettes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Cards in IronDrobe Tone Palettes (Compact Small Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
         <div className="metric-card metric-tone-usage">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Total Sales in Scope</span>
-            <Receipt className="w-4 h-4 text-black" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Total Sales in Scope</span>
+            <Receipt className="w-3.5 h-3.5 text-black" />
           </div>
-          <div className="metric-value text-2xl lg:text-3xl font-bold font-mono">
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono">
             {filteredBills.length}
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">
-            {exactDate ? `On exact date: ${exactDate}` : 'Across all dates'}
+          <span className="text-[10px] text-slate-500 mt-0.5 block">
+            {exactDate ? `On date: ${exactDate}` : 'Across all dates'}
           </span>
         </div>
 
         <div className="metric-card metric-tone-revenue">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Invoiced Sales Volume</span>
-            <DollarSign className="w-4 h-4 text-black" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Invoiced Sales Volume</span>
+            <DollarSign className="w-3.5 h-3.5 text-black" />
           </div>
-          <div className="metric-value text-2xl lg:text-3xl font-bold font-mono">
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono">
             {formatCurrency(totalAmountMinor)}
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">Gross invoiced value</span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Gross invoiced value</span>
         </div>
 
         <div className="metric-card metric-tone-conversion">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Average Ticket Size</span>
-            <TrendingUp className="w-4 h-4 text-black" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Average Ticket Size</span>
+            <TrendingUp className="w-3.5 h-3.5 text-black" />
           </div>
-          <div className="metric-value text-2xl lg:text-3xl font-bold font-mono">
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono">
             {formatCurrency(avgBillSize)}
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">Average ticket value</span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Average ticket value</span>
         </div>
 
         <div className="metric-card metric-tone-brand">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Billing Salons</span>
-            <Building2 className="w-4 h-4 text-black" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Billing Salons</span>
+            <Building2 className="w-3.5 h-3.5 text-black" />
           </div>
-          <div className="metric-value text-2xl lg:text-3xl font-bold font-mono">
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono">
             {activeBillingSalonsCount}
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">Salons actively billing</span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Salons actively billing</span>
         </div>
       </div>
 

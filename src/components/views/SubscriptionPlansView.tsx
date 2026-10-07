@@ -362,55 +362,55 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       </div>
 
       {/* KPI Cards in IronDrobe Tones */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
         {/* Total Salons */}
         <div className="metric-card metric-tone-usage flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Registered Salons</span>
-            <Building2 className="w-4 h-4 text-[#0d9488]" />
+          <div className="flex items-center justify-between text-slate-500 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider">Registered Salons</span>
+            <Building2 className="w-3.5 h-3.5 text-[#0d9488]" />
           </div>
-          <div className="metric-value text-2xl sm:text-3xl font-bold font-mono">{totalSalons}</div>
-          <div className="text-[11px] font-medium text-slate-500 mt-1">Unique salons registered</div>
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight">{totalSalons}</div>
+          <div className="text-[10px] font-medium text-slate-500 mt-0.5">Unique salons registered</div>
         </div>
 
         {/* Free Tier Active */}
         <div className="metric-card metric-tone-trial flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Free Tier Active</span>
-            <CheckCircle2 className="w-4 h-4 text-[#d97706]" />
+          <div className="flex items-center justify-between text-slate-500 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider">Free Tier Active</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#d97706]" />
           </div>
-          <div className="metric-value text-2xl sm:text-3xl font-bold font-mono">{freeActiveCount}</div>
-          <div className="text-[11px] font-medium text-slate-500 mt-1">&lt; 50 sales completed</div>
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight">{freeActiveCount}</div>
+          <div className="text-[10px] font-medium text-slate-500 mt-0.5">&lt; 50 sales completed</div>
         </div>
 
         {/* Nearing Limit (High Usage) */}
         <div className="metric-card metric-tone-order-warn flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-600">Nearing 100 Limit</span>
-            <Clock className="w-4 h-4 text-[#ea580c]" />
+          <div className="flex items-center justify-between text-slate-500 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600">Nearing 100 Limit</span>
+            <Clock className="w-3.5 h-3.5 text-[#ea580c]" />
           </div>
-          <div className="metric-value text-2xl sm:text-3xl font-bold font-mono text-orange-600">{nearingLimitCount}</div>
-          <div className="text-[11px] font-medium text-slate-500 mt-1">50 to 99 sales (Alert zone)</div>
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-orange-600">{nearingLimitCount}</div>
+          <div className="text-[10px] font-medium text-slate-500 mt-0.5">50 to 99 sales (Alert zone)</div>
         </div>
 
         {/* Pro Required */}
         <div className="metric-card metric-tone-order-risk flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600">Pro Required</span>
-            <AlertTriangle className="w-4 h-4 text-[#dc2626]" />
+          <div className="flex items-center justify-between text-slate-500 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">Pro Required</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-[#dc2626]" />
           </div>
-          <div className="metric-value text-2xl sm:text-3xl font-bold font-mono text-rose-600">{proRequiredCount}</div>
-          <div className="text-[11px] font-medium text-slate-500 mt-1">100+ sales completed</div>
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-rose-600">{proRequiredCount}</div>
+          <div className="text-[10px] font-medium text-slate-500 mt-0.5">100+ sales completed</div>
         </div>
 
         {/* Platform Total Sales Done */}
         <div className="metric-card metric-tone-revenue flex flex-col justify-between col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Total Sales Billed</span>
-            <Receipt className="w-4 h-4 text-[#059669]" />
+          <div className="flex items-center justify-between text-slate-500 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider">Total Sales Billed</span>
+            <Receipt className="w-3.5 h-3.5 text-[#059669]" />
           </div>
-          <div className="metric-value text-2xl sm:text-3xl font-bold font-mono">{totalPlatformSalesDone}</div>
-          <div className="text-[11px] font-medium text-slate-500 mt-1">Invoices in database</div>
+          <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight">{totalPlatformSalesDone}</div>
+          <div className="text-[10px] font-medium text-slate-500 mt-0.5">Invoices in database</div>
         </div>
       </div>
 

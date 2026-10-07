@@ -464,56 +464,56 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         </span>
       </div>
 
-      {/* True KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+      {/* True KPI Cards (Compact Small Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Total Real Revenue</span>
-            <DollarSign className="w-4 h-4 text-black" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Total Real Revenue</span>
+            <DollarSign className="w-3.5 h-3.5 text-black" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
             {formatCurrency(totalRevenueCollectedMinor)}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">
+          <span className="text-[10px] text-neutral-400 mt-0.5 block">
             Completed payment settlements
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Transactions Settled</span>
-            <CheckCircle2 className="w-4 h-4 text-neutral-800" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Transactions Settled</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-800" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
             {totalCompletedTransactions}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">
+          <span className="text-[10px] text-neutral-400 mt-0.5 block">
             Verified records in public.payments
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Contributing Salons</span>
-            <Building2 className="w-4 h-4 text-neutral-700" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Contributing Salons</span>
+            <Building2 className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
             {activeContributingSalons}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">
+          <span className="text-[10px] text-neutral-400 mt-0.5 block">
             Salons with completed settlements
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Average Settlement</span>
-            <TrendingUp className="w-4 h-4 text-neutral-900" />
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Average Settlement</span>
+            <TrendingUp className="w-3.5 h-3.5 text-neutral-900" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono text-[#1c1f26]">
             {formatCurrency(avgTransactionAmountMinor)}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">
+          <span className="text-[10px] text-neutral-400 mt-0.5 block">
             Average per transaction
           </span>
         </div>

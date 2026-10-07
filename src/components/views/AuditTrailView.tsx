@@ -379,55 +379,55 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       </div>
 
       {/* Snapshot Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Audit Records</span>
-            <History className="w-4 h-4 text-black" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Audit Records</span>
+            <History className="w-3.5 h-3.5 text-[#1c1f26]" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {filteredItems.length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Events matching filter</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Events matching filter</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Active Filter Scope</span>
-            <Building2 className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Active Filter Scope</span>
+            <Building2 className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-lg font-bold text-black truncate mt-1">
+          <div className="text-sm font-bold text-[#1c1f26] truncate mt-1">
             {salonFilter !== 'all'
               ? shopMap.get(salonFilter)?.name || '1 Salon'
               : cityFilter !== 'all'
               ? `${cityFilter} Region`
               : 'All Salons & Cities'}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">
             {exactDate ? `Date: ${exactDate}` : 'Filtered time window'}
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Payments Recorded</span>
-            <CreditCard className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Payments Recorded</span>
+            <CreditCard className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {filteredItems.filter((i) => i.type === 'Payment').length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Settled transactions</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Settled transactions</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Invoices Issued</span>
-            <FileSpreadsheet className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Invoices Issued</span>
+            <FileSpreadsheet className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {filteredItems.filter((i) => i.type === 'Invoice').length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Bills in active scope</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Bills in active scope</span>
         </div>
       </div>
 

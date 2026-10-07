@@ -285,49 +285,49 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Total Tracked Clients</span>
-            <Users className="w-4 h-4 text-black" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Total Tracked Clients</span>
+            <Users className="w-3.5 h-3.5 text-[#1c1f26]" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {customers.length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Registered in database</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Registered in database</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Filtered Matches</span>
-            <UserCheck className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Filtered Matches</span>
+            <UserCheck className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {filteredCustomers.length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Matching active filters</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Matching active filters</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Starred VIP Clients</span>
-            <Star className="w-4 h-4 text-neutral-900 fill-black" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Starred VIP Clients</span>
+            <Star className="w-3.5 h-3.5 text-[#1c1f26] fill-neutral-800" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {customers.filter((c) => c.is_starred).length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Tagged by salon owners</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Tagged by salon owners</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Salons with Clients</span>
-            <Building2 className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Salons with Clients</span>
+            <Building2 className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {new Set(customers.map((c) => c.shop_id)).size}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Active salon client bases</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Active salon client bases</span>
         </div>
       </div>
 

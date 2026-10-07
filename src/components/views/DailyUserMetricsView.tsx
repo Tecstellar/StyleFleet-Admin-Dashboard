@@ -329,56 +329,56 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         </button>
       </div>
 
-      {/* 4 IronDrobe Metric KPI Cards strictly with live Supabase data */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 4 IronDrobe Metric KPI Cards strictly with live Supabase data (Compact Small Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
         {/* CARD 1: TOTAL USERS */}
-        <div className="bg-white rounded-xl p-5 border border-neutral-200/90 shadow-2xs border-l-4 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[11px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
             TOTAL USERS
           </div>
-          <div className="text-3xl font-extrabold text-[#1c1f26] tracking-tight mt-2.5">
+          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
             {formatNumber(totalUsersCount)}
           </div>
-          <div className="text-xs text-neutral-400 mt-2 font-medium">
+          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
             as of {latestDateString} • all dates
           </div>
         </div>
 
         {/* CARD 2: NEW SUBSCRIBERS */}
-        <div className="bg-white rounded-xl p-5 border border-neutral-200/90 shadow-2xs border-l-4 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[11px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
             NEW SUBSCRIBERS
           </div>
-          <div className="text-3xl font-extrabold text-[#1c1f26] tracking-tight mt-2.5">
+          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
             {newSubscribersCount}
           </div>
-          <div className="text-xs text-neutral-400 mt-2 font-medium">
+          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
             first payments • all dates
           </div>
         </div>
 
         {/* CARD 3: TOTAL SUBSCRIBERS */}
-        <div className="bg-white rounded-xl p-5 border border-neutral-200/90 shadow-2xs border-l-4 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[11px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
             TOTAL SUBSCRIBERS
           </div>
-          <div className="text-3xl font-extrabold text-[#1c1f26] tracking-tight mt-2.5">
+          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
             {totalSubscribersCount}
           </div>
-          <div className="text-xs text-neutral-400 mt-2 font-medium">
+          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
             as of {latestDateString}
           </div>
         </div>
 
         {/* CARD 4: USER GROWTH */}
-        <div className="bg-white rounded-xl p-5 border border-neutral-200/90 shadow-2xs border-l-4 border-l-[#1c1f26] flex flex-col justify-between">
-          <div className="text-[11px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
+        <div className="bg-white rounded-lg p-3 border border-neutral-200/90 shadow-2xs border-l-3 border-l-[#1c1f26] flex flex-col justify-between">
+          <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase font-mono">
             USER GROWTH
           </div>
-          <div className="text-3xl font-extrabold text-[#1c1f26] tracking-tight mt-2.5">
+          <div className="text-lg sm:text-xl font-bold text-[#1c1f26] font-mono tracking-tight mt-1">
             {growthPercentage}
           </div>
-          <div className="text-xs text-neutral-400 mt-2 font-medium">
+          <div className="text-[10.5px] text-neutral-400 mt-1 font-medium">
             over loaded date range
           </div>
         </div>

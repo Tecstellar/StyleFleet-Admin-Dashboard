@@ -269,49 +269,49 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Incomplete Salons</span>
-            <AlertTriangle className="w-4 h-4 text-black" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Incomplete Salons</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-[#1c1f26]" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {incompleteShops.length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Require onboarding outreach</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Require onboarding outreach</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Zero Staff Added</span>
-            <Users className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Zero Staff Added</span>
+            <Users className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {deduplicatedShops.filter((s) => (s.staff_count ?? 0) === 0).length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Awaiting team invitation</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Awaiting team invitation</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Awaiting 1st Bill</span>
-            <Receipt className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Awaiting 1st Bill</span>
+            <Receipt className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {deduplicatedShops.filter((s) => (s.bill_count ?? 0) === 0).length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Ready to start billing</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Ready to start billing</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
+        <div className="p-3 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Fully Onboarded</span>
-            <CheckCircle className="w-4 h-4 text-neutral-700" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Fully Onboarded</span>
+            <CheckCircle className="w-3.5 h-3.5 text-neutral-700" />
           </div>
-          <div className="text-3xl font-black font-mono text-black">
+          <div className="text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
             {deduplicatedShops.filter((s) => (s.staff_count ?? 0) > 0 && (s.bill_count ?? 0) > 0).length}
           </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Staff + billing active</span>
+          <span className="text-[10px] text-neutral-500 mt-0.5 block">Staff + billing active</span>
         </div>
       </div>
 
