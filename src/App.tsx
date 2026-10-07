@@ -10,10 +10,20 @@ import { AppTelemetryCombinedView } from './components/views/AppTelemetryCombine
 import { AuditTrailView } from './components/views/AuditTrailView';
 import { SystemHealthView } from './components/views/SystemHealthView';
 import { AccountDeletionsView } from './components/views/AccountDeletionsView';
-import { SystemGovernanceCombinedView } from './components/views/SystemGovernanceCombinedView';
+import { PurchasesView } from './components/views/PurchasesView';
+import { CustomerTrackingView } from './components/views/CustomerTrackingView';
+import { IncompleteSignupsView } from './components/views/IncompleteSignupsView';
+import { DailyBillsView } from './components/views/DailyBillsView';
+import { SubscriptionRevenueView } from './components/views/SubscriptionRevenueView';
+import { SubscriptionPlansView } from './components/views/SubscriptionPlansView';
+import { OverviewView } from './components/views/OverviewView';
+import { ProductAnalyticsView } from './components/views/ProductAnalyticsView';
+import { DailyUserMetricsView } from './components/views/DailyUserMetricsView';
+import { CrmAddedUsersView } from './components/views/CrmAddedUsersView';
 import { LoginView } from './components/auth/LoginView';
 import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
 import { DeleteAccountView } from './components/views/DeleteAccountView';
+import { ResetPasswordModal } from './components/modals/ResetPasswordModal';
 import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
@@ -192,6 +202,9 @@ export const App: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [selectedShopForModal, setSelectedShopForModal] = useState<Shop | null>(null);
+  const [salonModalInitialTab, setSalonModalInitialTab] = useState<'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry'>('billing');
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+  const [shopForPasswordReset, setShopForPasswordReset] = useState<Shop | null>(null);
 
   // Real Database Entities
   const [shops, setShops] = useState<Shop[]>([]);
@@ -320,8 +333,12 @@ export const App: React.FC = () => {
     loadAllData();
   };
 
-  const handleSelectSalonDrilldown = (shop: Shop) => {
+  const handleSelectSalonDrilldown = (
+    shop: Shop,
+    initialTab: 'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry' = 'billing'
+  ) => {
     setSelectedShopForModal(shop);
+    setSalonModalInitialTab(initialTab);
     setSalonsTab('directory');
     setCurrentView('salons_360');
   };
@@ -336,17 +353,20 @@ export const App: React.FC = () => {
   if (billRedirectInfo.id) {
     if (billRedirectLoading) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-[#0B1F44] text-white p-6 flex-col gap-4 text-center">
-          <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="flex min-h-screen items-center justify-center bg-[#F8F9FA] text-neutral-900 p-6 flex-col gap-4 text-center selection:bg-black selection:text-white">
+          <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
           <h2 className="text-lg font-semibold tracking-wide">Opening StyleFleet Invoice...</h2>
-          <p className="text-xs text-white/60">Redirecting to your verified salon PDF invoice</p>
+          <p className="text-xs text-neutral-500">Redirecting to your verified salon PDF invoice</p>
         </div>
       );
     }
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B1F44] text-white p-6 flex-col gap-4 text-center">
-        <h2 className="text-xl font-bold tracking-wide">StyleFleet Invoice</h2>
-        <p className="text-xs text-white/70 max-w-sm">
+      <div className="flex min-h-screen items-center justify-center bg-[#F8F9FA] text-neutral-900 p-6 flex-col gap-4 text-center selection:bg-black selection:text-white">
+        <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center p-2 shadow-xs mb-2">
+          <img src="/stylefleet-logo.png" alt="StyleFleet Logo" className="w-full h-full object-contain invert" />
+        </div>
+        <h2 className="text-xl font-bold tracking-tight text-neutral-900">StyleFleet Invoice</h2>
+        <p className="text-xs text-neutral-600 max-w-sm">
           Your invoice document is ready. Click below to view or download.
         </p>
         {resolvedPdfUrl ? (
@@ -354,12 +374,12 @@ export const App: React.FC = () => {
             href={resolvedPdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 font-semibold text-black text-sm transition-colors"
+            className="px-6 py-2.5 rounded-xl bg-black hover:bg-neutral-800 font-semibold text-white text-sm transition-colors shadow-xs"
           >
             View / Download Invoice PDF
           </a>
         ) : (
-          <p className="text-xs text-amber-300">
+          <p className="text-xs text-neutral-500 bg-neutral-100 px-4 py-2 rounded-xl border border-neutral-200">
             Invoice not found or expired. Please contact your salon for assistance.
           </p>
         )}
@@ -424,14 +444,22 @@ export const App: React.FC = () => {
         supportCount={supportMessages.filter((m) => m.status === 'open').length}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main Content Area — Offset for fixed sidebar so dashboard is never hidden */}
+      <div
+        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
+          isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'
+        }`}
+      >
         {/* Header Bar */}
         <Header
           onToggleMobileNav={() => setIsMobileNavOpen(true)}
           onSelectView={(v) => setCurrentView(v)}
           onRefreshData={handleManualRefresh}
           isRefreshing={isRefreshing}
+          onOpenResetPassword={() => {
+            setShopForPasswordReset(null);
+            setIsResetPasswordOpen(true);
+          }}
         />
 
         {/* Global Error Banner */}
@@ -452,7 +480,7 @@ export const App: React.FC = () => {
 
         {/* Main Viewport */}
         <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">
-          {/* 1. Dashboard */}
+          {/* 1. Founder Dashboard */}
           {currentView === 'dashboard' && (
             <DashboardView
               shops={shops}
@@ -466,6 +494,7 @@ export const App: React.FC = () => {
               supportMessages={supportMessages}
               subscriptions={subscriptions}
               loading={loading}
+              initialTab="overview"
               onNavigate={(v) => setCurrentView(v)}
               onSelectSalon={handleSelectSalonDrilldown}
               onNavigateToStylists={handleNavigateToStylists}
@@ -474,8 +503,90 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 2. Salons & 360° */}
-          {currentView === 'salons_360' && (
+          {/* 1a. Product Analytics */}
+          {currentView === 'product_analytics' && (
+            <ProductAnalyticsView
+              shops={shops}
+              bills={bills}
+              appointments={appointments}
+              staff={staff}
+              customers={customers}
+              telemetryRecords={telemetryRecords}
+              loading={loading}
+              onNavigate={(v) => setCurrentView(v)}
+            />
+          )}
+
+          {/* 1b. Daily User Metrics */}
+          {currentView === 'daily_user_metrics' && (
+            <DailyUserMetricsView
+              shops={shops}
+              profiles={profiles}
+              staff={staff}
+              customers={customers}
+              bills={bills}
+              appointments={appointments}
+              subscriptions={subscriptions}
+              payments={payments}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
+
+          {/* 1c. Dedicated Daily Order / Bills Metrics View */}
+          {currentView === 'daily_bills' && (
+            <DailyBillsView
+              bills={bills}
+              shops={shops}
+              payments={payments}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
+
+          {/* 1d. Dedicated Subscription Revenue View */}
+          {currentView === 'revenue_trend' && (
+            <SubscriptionRevenueView
+              payments={payments}
+              bills={bills}
+              shops={shops}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
+
+          {/* 1e. Dedicated Overview View */}
+          {currentView === 'overview' && (
+            <OverviewView
+              shops={shops}
+              profiles={profiles}
+              staff={staff}
+              customers={customers}
+              bills={bills}
+              payments={payments}
+              appointments={appointments}
+              deletions={deletions}
+              supportMessages={supportMessages}
+              subscriptions={subscriptions}
+              loading={loading}
+              onNavigate={(v) => setCurrentView(v)}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
+
+          {/* 1f. Dedicated 100 Free Sales Quota & Subscription Plans Hub */}
+          {currentView === 'subscription_plans' && (
+            <SubscriptionPlansView
+              shops={shops}
+              bills={bills}
+              payments={payments}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
+
+          {/* 2. Salons & 360 Ecosystem */}
+          {(currentView === 'salons_360' || currentView === 'user_details') && (
             <SalonsCombinedView
               shops={shops}
               profiles={profiles}
@@ -490,7 +601,28 @@ export const App: React.FC = () => {
               selectedShop={selectedShopForModal}
               onClearSelectedShop={() => setSelectedShopForModal(null)}
               onRefresh={handleManualRefresh}
-              initialTab={salonsTab}
+              initialTab={currentView === 'user_details' ? 'ecosystem_360' : salonsTab}
+              initialModalTab={salonModalInitialTab}
+            />
+          )}
+
+          {/* 2b. Customer Tracking View */}
+          {currentView === 'customer_tracking' && (
+            <CustomerTrackingView
+              customers={customers}
+              shops={shops}
+              bills={bills}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
+
+          {/* 2c. Incomplete Signups Drop-off Recovery */}
+          {currentView === 'incomplete_signups' && (
+            <IncompleteSignupsView
+              shops={shops}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
 
@@ -505,7 +637,16 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 4. Reports & BI */}
+          {/* 4. Payment History (Purchases & Transactions) */}
+          {currentView === 'purchases' && (
+            <PurchasesView
+              payments={payments}
+              shops={shops}
+              loading={loading}
+            />
+          )}
+
+          {/* 5. Reports & BI */}
           {currentView === 'reports_bi' && (
             <ReportsView
               shops={shops}
@@ -516,7 +657,7 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 4. Support Messages */}
+          {/* 6. Support Messages */}
           {currentView === 'support_messages' && (
             <SupportMessagesView
               messages={supportMessages}
@@ -525,7 +666,7 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 5. App Version & Telemetry */}
+          {/* 7. App Telemetry */}
           {currentView === 'app_telemetry' && (
             <AppTelemetryCombinedView
               records={telemetryRecords}
@@ -535,7 +676,7 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 6. Platform Audit Trail */}
+          {/* 8. Activity Logs & Platform Audit */}
           {currentView === 'platform_audit' && (
             <AuditTrailView
               payments={payments}
@@ -547,18 +688,20 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 7. System Health Alerts */}
-          {currentView === 'system_health' && (
+          {/* 9. Shop Health & Diagnostic Logs */}
+          {(currentView === 'system_health' || currentView === 'diagnostic_logs') && (
             <SystemHealthView
               healthRecords={systemHealthRecords}
               logs={systemLogs}
               shops={shops}
+              bills={bills}
               loading={loading}
               onRefresh={handleManualRefresh}
+              onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
 
-          {/* 8. Account Deletions */}
+          {/* 10. Account Deletions */}
           {currentView === 'account_deletions' && (
             <AccountDeletionsView
               deletions={deletions}
@@ -567,10 +710,27 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 9. System Governance */}
-          {currentView === 'system_governance' && <SystemGovernanceCombinedView />}
+          {/* 11. CRM Added Users */}
+          {currentView === 'crm_added_users' && (
+            <CrmAddedUsersView
+              customers={customers}
+              shops={shops}
+              bills={bills}
+              loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
+            />
+          )}
         </main>
       </div>
+
+      {/* Reset Account Password Modal (Admin Panel Only) */}
+      <ResetPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={() => {
+          setIsResetPasswordOpen(false);
+          setShopForPasswordReset(null);
+        }}
+      />
     </div>
   );
 };

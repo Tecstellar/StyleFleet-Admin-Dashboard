@@ -1,5 +1,5 @@
 import React from 'react';
-import { Smartphone, Apple, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Smartphone, Apple } from 'lucide-react';
 import { UnavailableBanner } from '../common/UnavailableBanner';
 
 export const PlatformView: React.FC = () => {
@@ -7,7 +7,7 @@ export const PlatformView: React.FC = () => {
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-2">
-          <Smartphone className="w-5 h-5 text-[#D4AF37]" />
+          <Smartphone className="w-5 h-5 text-neutral-900" />
           <h1 className="text-xl font-bold tracking-tight text-neutral-900">
             Platform &amp; Device Ecosystem
           </h1>
@@ -26,9 +26,9 @@ export const PlatformView: React.FC = () => {
 
       {/* Target Platforms from verified codebase */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-3 shadow-xs">
+        <div className="p-5 rounded-2xl border border-neutral-200 bg-white space-y-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-sm">
+            <div className="w-9 h-9 rounded-xl bg-neutral-900 text-white flex items-center justify-center font-bold text-sm">
               🤖
             </div>
             <div>
@@ -56,10 +56,10 @@ export const PlatformView: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white space-y-3 shadow-xs">
+        <div className="p-5 rounded-2xl border border-neutral-200 bg-white space-y-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4] flex items-center justify-center font-bold text-sm">
-              <Apple className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-neutral-100 text-neutral-900 border border-neutral-300 flex items-center justify-center font-bold text-sm">
+              <Apple className="w-5 h-5 text-neutral-900" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-neutral-900">

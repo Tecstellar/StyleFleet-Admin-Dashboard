@@ -1,73 +1,221 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --bg-primary: #F8F9FA;
-    --bg-surface: #FFFFFF;
-    --bg-card: #FFFFFF;
-    --bg-card-hover: #F3F4F6;
-    --bg-elevated: #FFFFFF;
-    --border-main: #E5E7EB;
-    --border-subtle: #F3F4F6;
-    --text-primary: #111827;
-    --text-secondary: #374151;
-    --text-muted: #6B7280;
-    --text-subtle: #9CA3AF;
-    --accent-gold: #D4AF37;
-    --accent-gold-light: #F3D78A;
-    --accent-gold-dim: rgba(212, 175, 55, 0.12);
-    --accent-gold-border: rgba(212, 175, 55, 0.35);
-  }
+@theme {
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --color-sidebar-bg: #1c1f26;
+  --color-sidebar-bg-elevated: #252932;
+  --color-sidebar-text: #a1a1aa;
+  --color-sidebar-text-active: #ffffff;
+  --color-sidebar-accent: #ffffff;
+  --color-brand: #1c1f26;
+  --color-brand-hover: #282d37;
+  --color-brand-soft: #f4f4f5;
+  --color-bg-app: #f4f4f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-line: #e4e4e7;
+}
 
-  .dark {
-    --bg-primary: #121212;
-    --bg-surface: #181818;
-    --bg-card: #202020;
-    --bg-card-hover: #2A2A2A;
-    --bg-elevated: #242424;
-    --border-main: #333333;
-    --border-subtle: #262626;
-    --text-primary: #FFFFFF;
-    --text-secondary: #E5E5E5;
-    --text-muted: #A3A3A3;
-    --text-subtle: #737373;
-    --accent-gold: #D4AF37;
-    --accent-gold-light: #F3D78A;
-    --accent-gold-dim: rgba(212, 175, 55, 0.15);
-    --accent-gold-border: rgba(212, 175, 55, 0.35);
-  }
+:root {
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --bg-app: #f4f4f5;
+  --bg-subtle: #e4e4e7;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --surface-hover: #f1f5f9;
+  --sidebar-bg: #1c1f26;
+  --sidebar-bg-elevated: #252932;
+  --sidebar-text: #a1a1aa;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: #27272a;
+  --sidebar-accent: #ffffff;
+  --text: #09090b;
+  --text-secondary: #52525b;
+  --muted: #71717a;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+  --brand: #1c1f26;
+  --brand-hover: #282d37;
+  --brand-soft: #f4f4f5;
+  --accent: #1c1f26;
+  --accent-soft: #f4f4f5;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --success: #059669;
+  --success-soft: #ecfdf5;
+  --warning: #d97706;
+  --warning-soft: #fffbeb;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 12px 24px -8px rgba(15, 23, 42, 0.12);
+  --sidebar-width: 240px;
+}
 
-  body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-  }
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* Custom thin scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.35);
-    border-radius: 9999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(212, 175, 55, 0.6);
-  }
+/* Custom thin scrollbar - IronDrobe Style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
 
-  /* Ensure input text is never hidden or color-clashed by browser autofill */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover, 
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-text-fill-color: #111827 !important;
-    -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
-    box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
-    transition: background-color 5000s ease-in-out 0s;
-    caret-color: #111827 !important;
-  }
+/* IronDrobe Metric Card Tones */
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-xs);
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.metric-tone-revenue,
+.metric-tone-usage,
+.metric-tone-brand,
+.metric-tone-signup,
+.metric-tone-conversion,
+.metric-tone-trial,
+.metric-tone-neutral,
+.metric-tone-order-good,
+.metric-tone-order-warn,
+.metric-tone-order-risk {
+  background: #ffffff;
+  border-color: #e4e4e7;
+  border-left: 4px solid #1c1f26;
+}
+.metric-tone-revenue .metric-value,
+.metric-tone-usage .metric-value,
+.metric-tone-brand .metric-value,
+.metric-tone-signup .metric-value,
+.metric-tone-conversion .metric-value,
+.metric-tone-trial .metric-value,
+.metric-tone-neutral .metric-value,
+.metric-tone-order-good .metric-value,
+.metric-tone-order-warn .metric-value,
+.metric-tone-order-risk .metric-value {
+  color: #1c1f26;
+}
+
+/* IronDrobe Panel */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Overview Section Header */
+.overview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.overview-section-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.overview-section--live,
+.overview-section--subscriptions,
+.overview-section--orders,
+.overview-section--revenue {
+  background: #ffffff;
+  border-color: #e4e4e7;
+}
+.overview-section--live .overview-section-title,
+.overview-section--subscriptions .overview-section-title,
+.overview-section--orders .overview-section-title,
+.overview-section--revenue .overview-section-title {
+  color: #09090b;
+}
+
+/* IronDrobe Controls */
+.btn-export {
+  border: 1px solid var(--brand);
+  background: var(--surface);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-export:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.segmented-control {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+.segmented-control .segment {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+.segmented-control .segment.active {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Ensure input autofill maintains contrast */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #0f172a !important;
 }

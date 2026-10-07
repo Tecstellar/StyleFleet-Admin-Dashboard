@@ -123,7 +123,7 @@ export function DataTable<T extends Record<string, any>>({
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-[#E5E7EB] bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
+            className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-[#E5E7EB] bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-black transition-colors"
           />
         </div>
 
@@ -137,7 +137,7 @@ export function DataTable<T extends Record<string, any>>({
                 setRowsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="py-1 px-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-neutral-800 focus:outline-none focus:border-[#D4AF37]"
+              className="py-1 px-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-neutral-800 focus:outline-none focus:border-black"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -166,7 +166,7 @@ export function DataTable<T extends Record<string, any>>({
                     <div className="flex items-center gap-1.5">
                       <span>{col.header}</span>
                       {col.sortable !== false && (
-                        <span className="text-[#B8860B]">
+                        <span className="text-neutral-900">
                           {sortField === col.key ? (
                             sortOrder === 'asc' ? (
                               <ArrowUp className="w-3 h-3" />

@@ -173,7 +173,7 @@ export function filterByDateRange<T>(
 ): T[] {
   if (!range.startDate && !range.endDate) return items;
   return items.filter((item) => {
-    const val = item[dateField];
+    const val = item[dateField] || (item as any)['created_at'] || (item as any)['issued_at'] || (item as any)['paid_at'];
     if (!val || typeof val !== 'string') return false;
     const itemDate = new Date(val).getTime();
     if (isNaN(itemDate)) return false;

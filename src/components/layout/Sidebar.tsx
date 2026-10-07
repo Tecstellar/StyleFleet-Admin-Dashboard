@@ -1,25 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutDashboard,
-  Store,
-  BarChart3,
-  MessageSquare,
+  BarChart2,
+  TrendingUp,
+  LayoutGrid,
+  Users,
+  Activity,
+  UserPlus,
+  Headphones,
   Smartphone,
+  Bug,
+  Store,
+  Crown,
+  UserCheck,
   History,
-  ShieldAlert,
-  UserX,
-  Sliders,
-  Sparkles,
+  CreditCard,
+  Database,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
-  Database,
+  ChevronDown,
   X,
-  LogOut,
-  Crown,
-  Shield,
   FileText,
   Trash2,
-  UserCheck,
+  LogOut,
 } from 'lucide-react';
 import { NavView } from '../../types/dashboard';
 import { useAuth } from '../../context/AuthContext';
@@ -39,14 +43,6 @@ interface SidebarProps {
   supportCount?: number;
 }
 
-interface NavItem {
-  id: NavView;
-  label: string;
-  icon: any;
-  badge?: number;
-  badgeColor?: string;
-}
-
 export const Sidebar: React.FC<SidebarProps> = ({
   currentView,
   onSelectView,
@@ -61,221 +57,342 @@ export const Sidebar: React.FC<SidebarProps> = ({
   deletionsCount = 5,
   supportCount = 0,
 }) => {
-  const { user, logout } = useAuth();
-  
-  const navItems: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'salons_360', label: 'Salons & 360°', icon: Store, badge: salonsCount },
-    { id: 'staff_access', label: 'Staff Access Control', icon: UserCheck, badge: staffCount },
-    { id: 'reports_bi', label: 'Reports & BI', icon: BarChart3 },
-    { id: 'support_messages', label: 'Support Messages', icon: MessageSquare, badge: supportCount },
-    { id: 'app_telemetry', label: 'App Version & Telemetry', icon: Smartphone },
-    { id: 'platform_audit', label: 'Platform Audit Trail', icon: History },
-    { id: 'system_health', label: 'System Health Alerts', icon: ShieldAlert },
-    {
-      id: 'account_deletions',
-      label: 'Account Deletions',
-      icon: UserX,
-      badge: deletionsCount,
-      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
-    },
-    { id: 'system_governance', label: 'System Governance', icon: Sliders },
-  ];
+  const { logout } = useAuth();
+  const [isAppActivityOpen, setIsAppActivityOpen] = useState(false);
+  const [isShopAnalyticsOpen, setIsShopAnalyticsOpen] = useState(false);
 
   const handleItemClick = (id: NavView) => {
     onSelectView(id);
     onCloseMobile();
   };
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full bg-white border-r border-[#E5E7EB] text-[#111827] transition-colors select-none">
-      {/* Brand Header */}
-      <div className="h-16 px-4 flex items-center justify-between border-b border-[#E5E7EB] bg-white">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center shadow-xs flex-shrink-0 border-2 border-[#D4AF37] overflow-hidden p-1">
-            <img src="/stylefleet-logo.png" alt="StyleFleet Logo" className="w-full h-full object-contain" />
+  const isItemActive = (id: NavView) => currentView === id;
+
+  const renderNavButton = (
+    id: NavView,
+    label: string,
+    Icon: React.ComponentType<{ className?: string }>,
+    badge?: number,
+    badgeColor?: string
+  ) => {
+    const active = isItemActive(id);
+    return (
+      <button
+        key={id}
+        onClick={() => handleItemClick(id)}
+        title={isCollapsed && !isMobileOpen ? label : undefined}
+        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-all group relative text-left cursor-pointer ${
+          active
+            ? 'bg-white text-[#1c1f26] font-bold shadow-xs'
+            : 'text-neutral-400 hover:text-white hover:bg-[#252932] font-medium'
+        }`}
+      >
+        <Icon
+          className={`w-4 h-4 shrink-0 transition-colors ${
+            active ? 'text-[#1c1f26]' : 'text-neutral-400 group-hover:text-white'
+          }`}
+        />
+
+        {(!isCollapsed || isMobileOpen) && (
+          <div className="flex-1 flex items-center justify-between overflow-hidden">
+            <span className="truncate">{label}</span>
+            {badge !== undefined && badge > 0 && (
+              <span
+                className={`ml-2 px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                  active ? 'bg-[#1c1f26] text-white' : 'bg-white text-[#1c1f26]'
+                }`}
+              >
+                {badge}
+              </span>
+            )}
           </div>
-          {(!isCollapsed || isMobileOpen) && (
-            <div className="overflow-hidden transition-all duration-200">
-              <h1 className="text-sm font-bold text-neutral-900 tracking-wide truncate flex items-center gap-1.5">
-                <span>STYLE FLEET</span>
-                <span className="text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FCF9EE] text-[#B8860B] border border-[#D4AF37]/40 shadow-xs">
-                  SUPER ADMIN
-                </span>
-              </h1>
-              <div className="flex items-center gap-1 text-[11px] text-[#B8860B] font-bold tracking-wide">
-                <Sparkles className="w-3 h-3 text-[#D4AF37]" />
-                <span>HQ Command</span>
+        )}
+      </button>
+    );
+  };
+
+  const renderCollapsibleHeader = (
+    label: string,
+    Icon: React.ComponentType<{ className?: string }>,
+    isOpen: boolean,
+    onToggle: () => void,
+    hasActiveChild: boolean
+  ) => {
+    return (
+      <button
+        onClick={onToggle}
+        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-all group cursor-pointer ${
+          hasActiveChild
+            ? 'text-white font-semibold'
+            : 'text-neutral-400 hover:text-white hover:bg-[#252932] font-medium'
+        }`}
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <Icon
+            className={`w-4 h-4 shrink-0 transition-colors ${
+              hasActiveChild ? 'text-white' : 'text-neutral-400 group-hover:text-white'
+            }`}
+          />
+          {(!isCollapsed || isMobileOpen) && <span className="truncate">{label}</span>}
+        </div>
+        {(!isCollapsed || isMobileOpen) && (
+          <ChevronRight
+            className={`w-4 h-4 text-neutral-400 group-hover:text-white transition-transform duration-200 shrink-0 ${
+              isOpen ? 'rotate-90' : ''
+            }`}
+          />
+        )}
+      </button>
+    );
+  };
+
+  const renderSubNavButton = (
+    id: NavView,
+    label: string,
+    Icon: React.ComponentType<{ className?: string }>,
+    badge?: number
+  ) => {
+    const active = isItemActive(id);
+    return (
+      <button
+        key={id}
+        onClick={() => handleItemClick(id)}
+        className={`w-full flex items-center gap-2.5 pl-8 pr-3 py-1.5 rounded-lg text-[12px] transition-all group relative text-left cursor-pointer ${
+          active
+            ? 'bg-white text-[#1c1f26] font-bold shadow-xs'
+            : 'text-neutral-400 hover:text-white hover:bg-[#252932] font-medium'
+        }`}
+      >
+        <Icon
+          className={`w-3.5 h-3.5 shrink-0 ${
+            active ? 'text-[#1c1f26]' : 'text-neutral-400 group-hover:text-white'
+          }`}
+        />
+        <span className="truncate">{label}</span>
+        {badge !== undefined && badge > 0 && (
+          <span
+            className={`ml-auto px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold ${
+              active ? 'bg-[#1c1f26] text-white' : 'bg-white text-[#1c1f26]'
+            }`}
+          >
+            {badge}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  const isAppActivityActive =
+    isItemActive('app_telemetry') || isItemActive('diagnostic_logs');
+
+  const isShopAnalyticsActive =
+    isItemActive('salons_360') ||
+    isItemActive('subscription_plans') ||
+    isItemActive('staff_access') ||
+    isItemActive('platform_audit') ||
+    isItemActive('user_details') ||
+    isItemActive('purchases') ||
+    isItemActive('system_health') ||
+    isItemActive('reports_bi');
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-[#1c1f26] text-neutral-400 border-r border-[#2d3139] select-none">
+      {/* Brand Header */}
+      <div className="p-3.5 border-b border-[#2d3139]">
+        <div className="flex items-center justify-between">
+          {(!isCollapsed || isMobileOpen) ? (
+            <div className="w-full flex items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-[#2d3139]">
+                  <img
+                    src="/stylefleet-icon.png"
+                    alt="StyleFleet Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[12px] font-bold text-white tracking-wider uppercase leading-tight truncate">
+                    STYLEFLEET CRM
+                  </span>
+                  <span className="text-[11px] font-semibold text-neutral-400 leading-tight mt-0.5">
+                    Admin
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={onCloseMobile}
+                className="lg:hidden p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-[#252932] transition-colors cursor-pointer"
+                title="Close Navigation"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          ) : (
+            <div className="w-full flex justify-center py-1">
+              <div className="w-10 h-10 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-sm border border-[#2d3139]">
+                <img
+                  src="/stylefleet-icon.png"
+                  alt="StyleFleet Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
           )}
         </div>
-
-        {/* Mobile close button */}
-        <button
-          onClick={onCloseMobile}
-          className="lg:hidden p-1.5 rounded-lg text-neutral-500 hover:text-black hover:bg-[#F3F4F6] transition-colors border border-neutral-200"
-          title="Close Navigation"
-        >
-          <X className="w-5 h-5" />
-        </button>
       </div>
 
-      {/* User Card */}
-      {(!isCollapsed || isMobileOpen) && (
-        <div className="px-4 py-2.5 bg-[#F9FAFB] border-b border-[#E5E7EB]">
-          <div className="flex items-center justify-between text-xs font-bold text-neutral-800">
-            <div className="flex items-center gap-2 truncate max-w-[130px]">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span className="truncate text-[11px] font-semibold text-neutral-700">
-                {user?.email || 'Stylefleet@tecstellar.com'}
-              </span>
+      {/* Nav Menu: Exact Reference Architecture from user image */}
+      <nav className="flex-1 px-2.5 py-3 space-y-3 overflow-y-auto">
+        {/* TOP SECTION: EXACT SEQUENCE FROM IMAGE */}
+        <div className="space-y-0.5">
+          {(!isCollapsed || isMobileOpen) && (
+            <div className="px-3 pb-1.5 text-[10.5px] font-bold tracking-[0.08em] text-neutral-500 uppercase font-mono">
+              WORKSPACE
             </div>
-            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full border shadow-2xs bg-[#FCF9EE] text-[#B8860B] border-[#D4AF37]/40 shrink-0">
-              Super Admin
-            </span>
+          )}
+          {renderNavButton('dashboard', 'Founder Dashboard', LayoutDashboard)}
+          {renderNavButton('product_analytics', 'Product Analytics', BarChart2)}
+          {renderNavButton('daily_user_metrics', 'Daily User Metrics', BarChart2)}
+          {renderNavButton('daily_bills', 'Daily Order Metrics', BarChart2)}
+          {renderNavButton('revenue_trend', 'Revenue Trend', TrendingUp)}
+          {renderNavButton('overview', 'Overview', LayoutGrid)}
+          {renderNavButton('customer_tracking', 'Customer Tracking', Users)}
+          {renderNavButton('incomplete_signups', 'Incomplete signups', Users)}
+          {renderNavButton('account_deletions', 'Deleted users', Users, deletionsCount)}
+
+          {/* COLLAPSIBLE 1: APP ACTIVITY */}
+          <div className="pt-0.5">
+            {renderCollapsibleHeader(
+              'App Activity',
+              Activity,
+              isAppActivityOpen || isAppActivityActive,
+              () => setIsAppActivityOpen(!isAppActivityOpen),
+              isAppActivityActive
+            )}
+            {(isAppActivityOpen || isAppActivityActive || isCollapsed) && (
+              <div className="space-y-0.5 mt-0.5">
+                {renderSubNavButton('app_telemetry', 'Touch Heatmap', Smartphone)}
+                {renderSubNavButton('diagnostic_logs', 'App Bugs', Bug)}
+              </div>
+            )}
+          </div>
+
+          {/* COLLAPSIBLE 2: SHOP ANALYTICS */}
+          <div className="pt-0.5">
+            {renderCollapsibleHeader(
+              'Shop Analytics',
+              BarChart2,
+              isShopAnalyticsOpen || isShopAnalyticsActive,
+              () => setIsShopAnalyticsOpen(!isShopAnalyticsOpen),
+              isShopAnalyticsActive
+            )}
+            {(isShopAnalyticsOpen || isShopAnalyticsActive || isCollapsed) && (
+              <div className="space-y-0.5 mt-0.5">
+                {renderSubNavButton('salons_360', 'Salon Directory', Store, salonsCount)}
+                {renderSubNavButton('subscription_plans', 'Subscription & 100 Quotas', Crown)}
+                {renderSubNavButton('staff_access', 'Stylist Access Control', UserCheck, staffCount)}
+                {renderSubNavButton('platform_audit', 'Activity Logs', History)}
+                {renderSubNavButton('user_details', 'User Details', UserCheck)}
+                {renderSubNavButton('purchases', 'Payment History', CreditCard)}
+                {renderSubNavButton('system_health', 'Shop Health', Database)}
+                {renderSubNavButton('reports_bi', 'Analytics', BarChart3)}
+              </div>
+            )}
+          </div>
+
+          {/* CRM added users */}
+          {renderNavButton('crm_added_users', 'CRM added users', UserPlus)}
+        </div>
+
+        {/* SECTION: ENGAGEMENT */}
+        <div className="pt-2">
+          {(!isCollapsed || isMobileOpen) && (
+            <div className="px-3 pb-1.5 text-[11px] font-bold tracking-[0.08em] text-neutral-500 uppercase font-mono">
+              ENGAGEMENT
+            </div>
+          )}
+          <div className="space-y-0.5">
+            {renderNavButton('support_messages', 'Support', Headphones, supportCount)}
           </div>
         </div>
-      )}
-
-      {/* Nav Menu */}
-      <nav className="flex-1 px-3 py-3 space-y-1.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentView === item.id;
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleItemClick(item.id)}
-              title={isCollapsed && !isMobileOpen ? item.label : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group relative text-left cursor-pointer ${
-                isActive
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-black shadow-xs border border-[#D4AF37]'
-                  : 'text-neutral-700 hover:text-black hover:bg-[#F3F4F6] border border-transparent'
-              }`}
-            >
-              <Icon
-                className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                  isActive
-                    ? 'text-black'
-                    : 'text-[#B8860B] group-hover:text-black'
-                }`}
-              />
-
-              {(!isCollapsed || isMobileOpen) && (
-                <div className="flex-1 flex items-center justify-between overflow-hidden">
-                  <span className="truncate">{item.label}</span>
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span
-                      className={`ml-2 px-1.5 py-0.5 rounded-md text-[10px] font-mono border ${
-                        isActive
-                          ? 'bg-black text-[#D4AF37] border-black'
-                          : item.badgeColor || 'bg-[#F3F4F6] text-[#B8860B] border-[#D4AF37]/40'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-              )}
-            </button>
-          );
-        })}
       </nav>
 
-      {/* Footer / Sign Out & Supabase Status */}
-      <div className="p-3 border-t border-[#E5E7EB] bg-white space-y-2">
+      {/* Footer Utility Bar */}
+      <div className="p-2.5 border-t border-[#2d3139] bg-[#1c1f26]">
         {(!isCollapsed || isMobileOpen) ? (
-          <>
+          <div className="space-y-2">
             <div className="flex items-center justify-between px-1 text-[11px]">
-              <div className="flex items-center gap-1.5 text-emerald-600 font-semibold font-mono">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Supabase Live</span>
+              <div className="flex items-center gap-1.5 text-neutral-300 font-bold font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] tracking-wide uppercase text-neutral-400">Live Sync</span>
               </div>
               <button
                 onClick={onToggleCollapse}
-                className="hidden lg:flex p-1 rounded hover:bg-[#F3F4F6] text-neutral-400 hover:text-neutral-800 transition-colors cursor-pointer"
+                className="hidden lg:flex p-1 rounded-md hover:bg-[#252932] text-neutral-400 hover:text-white transition-colors cursor-pointer"
                 title="Collapse Sidebar"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <button
-              onClick={() => onSelectView('system_governance')}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-neutral-700 hover:text-black hover:bg-[#F3F4F6] transition-colors border border-[#E5E7EB] cursor-pointer"
-              title="System Governance & Settings"
-            >
-              <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>Governance Settings</span>
-            </button>
+            {/* Icon-Only Compact Horizontal Toolbar */}
+            <div className="flex items-center justify-between gap-1 p-1 bg-[#15171d] rounded-xl border border-[#2d3139]">
+              {onOpenPrivacyPolicy && (
+                <button
+                  onClick={onOpenPrivacyPolicy}
+                  className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-[#252932] transition-all cursor-pointer"
+                  title="Privacy Policy"
+                >
+                  <FileText className="w-4 h-4" />
+                </button>
+              )}
 
-            {onOpenPrivacyPolicy && (
+              {onOpenDeleteAccount && (
+                <button
+                  onClick={onOpenDeleteAccount}
+                  className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-[#252932] transition-all cursor-pointer"
+                  title="Account Deletion Info"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+
+              <div className="w-px h-4 bg-[#2d3139] mx-0.5" />
+
               <button
-                onClick={onOpenPrivacyPolicy}
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 hover:text-black hover:bg-[#F3F4F6] transition-colors cursor-pointer"
-                title="View StyleFleet Privacy Policy"
+                onClick={logout}
+                className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-[#252932] transition-all cursor-pointer"
+                title="Sign Out"
               >
-                <FileText className="w-3.5 h-3.5 text-[#D4AF37]" />
-                <span>Privacy Policy</span>
+                <LogOut className="w-4 h-4" />
               </button>
-            )}
-
-            {onOpenDeleteAccount && (
-              <button
-                onClick={onOpenDeleteAccount}
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                title="View Account Deletion Instructions"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                <span>Delete Account</span>
-              </button>
-            )}
-
-            <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors border border-rose-200 cursor-pointer"
-              title="Sign Out of Admin Console"
-            >
-              <LogOut className="w-3.5 h-3.5 text-rose-500" />
-              <span>Sign Out</span>
-            </button>
-          </>
+            </div>
+          </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
             <span
-              className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
-              title="Supabase Live"
+              className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"
+              title="Live Connection"
             />
             {onOpenPrivacyPolicy && (
               <button
                 onClick={onOpenPrivacyPolicy}
-                className="p-1.5 rounded hover:bg-[#F3F4F6] text-[#D4AF37] transition-colors cursor-pointer"
+                className="p-2 rounded-lg hover:bg-[#252932] text-neutral-400 hover:text-white transition-colors cursor-pointer"
                 title="Privacy Policy"
               >
                 <FileText className="w-4 h-4" />
               </button>
             )}
-            {onOpenDeleteAccount && (
-              <button
-                onClick={onOpenDeleteAccount}
-                className="p-1.5 rounded hover:bg-rose-50 text-rose-500 transition-colors cursor-pointer"
-                title="Account Deletion Instructions"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
             <button
               onClick={logout}
-              className="p-1.5 rounded hover:bg-rose-50 text-rose-500 transition-colors cursor-pointer"
+              className="p-2 rounded-lg hover:bg-[#252932] text-neutral-400 hover:text-white transition-colors cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
             </button>
             <button
               onClick={onToggleCollapse}
-              className="hidden lg:flex p-1.5 rounded hover:bg-[#F3F4F6] text-neutral-400 hover:text-neutral-800 transition-colors cursor-pointer"
+              className="hidden lg:flex p-1.5 rounded-md hover:bg-[#252932] text-neutral-400 hover:text-white transition-colors cursor-pointer"
               title="Expand Sidebar"
             >
               <ChevronRight className="w-4 h-4" />
@@ -290,25 +407,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <>
       {/* Desktop Persistent Sidebar */}
       <aside
-        className={`hidden lg:block shrink-0 transition-all duration-300 ease-in-out h-screen sticky top-0 ${
+        className={`hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 transition-all duration-300 ${
           isCollapsed ? 'w-20' : 'w-64'
         }`}
       >
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Overlay */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-            onClick={onCloseMobile}
-          />
-          <div className="fixed inset-y-0 left-0 w-72 max-w-[80vw] shadow-2xl z-10">
-            {sidebarContent}
-          </div>
-        </div>
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity"
+          onClick={onCloseMobile}
+        />
       )}
+
+      {/* Mobile Off-canvas Drawer */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-72 lg:hidden transform transition-transform duration-300 ease-in-out ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {sidebarContent}
+      </div>
     </>
   );
 };

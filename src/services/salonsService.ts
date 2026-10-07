@@ -100,35 +100,49 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
       }
     }
 
-    // 3. Group salons for deduplication
-    // Duplicates can share:
-    // a) owner_profile_id
-    // b) normalized phone
-    // c) identical salon name & city
-    const groups = new Map<string, Shop[]>();
+    // 3. Strict Multi-Attribute Clustering Deduplication
+    // Duplicates can share: Normalized Name, Normalized 10-Digit Phone, or Owner Profile ID
+    const cleanName = (n: string) => (n || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const groups: Shop[][] = [];
 
-    realShops.forEach((shop) => {
-      let key = '';
-      const normPhone = normalizePhone(shop.phone);
-      if (shop.owner_profile_id) {
-        key = `owner:${shop.owner_profile_id}`;
-      } else if (normPhone.length >= 10) {
-        key = `phone:${normPhone}`;
+    for (const shop of realShops) {
+      const sName = cleanName(shop.name);
+      const sPhone = normalizePhone(shop.phone);
+      const sOwner = shop.owner_profile_id;
+
+      let matchedGroupIndex = -1;
+      for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
+        const isMatch = group.some((g) => {
+          const gName = cleanName(g.name);
+          const gPhone = normalizePhone(g.phone);
+          const gOwner = g.owner_profile_id;
+
+          const nameMatch = sName.length >= 3 && gName.length >= 3 && (sName === gName || sName.includes(gName) || gName.includes(sName));
+          const phoneMatch = sPhone.length >= 10 && gPhone.length >= 10 && sPhone === gPhone;
+          const ownerMatch = !!sOwner && !!gOwner && sOwner === gOwner;
+
+          return nameMatch || phoneMatch || ownerMatch;
+        });
+
+        if (isMatch) {
+          matchedGroupIndex = i;
+          break;
+        }
+      }
+
+      if (matchedGroupIndex >= 0) {
+        groups[matchedGroupIndex].push(shop);
       } else {
-        key = `name:${(shop.name || '').toLowerCase().trim()}_${(shop.city || '').toLowerCase().trim()}`;
+        groups.push([shop]);
       }
+    }
 
-      if (!groups.has(key)) {
-        groups.set(key, []);
-      }
-      groups.get(key)!.push(shop);
-    });
-
-    // 4. Select the canonical active shop for each group
+    // 4. Select the single canonical active shop for each group
     const deduplicatedShops: Shop[] = [];
 
     groups.forEach((shopGroup) => {
-      // Sort group: highest activity (customers > bills > staff) first, then latest created
+      // Sort group: highest activity (customers > bills > staff > owner present) first, then latest created
       shopGroup.sort((a, b) => {
         const aCust = custCountMap.get(a.id) || 0;
         const bCust = custCountMap.get(b.id) || 0;
@@ -136,9 +150,11 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
         const bBills = billCountMap.get(b.id) || 0;
         const aStaff = staffCountMap.get(a.id) || 0;
         const bStaff = staffCountMap.get(b.id) || 0;
+        const aOwnerBonus = a.owner_profile_id ? 20 : 0;
+        const bOwnerBonus = b.owner_profile_id ? 20 : 0;
 
-        const aScore = aCust * 10 + aBills * 5 + aStaff * 2;
-        const bScore = bCust * 10 + bBills * 5 + bStaff * 2;
+        const aScore = aCust * 10 + aBills * 5 + aStaff * 2 + aOwnerBonus;
+        const bScore = bCust * 10 + bBills * 5 + bStaff * 2 + bOwnerBonus;
 
         if (aScore !== bScore) {
           return bScore - aScore;
@@ -150,12 +166,26 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
       const canonical = shopGroup[0];
       const duplicatesMerged = shopGroup.length - 1;
 
+      // Sum all relational counts across duplicate entries so no child records are lost
+      let totalStaff = 0;
+      let totalCust = 0;
+      let totalBills = 0;
+      shopGroup.forEach((s) => {
+        totalStaff += staffCountMap.get(s.id) || 0;
+        totalCust += custCountMap.get(s.id) || 0;
+        totalBills += billCountMap.get(s.id) || 0;
+      });
+
+      // Best owner profile among group
+      const canonicalOwnerId = canonical.owner_profile_id || shopGroup.find((s) => s.owner_profile_id)?.owner_profile_id || null;
+
       deduplicatedShops.push({
         ...canonical,
-        owner_profile: canonical.owner_profile_id ? profilesMap.get(canonical.owner_profile_id) || null : null,
-        staff_count: staffCountMap.get(canonical.id) || 0,
-        customer_count: custCountMap.get(canonical.id) || 0,
-        bill_count: billCountMap.get(canonical.id) || 0,
+        owner_profile_id: canonicalOwnerId,
+        owner_profile: canonicalOwnerId ? profilesMap.get(canonicalOwnerId) || null : null,
+        staff_count: totalStaff || staffCountMap.get(canonical.id) || 0,
+        customer_count: totalCust || custCountMap.get(canonical.id) || 0,
+        bill_count: totalBills || billCountMap.get(canonical.id) || 0,
         duplicate_count: duplicatesMerged,
       });
     });
@@ -256,5 +286,123 @@ export async function updateStaffPermissions(
   } catch (err: any) {
     console.error('Error updating staff permissions:', err);
     return { success: false, error: err.message || 'Failed to update stylist permissions' };
+  }
+}
+
+export interface CreateSalonAccountParams {
+  salonName: string;
+  ownerName: string;
+  phone: string;
+  email: string;
+  password: string;
+  city?: string;
+  address?: string;
+  pinCode?: string;
+  gstin?: string;
+}
+
+/**
+ * Creates a brand new salon account with owner authentication in Supabase
+ */
+export async function createSalonAccount(
+  params: CreateSalonAccountParams
+): Promise<{ success: boolean; data?: Shop; error: string | null }> {
+  try {
+    const cleanPhone = normalizePhone(params.phone);
+    if (!cleanPhone || cleanPhone.length < 10) {
+      return { success: false, error: 'Please enter a valid 10-digit mobile number' };
+    }
+
+    const cleanEmail = params.email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      return { success: false, error: 'Please enter a valid login email address' };
+    }
+
+    if (!params.password || params.password.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long' };
+    }
+
+    // 1. Generate initials invoice prefix (e.g., "Luxe Hair" -> "LH", fallback "SF")
+    const words = params.salonName.trim().split(/\s+/);
+    let prefix = words.map((w) => w[0]?.toUpperCase()).join('').slice(0, 4);
+    if (!prefix) prefix = 'SF';
+
+    // 2. Sign up the owner account in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password: params.password,
+      options: {
+        data: {
+          full_name: params.ownerName.trim(),
+          phone: cleanPhone,
+        },
+      },
+    });
+
+    if (authError && !authError.message.toLowerCase().includes('already registered')) {
+      return { success: false, error: authError.message };
+    }
+
+    const ownerId = authData?.user?.id;
+
+    // 3. Upsert owner profile if owner ID was created
+    if (ownerId) {
+      await supabase.from('profiles').upsert({
+        id: ownerId,
+        full_name: params.ownerName.trim(),
+        phone: cleanPhone,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    // 4. Insert the new salon shop record into `shops`
+    const { data: shopData, error: shopError } = await supabase
+      .from('shops')
+      .insert({
+        name: params.salonName.trim(),
+        owner_profile_id: ownerId || null,
+        phone: cleanPhone,
+        city: params.city?.trim() || null,
+        address: params.address?.trim() || null,
+        pin_code: params.pinCode?.trim() || null,
+        gstin: params.gstin?.trim() || null,
+        invoice_prefix: prefix,
+        accent_color: '#000000',
+        created_at: new Date().toISOString(),
+      })
+      .select('*')
+      .single();
+
+    if (shopError) throw shopError;
+
+    return { success: true, data: shopData, error: null };
+  } catch (err: any) {
+    console.error('Error creating salon account:', err);
+    return { success: false, error: err.message || 'Failed to create salon account' };
+  }
+}
+
+/**
+ * Sends an official Supabase password reset link directly to the salon account email
+ */
+export async function resetAccountPassword(
+  email: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      return { success: false, error: 'Please enter a valid email address' };
+    }
+
+    const redirectTo = window.location.origin;
+    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo,
+    });
+
+    if (error) throw error;
+    return { success: true, error: null };
+  } catch (err: any) {
+    console.error('Error resetting password:', err);
+    return { success: false, error: err.message || 'Failed to send password reset request' };
   }
 }

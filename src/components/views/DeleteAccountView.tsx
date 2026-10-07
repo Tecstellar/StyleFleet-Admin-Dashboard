@@ -36,15 +36,15 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
   const mailtoLink = `mailto:${supportEmail}?subject=Account%20Deletion%20Request&body=Hello%20StyleFleet%20Support%20Team%2C%0A%0AI%20would%20like%20to%20request%20the%20permanent%20deletion%20of%20my%20StyleFleet%20account%20and%20all%20associated%20salon%20data.%0A%0AMy%20Registered%20Details%3A%0A-%20Full%20Name%3A%20%0A-%20Salon%20Name%3A%20%0A-%20Registered%20Mobile%20Number%3A%20%0A-%20Reason%20for%20Deletion%20(Optional)%3A%20%0A%0AThank%20you.`;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-neutral-900 transition-colors">
+    <div className="min-h-screen bg-[#F8F9FA] text-neutral-900 selection:bg-black selection:text-white transition-colors">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#FAF7EE] border border-[#D4AF37] flex items-center justify-center p-1 shadow-xs shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center p-1.5 shadow-xs shrink-0">
             <img
               src="/stylefleet-logo.png"
               alt="StyleFleet Logo"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain invert"
             />
           </div>
           <div>
@@ -52,7 +52,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
               <span className="font-extrabold text-sm tracking-wide text-neutral-900">
                 STYLEFLEET
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4] uppercase">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-800 border border-neutral-300 uppercase">
                 User Rights
               </span>
             </div>
@@ -65,19 +65,19 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-700 hover:text-neutral-900 hover:border-[#D4AF37] transition-colors cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 bg-white text-xs font-semibold text-neutral-700 hover:text-black hover:border-black transition-colors cursor-pointer shadow-xs"
             title="Print or Save as PDF"
           >
-            <Printer className="w-3.5 h-3.5 text-[#B8860B]" />
+            <Printer className="w-3.5 h-3.5 text-neutral-800" />
             <span className="hidden sm:inline">Print / Save PDF</span>
           </button>
 
           {onOpenPrivacyPolicy && (
             <button
               onClick={onOpenPrivacyPolicy}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-700 hover:text-[#B8860B] hover:border-[#D4AF37] transition-colors cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 bg-white text-xs font-semibold text-neutral-700 hover:text-black hover:border-black transition-colors cursor-pointer shadow-xs"
             >
-              <FileText className="w-3.5 h-3.5 text-[#B8860B]" />
+              <FileText className="w-3.5 h-3.5 text-neutral-800" />
               <span className="hidden sm:inline">Privacy Policy</span>
             </button>
           )}
@@ -85,7 +85,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           {isPublic && onNavigateToLogin && (
             <button
               onClick={onNavigateToLogin}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[#111827] text-white text-xs font-bold hover:bg-[#D4AF37] hover:text-[#111827] shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-black text-white text-xs font-bold hover:bg-neutral-800 shadow-xs transition-all cursor-pointer"
             >
               <span>Admin Login</span>
               <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
@@ -95,7 +95,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           {!isPublic && onBackToDashboard && (
             <button
               onClick={onBackToDashboard}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[#111827] text-white text-xs font-bold hover:bg-[#D4AF37] hover:text-[#111827] shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-black text-white text-xs font-bold hover:bg-neutral-800 shadow-xs transition-all cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Dashboard</span>
@@ -106,9 +106,9 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
 
       {/* Main Content Viewport */}
       <div className="w-full flex justify-center p-4 sm:p-6 lg:p-8">
-        <div className="bg-white rounded-2xl shadow-xs border border-[#E5E7EB] w-full max-w-3xl p-6 sm:p-10 md:p-12 text-neutral-800">
+        <div className="bg-white rounded-2xl shadow-xs border border-neutral-200 border-l-4 border-l-black w-full max-w-3xl p-6 sm:p-10 md:p-12 text-neutral-800">
           {/* Header Title */}
-          <div className="border-b border-[#E5E7EB] pb-6 mb-8">
+          <div className="border-b border-neutral-200 pb-6 mb-8">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold mb-3 border border-rose-200">
               <Trash2 className="w-3.5 h-3.5" />
               <span>Data Rights &amp; Erasure</span>
@@ -117,7 +117,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
               Account Deletion Instructions
             </h1>
             <p className="text-xs sm:text-sm text-neutral-500 flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-[#B8860B]" />
+              <Clock className="w-3.5 h-3.5 text-neutral-700" />
               <span>Last Updated: {lastUpdated}</span>
             </p>
           </div>
@@ -128,9 +128,9 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           </p>
 
           {/* Option 1: In-App Deletion */}
-          <section className="mb-10 p-6 rounded-2xl bg-[#FAF7EE] border border-[#E8DEC4]">
+          <section className="mb-10 p-6 rounded-2xl bg-neutral-50 border border-neutral-200 border-l-4 border-l-black">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-white border border-[#D4AF37] text-[#B8860B] flex items-center justify-center font-bold text-sm shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-bold text-sm shadow-xs">
                 <Smartphone className="w-4 h-4" />
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
@@ -157,9 +157,9 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           </section>
 
           {/* Option 2: Email Request */}
-          <section className="mb-10 p-6 rounded-2xl bg-[#FAF7EE] border border-[#E8DEC4]">
+          <section className="mb-10 p-6 rounded-2xl bg-neutral-50 border border-neutral-200 border-l-4 border-l-black">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-white border border-[#D4AF37] text-[#B8860B] flex items-center justify-center font-bold text-sm shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-bold text-sm shadow-xs">
                 <Mail className="w-4 h-4" />
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
@@ -171,7 +171,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
                 Send an email to{' '}
                 <a
                   href={`mailto:${supportEmail}`}
-                  className="font-bold text-[#B8860B] hover:underline"
+                  className="font-bold text-black underline underline-offset-2 hover:text-neutral-700"
                 >
                   {supportEmail}
                 </a>
@@ -190,7 +190,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
 
             <a
               href={mailtoLink}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#111827] text-white text-xs sm:text-sm font-bold hover:bg-[#D4AF37] hover:text-[#111827] shadow-xs transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black text-white text-xs sm:text-sm font-bold hover:bg-neutral-800 shadow-xs transition-all"
             >
               <Mail className="w-4 h-4" />
               <span>Compose Deletion Request Email</span>
@@ -232,7 +232,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           {/* Section: Data That Is Kept */}
           <section className="mb-8">
             <h2 className="text-xl sm:text-2xl font-bold mb-3 text-neutral-900 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#B8860B]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
               <span>Data That Is Kept</span>
             </h2>
             <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-neutral-600">
@@ -246,7 +246,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           </section>
 
           {/* Footer Info */}
-          <div className="pt-6 border-t border-[#E5E7EB] text-xs text-neutral-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="pt-6 border-t border-neutral-200 text-xs text-neutral-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>StyleFleet • Owned &amp; Operated by <strong>TECSTELLAR SOLUTIONS LLP</strong></span>
@@ -254,7 +254,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
             {onOpenPrivacyPolicy && (
               <button
                 onClick={onOpenPrivacyPolicy}
-                className="text-[#B8860B] hover:underline cursor-pointer font-medium"
+                className="text-black font-semibold hover:underline cursor-pointer"
               >
                 Read Full Privacy Policy &rarr;
               </button>

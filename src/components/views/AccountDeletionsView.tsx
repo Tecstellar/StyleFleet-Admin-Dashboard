@@ -15,7 +15,7 @@ interface AccountDeletionsViewProps {
   onOpenDeleteAccountInstructions?: () => void;
 }
 
-const GOLD_PALETTE = ['#D9A441', '#E0C068', '#B8863B', '#8C6239', '#5B4021'];
+const MONO_PALETTE = ['#111827', '#374151', '#4B5563', '#6B7280', '#9CA3AF'];
 
 export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
   deletions,
@@ -99,7 +99,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
             </h1>
           </div>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Verified account deletion requests from Supabase table <code className="text-[#B8860B] font-mono">public.account_deletions</code>.
+            Verified account deletion requests from Supabase table <code className="text-neutral-900 font-semibold font-mono">public.account_deletions</code>.
           </p>
         </div>
 
@@ -107,10 +107,10 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
           {onOpenDeleteAccountInstructions && (
             <button
               onClick={onOpenDeleteAccountInstructions}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-800 hover:text-[#B8860B] hover:border-[#D4AF37] transition-colors cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 bg-white text-xs font-semibold text-neutral-800 hover:text-black hover:border-black transition-colors cursor-pointer shadow-xs"
               title="Open Public Account Deletion Instructions Page"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-[#B8860B]" />
+              <ExternalLink className="w-3.5 h-3.5 text-black" />
               <span>Public Deletion Page</span>
             </button>
           )}
@@ -132,7 +132,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
       {/* Analytics Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Reasons Distribution Table */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#E5E7EB] bg-white p-5 space-y-4 shadow-xs">
+        <div className="lg:col-span-2 rounded-2xl border border-neutral-200 bg-white p-5 space-y-4 shadow-xs">
           <div>
             <h3 className="text-sm font-semibold text-neutral-900">
               Exact Reasons Analysis
@@ -159,7 +159,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${item.percentage}%`,
-                      backgroundColor: GOLD_PALETTE[idx % GOLD_PALETTE.length],
+                      backgroundColor: MONO_PALETTE[idx % MONO_PALETTE.length],
                     }}
                   />
                 </div>
@@ -169,7 +169,7 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
         </div>
 
         {/* Donut Chart */}
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 flex flex-col items-center justify-center shadow-xs">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5 flex flex-col items-center justify-center shadow-xs">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2 self-start">
             Reason Breakdown
           </h4>
@@ -188,13 +188,13 @@ export const AccountDeletionsView: React.FC<AccountDeletionsViewProps> = ({
                     paddingAngle={3}
                   >
                     {pieData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={GOLD_PALETTE[index % GOLD_PALETTE.length]} />
+                      <Cell key={`cell-${index}`} fill={MONO_PALETTE[index % MONO_PALETTE.length]} />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
-                      borderColor: '#D4AF37',
+                      borderColor: '#111827',
                       borderRadius: '8px',
                       fontSize: '11px',
                       color: '#111827',

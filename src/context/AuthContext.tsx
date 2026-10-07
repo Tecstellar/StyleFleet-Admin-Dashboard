@@ -12,12 +12,14 @@ interface AuthContextType {
   user: AdminUser | null;
   login: (email: string, pass: string) => { success: boolean; error?: string };
   logout: () => void;
+  updateAdminPassword: (newPass: string, currentPass?: string) => { success: boolean; error?: string };
 }
 
 const AUTH_STORAGE_KEY = 'stylefleet_admin_auth_session';
+const ADMIN_PASS_KEY = 'stylefleet_admin_custom_pwd';
 
 const VALID_EMAIL = 'stylefleet@tecstellar.com';
-const VALID_PASSWORD = 'Stylefleetadmin@4321';
+const DEFAULT_PASSWORD = 'Stylefleetadmin@4321';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -39,10 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = (email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = pass.trim();
+    const validPass = localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_PASSWORD;
 
-    if (cleanEmail === VALID_EMAIL && cleanPass === VALID_PASSWORD) {
+    if (cleanEmail === VALID_EMAIL && cleanPass === validPass) {
       const adminUser: AdminUser = {
-        email: 'Stylefleet@tecstellar.com',
+        email: 'stylefleet@tecstellar.com',
         name: 'Master Operator',
         role: 'Super Admin',
         loginAt: new Date().toISOString(),
@@ -58,13 +61,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const updateAdminPassword = (newPass: string, currentPass?: string) => {
+    const currentSaved = localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_PASSWORD;
+    if (currentPass && currentPass.trim() !== currentSaved) {
+      return { success: false, error: 'Current admin password does not match.' };
+    }
+    if (!newPass || newPass.trim().length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters long.' };
+    }
+    localStorage.setItem(ADMIN_PASS_KEY, newPass.trim());
+    return { success: true };
+  };
+
   const logout = () => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, updateAdminPassword }}>
       {children}
     </AuthContext.Provider>
   );

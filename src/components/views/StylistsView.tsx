@@ -396,34 +396,34 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
       {/* Top Banner & KPI Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs">
+        <div className="p-4 rounded-xl border border-neutral-200 border-l-4 border-l-[#1c1f26] bg-white shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-500">Total Stylists</span>
-            <Scissors className="w-4 h-4 text-[#D4AF37]" />
+            <Scissors className="w-4 h-4 text-[#1c1f26]" />
           </div>
           <div className="text-2xl font-bold text-neutral-900 mt-2 font-mono">{metrics.total}</div>
           <span className="text-[11px] text-neutral-500 mt-0.5 block">Across {shops.length} salons</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-xs">
+        <div className="p-4 rounded-xl border border-neutral-200 border-l-4 border-l-[#1c1f26] bg-white shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-700">App Active</span>
-            <Smartphone className="w-4 h-4 text-emerald-600" />
+            <span className="text-xs font-semibold text-neutral-700">App Active</span>
+            <Smartphone className="w-4 h-4 text-neutral-900" />
           </div>
-          <div className="text-2xl font-bold text-emerald-900 mt-2 font-mono">{metrics.appActive}</div>
-          <span className="text-[11px] text-emerald-600 mt-0.5 block">Logged in to mobile app</span>
+          <div className="text-2xl font-bold text-neutral-900 mt-2 font-mono">{metrics.appActive}</div>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Logged in to mobile app</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#E8DEC4] bg-[#FAF7EE] shadow-xs">
+        <div className="p-4 rounded-xl border border-neutral-200 border-l-4 border-l-neutral-700 bg-white shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#B8860B]">Invited via WhatsApp</span>
-            <MessageCircle className="w-4 h-4 text-[#D4AF37]" />
+            <span className="text-xs font-semibold text-neutral-700">Invited via WhatsApp</span>
+            <MessageCircle className="w-4 h-4 text-neutral-700" />
           </div>
           <div className="text-2xl font-bold text-neutral-900 mt-2 font-mono">{metrics.invited}</div>
-          <span className="text-[11px] text-[#B8860B] mt-0.5 block">Invite link delivered</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Invite link delivered</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/80 shadow-xs">
+        <div className="p-4 rounded-xl border border-neutral-200 border-l-4 border-l-neutral-400 bg-white shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-600">Pending Invite</span>
             <Users className="w-4 h-4 text-neutral-400" />
@@ -432,18 +432,18 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
           <span className="text-[11px] text-neutral-500 mt-0.5 block">Needs WhatsApp invite</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-[#D4AF37]/30 bg-[#FAF7EE]/60 shadow-xs">
+        <div className="p-4 rounded-xl border border-neutral-200 border-l-4 border-l-[#1c1f26] bg-white shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#B8860B]">Active Roster</span>
-            <CheckCircle2 className="w-4 h-4 text-[#B8860B]" />
+            <span className="text-xs font-semibold text-neutral-700">Active Roster</span>
+            <CheckCircle2 className="w-4 h-4 text-[#1c1f26]" />
           </div>
           <div className="text-2xl font-bold text-neutral-900 mt-2 font-mono">{metrics.activeAccounts}</div>
-          <span className="text-[11px] text-[#B8860B] mt-0.5 block">Enabled for salon work</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Enabled for salon work</span>
         </div>
       </div>
 
       {/* Control Bar: Search, Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-4 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
         <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           {/* Search */}
           <div className="relative flex-1 min-w-[200px]">
@@ -453,7 +453,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search stylist by name, phone, salon, or role..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-[#D4AF37] focus:bg-white"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-black focus:bg-white transition-all"
             />
           </div>
 
@@ -462,7 +462,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
             <select
               value={selectedShopFilter}
               onChange={(e) => setSelectedShopFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] text-neutral-800 focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-800 focus:outline-none focus:border-black transition-all"
             >
               <option value="all">All Salons ({shops.length})</option>
               {shops.map((s) => (
@@ -478,7 +478,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
             <select
               value={inviteStatusFilter}
               onChange={(e) => setInviteStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] text-neutral-800 focus:outline-none focus:border-[#D4AF37]"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-800 focus:outline-none focus:border-black transition-all"
             >
               <option value="all">All Invite Statuses</option>
               <option value="active">App Active</option>
@@ -516,13 +516,11 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
           <button
             onClick={handleOpenAdd}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0D1C42] text-white hover:bg-[#08122B] text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-black text-white hover:bg-neutral-800 text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-[#D4AF37]" />
+            <Plus className="w-4 h-4 text-white" />
             <span>Add Stylist</span>
           </button>
-
-
         </div>
       </div>
 
@@ -548,7 +546,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-[#FAF7EE] border-b border-[#E5E7EB] text-neutral-600 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="bg-neutral-50 border-b border-neutral-200 text-neutral-700 font-bold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Stylist</th>
                   <th className="py-3 px-4">Salon Assigned</th>
                   <th className="py-3 px-4">Mobile Number</th>
@@ -558,7 +556,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                   <th className="py-3 px-4 text-right">Admin Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F0F0F0]">
+              <tbody className="divide-y divide-neutral-200">
                 {filteredStaff.map((st) => {
                   const perms = st.permissions || DEFAULT_STYLIST_PERMISSIONS;
                   const grantedCount = Object.values(perms).filter(Boolean).length;
@@ -566,11 +564,11 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                   const isInvited = st.invitation_status === 'invited';
 
                   return (
-                    <tr key={st.id} className="hover:bg-[#FAF9F5] transition-colors group">
+                    <tr key={st.id} className="hover:bg-neutral-50 transition-colors group">
                       {/* Stylist Column */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-neutral-900 text-[#D4AF37] font-bold flex items-center justify-center text-xs shrink-0 shadow-2xs">
+                          <div className="w-8 h-8 rounded-lg bg-black text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-2xs">
                             {st.name.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
@@ -594,9 +592,9 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                             <button
                               type="button"
                               onClick={() => onSelectSalon?.(st.shop!)}
-                              className="font-semibold text-neutral-900 hover:text-[#B8860B] transition-colors text-xs flex items-center gap-1 group-hover:underline text-left"
+                              className="font-semibold text-neutral-900 hover:text-black transition-colors text-xs flex items-center gap-1 group-hover:underline text-left"
                             >
-                              <Store className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                              <Store className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
                               <span>{st.shop.name}</span>
                             </button>
                             {st.shop.city && (
@@ -636,16 +634,16 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                       {/* Invitation Status */}
                       <td className="py-3.5 px-4">
                         {isAppActive ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-neutral-900 text-white border border-neutral-900 shadow-2xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                             <span>App Active</span>
                           </span>
                         ) : isInvited ? (
                           <span
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-neutral-100 text-neutral-800 border border-neutral-300"
                             title={st.invited_at ? `Invited on ${formatDateTime(st.invited_at)}` : 'Invited'}
                           >
-                            <MessageCircle className="w-3.5 h-3.5 text-[#D4AF37]" />
+                            <MessageCircle className="w-3.5 h-3.5 text-neutral-700" />
                             <span>Invited {st.invited_at ? `(${formatDate(st.invited_at)})` : ''}</span>
                           </span>
                         ) : (
@@ -662,14 +660,14 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                           onClick={() => handleToggleActive(st)}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all border cursor-pointer ${
                             st.is_active
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                              ? 'bg-neutral-900 text-white border-black'
                               : 'bg-neutral-100 text-neutral-500 border-neutral-300 hover:bg-neutral-200'
                           }`}
                           title={`Click to ${st.is_active ? 'deactivate' : 'activate'} this stylist`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              st.is_active ? 'bg-emerald-600' : 'bg-neutral-400'
+                              st.is_active ? 'bg-emerald-400' : 'bg-neutral-400'
                             }`}
                           />
                           <span>{st.is_active ? 'Active' : 'Disabled'}</span>
@@ -681,14 +679,14 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setPermissionModalStaff(st)}
-                          className="flex items-center gap-2 group/perm hover:bg-[#FAF7EE] p-1.5 rounded-lg border border-transparent hover:border-[#D4AF37]/40 transition-all text-left"
+                          className="flex items-center gap-2 group/perm hover:bg-neutral-100 p-1.5 rounded-lg border border-transparent hover:border-neutral-300 transition-all text-left"
                         >
-                          <Shield className="w-4 h-4 text-[#D4AF37]" />
+                          <Shield className="w-4 h-4 text-black" />
                           <div>
                             <span className="font-bold text-neutral-900 block text-[11px]">
                               {grantedCount} of 8 modules
                             </span>
-                            <span className="text-[10px] text-neutral-500 group-hover/perm:text-[#B8860B] transition-colors">
+                            <span className="text-[10px] text-neutral-500 group-hover/perm:text-black transition-colors">
                               Click to configure &rarr;
                             </span>
                           </div>
@@ -712,11 +710,11 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                             }
                             className={`p-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-all ${
                               st.phone
-                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 shadow-2xs'
+                                ? 'border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-black hover:text-white hover:border-black shadow-2xs'
                                 : 'border-neutral-200 bg-neutral-50 text-neutral-300 cursor-not-allowed'
                             }`}
                           >
-                            <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                            <MessageCircle className="w-3.5 h-3.5" />
                             <span className="hidden xl:inline text-[11px]">
                               {isInvited ? 'Resend' : 'Invite'}
                             </span>
@@ -726,17 +724,17 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                           <button
                             type="button"
                             onClick={() => setPermissionModalStaff(st)}
-                            className="p-1.5 rounded-lg border border-[#E5E7EB] bg-white text-neutral-700 hover:text-black hover:border-[#D4AF37] hover:bg-[#FAF7EE] transition-colors"
+                            className="p-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:text-black hover:border-black hover:bg-neutral-50 transition-colors"
                             title="Manage Access Permissions"
                           >
-                            <Shield className="w-3.5 h-3.5 text-[#B8860B]" />
+                            <Shield className="w-3.5 h-3.5 text-neutral-800" />
                           </button>
 
                           {/* Edit Details */}
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(st)}
-                            className="p-1.5 rounded-lg border border-[#E5E7EB] bg-white text-neutral-700 hover:text-black hover:bg-neutral-50 transition-colors"
+                            className="p-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:text-black hover:border-black hover:bg-neutral-50 transition-colors"
                             title="Edit Stylist Details"
                           >
                             <Edit2 className="w-3.5 h-3.5 text-neutral-600" />
@@ -777,15 +775,15 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
         >
           <div className="space-y-5">
             {/* Realtime enforcement note */}
-            <div className="p-3.5 rounded-xl border border-[#D4AF37]/40 bg-[#FAF7EE] flex items-start gap-3">
-              <Sparkles className="w-4 h-4 text-[#B8860B] shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl border border-neutral-200 bg-neutral-50 flex items-start gap-3">
+              <Sparkles className="w-4 h-4 text-black shrink-0 mt-0.5" />
               <div className="text-xs text-neutral-800 leading-relaxed">
                 <span className="font-bold text-neutral-900">Enforced by Company Admin HQ:</span> All permission updates persist directly in Supabase and take effect <strong>immediately</strong> on the stylist's mobile device without requiring re-login.
               </div>
             </div>
 
             {/* Quick Action Bar */}
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
                 Module Access Controls ({Object.values(permissionModalStaff.permissions || DEFAULT_STYLIST_PERMISSIONS).filter(Boolean).length}/8 Active)
               </span>
@@ -794,7 +792,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                   type="button"
                   onClick={() => handleToggleAllPermissions(true)}
                   disabled={actionLoading}
-                  className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[#FAF7EE] text-[#B8860B] hover:bg-[#F3ECCE] border border-[#D4AF37]/50 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 text-xs font-bold rounded-lg bg-black text-white hover:bg-neutral-800 border border-black transition-colors cursor-pointer"
                 >
                   Grant All
                 </button>
@@ -802,7 +800,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                   type="button"
                   onClick={() => handleToggleAllPermissions(false)}
                   disabled={actionLoading}
-                  className="px-2.5 py-1 text-xs font-bold rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 border border-neutral-300 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 text-xs font-bold rounded-lg bg-neutral-100 text-neutral-700 hover:bg-neutral-200 border border-neutral-300 transition-colors cursor-pointer"
                 >
                   Revoke All
                 </button>
@@ -821,22 +819,22 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                     onClick={() => handleTogglePermission(key)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none flex items-start justify-between gap-3 ${
                       isGranted
-                        ? 'border-[#D4AF37] bg-[#FAF7EE]/60 shadow-xs'
-                        : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 opacity-75'
+                        ? 'border-black bg-neutral-900 text-white shadow-xs'
+                        : 'border-neutral-200 bg-white text-neutral-900 hover:border-neutral-400 opacity-90'
                     }`}
                   >
                     <div className="flex items-start gap-2.5">
                       <span className="text-lg shrink-0">{icon}</span>
                       <div>
-                        <div className="font-bold text-neutral-900 text-xs flex items-center gap-1.5">
+                        <div className={`font-bold text-xs flex items-center gap-1.5 ${isGranted ? 'text-white' : 'text-neutral-900'}`}>
                           <span>{label}</span>
                           {isGranted && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-white text-black">
                               Enabled
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-neutral-500 mt-0.5 leading-snug">
+                        <p className={`text-[11px] mt-0.5 leading-snug ${isGranted ? 'text-neutral-300' : 'text-neutral-500'}`}>
                           {description}
                         </p>
                       </div>
@@ -844,12 +842,12 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
                     <div
                       className={`w-9 h-5 rounded-full transition-colors relative shrink-0 mt-0.5 ${
-                        isGranted ? 'bg-[#D4AF37]' : 'bg-neutral-300'
+                        isGranted ? 'bg-white' : 'bg-neutral-300'
                       }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded-full bg-white shadow-xs transition-transform absolute top-0.5 ${
-                          isGranted ? 'translate-x-4' : 'translate-x-0.5'
+                        className={`w-4 h-4 rounded-full shadow-xs transition-transform absolute top-0.5 ${
+                          isGranted ? 'translate-x-4 bg-black' : 'translate-x-0.5 bg-white'
                         }`}
                       />
                     </div>
@@ -859,19 +857,17 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-3 border-t border-[#E5E7EB]">
+            <div className="flex items-center justify-between pt-3 border-t border-neutral-200">
               <span className="text-[11px] text-neutral-400">
-                Staff ID: <code className="font-mono">{permissionModalStaff.id}</code>
+                Staff ID: <code className="font-mono text-neutral-800">{permissionModalStaff.id}</code>
               </span>
               <button
                 type="button"
                 onClick={() => setPermissionModalStaff(null)}
-                className="px-4 py-2 rounded-xl bg-[#0D1C42] text-white hover:bg-[#08122B] font-bold text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-black text-white hover:bg-neutral-800 font-bold text-xs transition-colors cursor-pointer"
               >
                 Done
               </button>
-
-
             </div>
           </div>
         </Modal>
@@ -898,7 +894,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 value={formShopId}
                 onChange={(e) => setFormShopId(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E5E7EB] bg-white text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-black"
               >
                 <option value="">-- Choose a salon --</option>
                 {shops.map((s) => (
@@ -920,7 +916,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder="e.g. Rahul Sharma"
                 required
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E5E7EB] bg-white text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-black"
               />
             </div>
 
@@ -930,7 +926,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 Mobile Number (for OTP & WhatsApp Invite)
               </label>
               <div className="flex items-center">
-                <span className="px-3 py-2 text-xs bg-neutral-100 border border-r-0 border-[#E5E7EB] rounded-l-xl text-neutral-600 font-semibold font-mono">
+                <span className="px-3 py-2 text-xs bg-neutral-100 border border-r-0 border-neutral-200 rounded-l-xl text-neutral-600 font-semibold font-mono">
                   +91
                 </span>
                 <input
@@ -939,7 +935,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   placeholder="9876543210"
-                  className="w-full px-3 py-2 text-xs rounded-r-xl border border-[#E5E7EB] bg-white text-neutral-900 font-mono focus:outline-none focus:border-[#D4AF37]"
+                  className="w-full px-3 py-2 text-xs rounded-r-xl border border-neutral-200 bg-white text-neutral-900 font-mono focus:outline-none focus:border-black"
                 />
               </div>
               <p className="text-[10px] text-neutral-500 mt-1">
@@ -957,7 +953,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 value={formRole}
                 onChange={(e) => setFormRole(e.target.value)}
                 placeholder="e.g. Senior Stylist, Barber, Hairdresser, Colorist"
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#E5E7EB] bg-white text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-black"
               />
             </div>
 
@@ -968,7 +964,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 id="formIsActive"
                 checked={formIsActive}
                 onChange={(e) => setFormIsActive(e.target.checked)}
-                className="rounded border-[#E5E7EB] text-[#D4AF37] focus:ring-[#D4AF37]"
+                className="rounded border-neutral-300 text-black focus:ring-black"
               />
               <label htmlFor="formIsActive" className="text-xs font-semibold text-neutral-800">
                 Active in Salon Roster (Can take appointments and be assigned to bills)
@@ -977,39 +973,37 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
             {/* Auto WhatsApp Invite Checkbox (only for new creation) */}
             {!editingStaff && (
-              <div className="flex items-center gap-2 p-3 rounded-xl border border-emerald-200 bg-emerald-50/50">
+              <div className="flex items-center gap-2 p-3 rounded-xl border border-neutral-200 bg-neutral-50">
                 <input
                   type="checkbox"
                   id="formSendInvite"
                   checked={formSendInvite}
                   onChange={(e) => setFormSendInvite(e.target.checked)}
-                  className="rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500"
+                  className="rounded border-neutral-300 text-black focus:ring-black"
                 />
-                <label htmlFor="formSendInvite" className="text-xs font-semibold text-emerald-900">
+                <label htmlFor="formSendInvite" className="text-xs font-semibold text-neutral-900">
                   Prompt WhatsApp invitation immediately upon creation
                 </label>
               </div>
             )}
 
             {/* Form Action Buttons */}
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E7EB]">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-200">
               <button
                 type="button"
                 onClick={() => setIsAddEditModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-[#E5E7EB] text-neutral-700 hover:bg-neutral-50 font-bold text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-neutral-200 text-neutral-700 hover:bg-neutral-50 font-bold text-xs transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="px-5 py-2 rounded-xl bg-[#0D1C42] text-white hover:bg-[#08122B] font-bold text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-black text-white hover:bg-neutral-800 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
               >
-                {actionLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#D4AF37]" />}
+                {actionLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />}
                 <span>{editingStaff ? 'Update Stylist' : 'Save Stylist'}</span>
               </button>
-
-
             </div>
           </form>
         </Modal>

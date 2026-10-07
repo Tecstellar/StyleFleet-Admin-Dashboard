@@ -121,7 +121,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
       key: 'id',
       header: 'Ticket ID',
       render: (m) => (
-        <span className="font-mono text-xs text-[#B8860B] font-semibold">
+        <span className="font-mono text-xs text-neutral-900 font-semibold">
           #{m.id.slice(0, 8)}
         </span>
       ),
@@ -158,7 +158,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
           <span
             className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium border ${
               count > 0
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                ? 'bg-neutral-900 text-white border-neutral-900'
                 : 'bg-neutral-100 text-neutral-500 border-neutral-200'
             }`}
           >
@@ -190,9 +190,9 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
             e.stopPropagation();
             handleOpenModal(m);
           }}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-800 hover:border-[#D4AF37] hover:text-[#B8860B] shadow-xs transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-800 hover:border-black hover:text-black shadow-xs transition-colors"
         >
-          <Eye className="w-3.5 h-3.5 text-[#B8860B]" />
+          <Eye className="w-3.5 h-3.5 text-neutral-800" />
           <span>Reply &amp; Manage</span>
         </button>
       ),
@@ -206,13 +206,13 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#B8860B]" />
+            <MessageSquare className="w-5 h-5 text-neutral-900" />
             <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               Support Messages &amp; Help Desk
             </h1>
           </div>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Realtime salon communications. Replies are recorded into Supabase table <code className="text-[#B8860B] font-mono">public.support_message_answers</code>.
+            Realtime salon communications. Replies are recorded into Supabase table <code className="text-neutral-900 font-semibold font-mono">public.support_message_answers</code>.
           </p>
         </div>
 
@@ -236,10 +236,10 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
 
       {/* Supabase RLS Notice Banner */}
       {messages.length === 0 && (
-        <div className="p-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 text-xs text-amber-200 space-y-3 shadow-sm">
+        <div className="p-4 rounded-2xl border border-neutral-200 border-l-4 border-l-black bg-neutral-50 text-xs text-neutral-800 space-y-3 shadow-xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2 font-bold text-amber-300">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="flex items-center gap-2 font-bold text-neutral-900">
+              <AlertCircle className="w-4 h-4 text-neutral-900 shrink-0" />
               <span>Row Level Security (RLS) Notice — Why Supabase rows might be hidden</span>
             </div>
             <button
@@ -256,16 +256,16 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                 setCopiedSql(true);
                 setTimeout(() => setCopiedSql(false), 2500);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold border border-amber-500/40 transition-colors text-xs shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold transition-colors text-xs shrink-0 cursor-pointer shadow-xs"
             >
-              {copiedSql ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedSql ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedSql ? 'SQL Copied!' : 'Copy Supabase SQL Fix'}</span>
             </button>
           </div>
-          <p className="text-[11px] leading-relaxed text-amber-200/90">
+          <p className="text-[11px] leading-relaxed text-neutral-600">
             If you have existing tickets in your Supabase Table Editor that do not appear here, Postgres Row-Level Security is currently restricting access. Run this script in your Supabase SQL Editor to enable full access:
           </p>
-          <pre className="p-3 rounded-xl bg-white border border-amber-300 font-mono text-[10.5px] text-[#B8860B] overflow-x-auto leading-relaxed">
+          <pre className="p-3 rounded-xl bg-white border border-neutral-300 font-mono text-[10.5px] text-neutral-900 overflow-x-auto leading-relaxed">
 {`-- Allow read and write for support messages and replies:
 ALTER TABLE public.support_messages ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "allow_support_messages_all" ON public.support_messages;
@@ -307,9 +307,9 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
         {selectedMessage && (
           <div className="space-y-6">
             {/* Ticket Metadata Bar */}
-            <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#FAF7EE] text-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50 text-xs flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Store className="w-4 h-4 text-[#B8860B]" />
+                <Store className="w-4 h-4 text-neutral-800" />
                 <span className="font-semibold text-neutral-900">
                   {selectedMessage.shop?.name || 'Direct Mobile User'}
                 </span>
@@ -331,10 +331,10 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
               </h4>
 
               {/* 1. Client Question Bubble */}
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white text-xs space-y-2 shadow-xs">
+              <div className="p-4 rounded-xl border border-neutral-200 bg-white text-xs space-y-2 shadow-xs">
                 <div className="flex items-center justify-between text-neutral-500 text-[11px]">
                   <div className="flex items-center gap-1.5 font-medium text-neutral-900">
-                    <User className="w-3.5 h-3.5 text-[#B8860B]" />
+                    <User className="w-3.5 h-3.5 text-neutral-700" />
                     <span>Salon Inquiry</span>
                   </div>
                   <span className="font-mono">{formatDateTime(selectedMessage.created_at)}</span>
@@ -349,19 +349,19 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                 selectedMessage.answers.map((ans) => (
                   <div
                     key={ans.id}
-                    className="p-4 rounded-xl border border-[#D4AF37]/50 bg-[#FAF7EE] text-xs space-y-2 ml-4 sm:ml-8 shadow-xs"
+                    className="p-4 rounded-xl border border-neutral-200 bg-neutral-100 text-xs space-y-2 ml-4 sm:ml-8 shadow-xs"
                   >
                     <div className="flex items-center justify-between text-[11px]">
-                      <div className="flex items-center gap-1.5 font-bold text-[#B8860B]">
-                        <Shield className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1.5 font-bold text-neutral-900">
+                        <Shield className="w-3.5 h-3.5 text-black" />
                         <span>{ans.admin_name || 'Super Admin'}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-neutral-500">{formatDateTime(ans.created_at)}</span>
                         {ans.is_read ? (
-                          <span className="text-[10px] text-emerald-700 font-mono">Read by Salon</span>
+                          <span className="text-[10px] text-neutral-700 font-mono font-medium">Read by Salon</span>
                         ) : (
-                          <span className="text-[10px] text-amber-700 font-mono">Delivered</span>
+                          <span className="text-[10px] text-neutral-500 font-mono">Delivered</span>
                         )}
                       </div>
                     </div>
@@ -371,28 +371,28 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                   </div>
                 ))
               ) : (
-                <div className="p-3.5 rounded-xl border border-dashed border-[#E5E7EB] text-center text-xs text-neutral-500 bg-white">
-                  No replies recorded in <code className="text-[#B8860B] font-mono">public.support_message_answers</code> yet.
+                <div className="p-3.5 rounded-xl border border-dashed border-neutral-200 text-center text-xs text-neutral-500 bg-white">
+                  No replies recorded in <code className="text-neutral-900 font-semibold font-mono">public.support_message_answers</code> yet.
                 </div>
               )}
             </div>
 
             {/* Error Notification if RLS Policy Blocks Insert */}
             {isRlsBlocked && (
-              <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 text-xs text-amber-900 space-y-2">
-                <div className="flex items-center gap-2 font-bold text-amber-800">
-                  <AlertCircle className="w-4 h-4 text-amber-600" />
+              <div className="p-4 rounded-xl border border-neutral-300 bg-neutral-50 text-xs text-neutral-900 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-neutral-900">
+                  <AlertCircle className="w-4 h-4 text-neutral-800" />
                   <span>Row Level Security (RLS) Policy Required</span>
                 </div>
-                <p className="leading-relaxed text-[11px]">
-                  Supabase returned error 42501 (violates row-level security policy for table <code className="font-mono text-amber-800">support_message_answers</code>). To allow the admin dashboard to store answers, run this SQL policy in your Supabase SQL editor:
+                <p className="leading-relaxed text-[11px] text-neutral-600">
+                  Supabase returned error 42501 (violates row-level security policy for table <code className="font-mono text-neutral-900 font-semibold">support_message_answers</code>). To allow the admin dashboard to store answers, run this SQL policy in your Supabase SQL editor:
                 </p>
-                <div className="flex items-center justify-between gap-2 p-2.5 rounded bg-white border border-amber-300 font-mono text-[11px] text-[#B8860B]">
+                <div className="flex items-center justify-between gap-2 p-2.5 rounded bg-white border border-neutral-300 font-mono text-[11px] text-neutral-900">
                   <span className="truncate">CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answers FOR ALL USING (true) WITH CHECK (true);</span>
                   <button
                     onClick={copySqlSnippet}
                     type="button"
-                    className="p-1 rounded bg-[#FAF7EE] hover:bg-[#F3ECCE] text-[#B8860B] border border-[#D4AF37] shrink-0"
+                    className="p-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-300 shrink-0"
                     title="Copy SQL snippet"
                   >
                     {copiedSql ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -408,10 +408,10 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
             )}
 
             {/* 3. Reply Composer Form */}
-            <form onSubmit={handleSendAnswer} className="space-y-4 pt-3 border-t border-[#E5E7EB]">
+            <form onSubmit={handleSendAnswer} className="space-y-4 pt-3 border-t border-neutral-200">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
-                  <CornerDownRight className="w-3.5 h-3.5 text-[#B8860B]" />
+                  <CornerDownRight className="w-3.5 h-3.5 text-neutral-900" />
                   <span>Compose Admin Reply</span>
                 </label>
                 <div className="flex items-center gap-2 text-xs">
@@ -419,7 +419,7 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                   <select
                     value={responseStatus}
                     onChange={(e) => setResponseStatus(e.target.value as any)}
-                    className="py-1 px-2.5 rounded-lg border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                    className="py-1 px-2.5 rounded-lg border border-neutral-200 bg-white text-xs font-semibold text-neutral-900 focus:outline-none focus:border-black"
                   >
                     <option value="in_progress">In Progress</option>
                     <option value="resolved">Resolved</option>
@@ -435,7 +435,7 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                 placeholder="Type your official response to this salon inquiry..."
                 rows={4}
                 required
-                className="w-full p-3 text-xs rounded-xl border border-[#E5E7EB] bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#D4AF37] transition-colors leading-relaxed shadow-xs"
+                className="w-full p-3 text-xs rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-black transition-colors leading-relaxed shadow-xs"
               />
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -445,14 +445,14 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                     type="text"
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
-                    className="py-1 px-2 rounded-lg border border-[#E5E7EB] bg-white text-xs font-medium text-neutral-900 focus:outline-none focus:border-[#D4AF37]"
+                    className="py-1 px-2 rounded-lg border border-neutral-200 bg-white text-xs font-medium text-neutral-900 focus:outline-none focus:border-black"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting || !answerText.trim()}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-bold bg-[#111827] text-white hover:bg-[#D4AF37] hover:text-[#111827] shadow-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-bold bg-black text-white hover:bg-neutral-800 shadow-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Send className={`w-3.5 h-3.5 ${isSubmitting ? 'animate-spin' : ''}`} />
                   <span>{isSubmitting ? 'Saving to Supabase...' : 'Send Answer & Store'}</span>

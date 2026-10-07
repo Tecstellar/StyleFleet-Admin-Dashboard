@@ -59,8 +59,8 @@ export const Modal: React.FC<ModalProps> = ({
         role="dialog"
         aria-modal="true"
       >
-        {/* Top Gold Accent */}
-        <div className="h-1 bg-gradient-to-r from-[#D4AF37]/20 via-[#D4AF37] to-[#D4AF37]/20" />
+        {/* Top Black Accent */}
+        <div className="h-1 bg-[#111827]" />
 
         {/* Header */}
         <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#E5E7EB]">

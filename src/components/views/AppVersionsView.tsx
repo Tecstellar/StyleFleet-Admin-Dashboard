@@ -1,5 +1,5 @@
 import React from 'react';
-import { GitBranch, Smartphone, Info, Layers, CheckCircle } from 'lucide-react';
+import { GitBranch } from 'lucide-react';
 import { UnavailableBanner } from '../common/UnavailableBanner';
 
 export const AppVersionsView: React.FC = () => {
@@ -7,7 +7,7 @@ export const AppVersionsView: React.FC = () => {
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-2">
-          <GitBranch className="w-5 h-5 text-[#D4AF37]" />
+          <GitBranch className="w-5 h-5 text-neutral-900" />
           <h1 className="text-xl font-bold tracking-tight text-neutral-900">
             App Version Fleet Management
           </h1>
@@ -25,7 +25,7 @@ export const AppVersionsView: React.FC = () => {
       />
 
       {/* Discovered Client Build Specification */}
-      <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 space-y-4 shadow-xs">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-6 space-y-4 shadow-xs">
         <h3 className="text-sm font-semibold text-neutral-900">
           Detected StyleFleet Client Applications in Workspace
         </h3>
@@ -34,10 +34,10 @@ export const AppVersionsView: React.FC = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F8F9FA] text-xs space-y-2">
+          <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50 text-xs space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-neutral-900">StyleFleet Android</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-900 text-white border border-neutral-900">
                 Active Client
               </span>
             </div>
@@ -49,10 +49,10 @@ export const AppVersionsView: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#FAF7EE] text-xs space-y-2">
+          <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50 text-xs space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-neutral-900">StyleFleet iOS</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-white text-[#B8860B] border border-[#E8DEC4]">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-100 text-neutral-800 border border-neutral-300">
                 In Repository
               </span>
             </div>

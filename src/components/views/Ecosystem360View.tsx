@@ -67,7 +67,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <Compass className="w-5 h-5 text-[#D4AF37]" />
+            <Compass className="w-5 h-5 text-neutral-900" />
             <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               StyleFleet 360° Ecosystem View
             </h1>
@@ -83,7 +83,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
           <select
             value={selectedShopId}
             onChange={(e) => setSelectedShopId(e.target.value)}
-            className="py-1.5 px-3 rounded-xl border border-[#E5E7EB] bg-[#F8F9FA] text-xs text-neutral-900 font-semibold focus:outline-none focus:border-[#D4AF37]"
+            className="py-1.5 px-3 rounded-xl border border-neutral-200 bg-neutral-50 text-xs text-neutral-900 font-semibold focus:outline-none focus:border-black"
           >
             {shops.map((s) => (
               <option key={s.id} value={s.id}>
@@ -98,10 +98,10 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
       {activeShop ? (
         <div className="space-y-4">
           {/* Node 1: USER / PROFILE */}
-          <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-3">
+          <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
+                <div className="p-1.5 rounded-lg bg-neutral-100 text-neutral-800 border border-neutral-300">
                   <User className="w-4 h-4" />
                 </div>
                 <h3 className="text-sm font-semibold text-neutral-900">
@@ -114,7 +114,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
                   public.profiles (ID: {linkedProfile.id.slice(0, 8)}...)
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-[11px] text-amber-600 font-mono">
+                <span className="inline-flex items-center gap-1 text-[11px] text-neutral-500 font-mono">
                   <XCircle className="w-3.5 h-3.5" />
                   owner_profile_id is NULL
                 </span>
@@ -122,7 +122,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
             </div>
 
             {linkedProfile ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-[#F8F9FA] border border-[#E5E7EB] p-3 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-neutral-50 border border-neutral-200 p-3 rounded-lg">
                 <div>
                   <span className="text-neutral-500">Full Name:</span>
                   <div className="font-semibold text-neutral-900">{linkedProfile.full_name || 'Not set'}</div>
@@ -137,34 +137,34 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+              <p className="text-xs text-neutral-700 bg-neutral-100 p-2.5 rounded-lg border border-neutral-200">
                 This salon does not have a linked user profile row in <code className="font-mono">public.profiles</code>.
               </p>
             )}
           </div>
 
-          <div className="flex justify-center text-[#D4AF37]">
+          <div className="flex justify-center text-neutral-400">
             <ArrowDown className="w-5 h-5" />
           </div>
 
           {/* Node 2: SALON */}
-          <div className="p-4 rounded-xl border border-[#D4AF37]/50 bg-white shadow-xs space-y-3">
+          <div className="p-4 rounded-xl border border-neutral-200 border-l-4 border-l-[#1c1f26] bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900">
+                <div className="p-1.5 rounded-lg bg-[#1c1f26] text-white">
                   <Store className="w-4 h-4" />
                 </div>
                 <h3 className="text-sm font-semibold text-neutral-900">
                   Step 2: Salon Business Entity
                 </h3>
               </div>
-              <span className="inline-flex items-center gap-1 text-[11px] text-[#B8860B] font-mono">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1 text-[11px] text-neutral-900 font-mono font-semibold">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#1c1f26]" />
                 public.shops (ID: {activeShop.id.slice(0, 8)}...)
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-[#FAF7EE] border border-[#E8DEC4] p-3 rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-neutral-50 border border-neutral-200 p-3 rounded-lg">
               <div>
                 <span className="text-neutral-500">Salon Name:</span>
                 <div className="font-semibold text-neutral-900">{activeShop.name}</div>
@@ -182,7 +182,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
                 <div className="flex items-center gap-1.5 font-mono text-neutral-900">
                   <span
                     className="w-3 h-3 rounded-full border border-neutral-300"
-                    style={{ backgroundColor: activeShop.accent_color || '#D4AF37' }}
+                    style={{ backgroundColor: activeShop.accent_color || '#111827' }}
                   />
                   {activeShop.accent_color}
                 </div>
@@ -196,38 +196,38 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
 
           {/* Node 3 & 4: DEVICE & APP VERSION (UNLINKED PER RULE 1) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl border border-dashed border-amber-300 bg-amber-50/60 space-y-2">
+            <div className="p-4 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-amber-800 font-semibold">
-                  <Smartphone className="w-4 h-4 text-amber-600" />
+                <div className="flex items-center gap-2 text-neutral-800 font-semibold">
+                  <Smartphone className="w-4 h-4 text-neutral-600" />
                   <span>Step 3: Device / Platform</span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                <span className="text-[10px] font-mono text-neutral-700 bg-neutral-200 px-2 py-0.5 rounded border border-neutral-300">
                   Unlinked (No table)
                 </span>
               </div>
-              <p className="text-xs text-amber-900/80 leading-relaxed">
+              <p className="text-xs text-neutral-600 leading-relaxed">
                 Device hardware identifier, OS platform (Android/iOS), and active installation records are not stored in Supabase.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-dashed border-amber-300 bg-amber-50/60 space-y-2">
+            <div className="p-4 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-amber-800 font-semibold">
-                  <Layers className="w-4 h-4 text-amber-600" />
+                <div className="flex items-center gap-2 text-neutral-800 font-semibold">
+                  <Layers className="w-4 h-4 text-neutral-600" />
                   <span>Step 4: App Version</span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                <span className="text-[10px] font-mono text-neutral-700 bg-neutral-200 px-2 py-0.5 rounded border border-neutral-300">
                   Unlinked (No table)
                 </span>
               </div>
-              <p className="text-xs text-amber-900/80 leading-relaxed">
+              <p className="text-xs text-neutral-600 leading-relaxed">
                 Client app version numbers and build numbers have no active logging table in the database schema.
               </p>
             </div>
           </div>
 
-          <div className="flex justify-center text-[#D4AF37]">
+          <div className="flex justify-center text-neutral-400">
             <ArrowDown className="w-5 h-5" />
           </div>
 
@@ -286,7 +286,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
             <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-neutral-900 font-semibold">
-                  <MessageSquare className="w-4 h-4 text-[#D4AF37]" />
+                  <MessageSquare className="w-4 h-4 text-neutral-900" />
                   <span>Step 6: Support Conversations</span>
                 </div>
                 <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">

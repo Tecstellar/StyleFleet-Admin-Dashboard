@@ -32,6 +32,7 @@ export interface Shop {
   staff_count?: number;
   customer_count?: number;
   bill_count?: number;
+  appointment_count?: number;
   duplicate_count?: number;
 }
 

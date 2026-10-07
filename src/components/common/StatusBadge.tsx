@@ -21,7 +21,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' })
   if (['active', 'completed', 'paid', 'resolved', 'processed', 'done'].includes(normalized)) {
     styles = 'bg-emerald-50 text-emerald-700 border-emerald-200';
   } else if (['pending', 'in_progress', 'open', 'not confirmed'].includes(normalized)) {
-    styles = 'bg-[#FAF7EE] text-[#B8860B] border-[#E8DEC4]';
+    styles = 'bg-neutral-100 text-neutral-800 border-neutral-300 font-semibold';
   } else if (['cancelled', 'closed', 'expired', 'failed', 'deleted'].includes(normalized)) {
     styles = 'bg-rose-50 text-rose-700 border-rose-200';
   } else if (['confirmed'].includes(normalized)) {

@@ -18,15 +18,26 @@ export interface DateRange {
 
 export type NavView =
   | 'dashboard'
-  | 'salons_360'
-  | 'staff_access'
-  | 'reports_bi'
-  | 'support_messages'
-  | 'app_telemetry'
-  | 'platform_audit'
-  | 'system_health'
+  | 'product_analytics'
+  | 'daily_user_metrics'
+  | 'daily_bills'
+  | 'revenue_trend'
+  | 'overview'
+  | 'customer_tracking'
+  | 'incomplete_signups'
   | 'account_deletions'
-  | 'system_governance';
+  | 'app_telemetry'
+  | 'diagnostic_logs'
+  | 'platform_audit'
+  | 'user_details'
+  | 'purchases'
+  | 'system_health'
+  | 'reports_bi'
+  | 'crm_added_users'
+  | 'support_messages'
+  | 'subscription_plans'
+  | 'salons_360'
+  | 'staff_access';
 
 export interface KPICardProps {
   title: string;
@@ -40,4 +51,5 @@ export interface KPICardProps {
   icon?: any;
   trendData?: number[];
   onClick?: () => void;
+  tone?: 'revenue' | 'usage' | 'brand' | 'signup' | 'conversion' | 'trial' | 'neutral' | 'order-good' | 'order-warn' | 'order-risk';
 }

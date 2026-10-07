@@ -14,7 +14,7 @@ interface DateFilterContextType {
 const DateFilterContext = createContext<DateFilterContextType | undefined>(undefined);
 
 export const DateFilterProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedOption, setSelectedOption] = useState<DateFilterOption>('all_time');
+  const [selectedOption, setSelectedOption] = useState<DateFilterOption>('today');
   const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
   const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
 

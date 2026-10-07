@@ -113,7 +113,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
         const shopName = r.shop?.name || shops.find((s) => s.id === r.shop_id)?.name || 'HQ / Unassigned';
         return (
           <div className="flex items-center gap-1.5 text-xs text-neutral-700">
-            <Store className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <Store className="w-3.5 h-3.5 text-neutral-800" />
             <span className="truncate max-w-[140px]">{shopName}</span>
           </div>
         );
@@ -130,9 +130,9 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             <span
               className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border ${
                 isAndroid
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  ? 'bg-neutral-900 text-white border-neutral-900'
                   : isIos
-                  ? 'bg-[#FAF7EE] text-[#B8860B] border-[#E8DEC4]'
+                  ? 'bg-neutral-100 text-neutral-800 border-neutral-300'
                   : 'bg-neutral-100 text-neutral-700 border-neutral-200'
               }`}
             >
@@ -151,7 +151,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       key: 'app_version',
       header: 'App Version',
       render: (r) => (
-        <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
+        <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-neutral-100 text-neutral-900 border border-neutral-300">
           v{r.app_version || '1.0.0'}
         </span>
       ),
@@ -176,7 +176,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
 
           {r.network_type && (
             <div className="flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-500">
-              <Wifi className="w-3 h-3 text-[#D4AF37]" />
+              <Wifi className="w-3 h-3 text-neutral-700" />
               <span>{r.network_type}</span>
             </div>
           )}
@@ -201,9 +201,9 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             e.stopPropagation();
             setSelectedRecord(r);
           }}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#E5E7EB] bg-white text-neutral-700 hover:text-neutral-900 hover:border-[#D4AF37] shadow-xs transition-colors"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-700 hover:text-black hover:border-black shadow-xs transition-colors"
         >
-          <Eye className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <Eye className="w-3.5 h-3.5 text-black" />
           <span>Inspect</span>
         </button>
       ),
@@ -217,11 +217,11 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Smartphone className="w-5 h-5 text-[#D4AF37]" />
+            <Smartphone className="w-5 h-5 text-black" />
             <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               App Version &amp; Hardware Telemetry
             </h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-300">
               Supabase public.telemetry
             </span>
           </div>
@@ -234,9 +234,9 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white text-xs font-semibold text-neutral-700 hover:text-neutral-900 hover:border-[#D4AF37] shadow-xs transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-neutral-200 bg-white text-xs font-semibold text-neutral-700 hover:text-black hover:border-black shadow-xs transition-colors"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#D4AF37] ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-black ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh Telemetry</span>
             </button>
           )}
@@ -272,14 +272,14 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3 text-xs">
+      <div className="flex items-center justify-between border-b border-neutral-200 pb-3 text-xs">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('devices')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'devices'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900 shadow-xs border border-[#D4AF37]'
-                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                ? 'bg-black text-white shadow-xs border border-black'
+                : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
             }`}
           >
             <Activity className="w-4 h-4" />
@@ -290,8 +290,8 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             onClick={() => setActiveTab('versions')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'versions'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900 shadow-xs border border-[#D4AF37]'
-                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                ? 'bg-black text-white shadow-xs border border-black'
+                : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
             }`}
           >
             <GitBranch className="w-4 h-4" />
@@ -302,8 +302,8 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             onClick={() => setActiveTab('clients')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
               activeTab === 'clients'
-                ? 'bg-gradient-to-r from-[#D4AF37] to-[#C5A059] text-neutral-900 shadow-xs border border-[#D4AF37]'
-                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                ? 'bg-black text-white shadow-xs border border-black'
+                : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -358,19 +358,19 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
               {versionDistribution.map((v) => (
                 <div
                   key={v.version}
-                  className="p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-3"
+                  className="p-5 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-neutral-900">
                       Build v{v.version}
                     </span>
-                    <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
+                    <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-neutral-100 text-neutral-900 border border-neutral-300">
                       {v.percentage}%
                     </span>
                   </div>
                   <div className="w-full bg-neutral-100 rounded-full h-2 overflow-hidden border border-neutral-200">
                     <div
-                      className="bg-gradient-to-r from-[#D4AF37] to-[#C5A059] h-full rounded-full transition-all duration-500"
+                      className="bg-black h-full rounded-full transition-all duration-500"
                       style={{ width: `${v.percentage}%` }}
                     />
                   </div>
@@ -381,11 +381,11 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-2">
+            <div className="p-8 text-center rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-2">
               <GitBranch className="w-8 h-8 text-neutral-400 mx-auto" />
               <div className="text-sm font-semibold text-neutral-900">No version telemetry recorded yet</div>
               <p className="text-xs text-neutral-500 max-w-md mx-auto">
-                Once mobile apps upload telemetry to <code className="text-[#B8860B] font-mono">public.telemetry</code>, version adoption percentages will calculate dynamically.
+                Once mobile apps upload telemetry to <code className="text-neutral-900 font-semibold font-mono">public.telemetry</code>, version adoption percentages will calculate dynamically.
               </p>
             </div>
           )}
@@ -395,7 +395,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       {/* Tab 3: Workspace Mobile Clients */}
       {activeTab === 'clients' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-3">
+          <div className="p-5 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-bold text-sm text-neutral-900">StyleFleet Android Client</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -404,23 +404,23 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             </div>
             <div className="space-y-1.5 text-xs text-neutral-600">
               <div>Framework: <span className="font-mono text-neutral-900">React Native 0.76 / Expo SDK 52</span></div>
-              <div>Client Type: <span className="font-mono text-[#B8860B]">StyleFleet Mobile Client</span></div>
+              <div>Client Type: <span className="font-mono text-neutral-900 font-semibold">StyleFleet Mobile Client</span></div>
               <div>Telemetry Target: <span className="font-mono text-emerald-700">public.telemetry</span></div>
               <div>Status: <span className="text-emerald-700 font-semibold">Active Supabase Sink</span></div>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs space-y-3">
+          <div className="p-5 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-bold text-sm text-neutral-900">StyleFleet iOS Client</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#FAF7EE] text-[#B8860B] border border-[#E8DEC4]">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-100 text-neutral-800 border border-neutral-300">
                 Target: iOS 16.0+
               </span>
             </div>
             <div className="space-y-1.5 text-xs text-neutral-600">
               <div>Framework: <span className="font-mono text-neutral-900">Xcode 16 / React Native</span></div>
-              <div>Bundle ID: <span className="font-mono text-[#B8860B]">com.stylefleet.ios</span></div>
-              <div>Telemetry Target: <span className="font-mono text-[#B8860B]">public.telemetry</span></div>
+              <div>Bundle ID: <span className="font-mono text-neutral-900 font-semibold">com.stylefleet.ios</span></div>
+              <div>Telemetry Target: <span className="font-mono text-neutral-900 font-semibold">public.telemetry</span></div>
               <div>Status: <span className="text-neutral-900 font-semibold">Ready in Workspace</span></div>
             </div>
           </div>
@@ -437,7 +437,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
       >
         {selectedRecord && (
           <div className="space-y-5 text-xs">
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-[#E5E7EB] bg-[#F8F9FA]">
+            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-neutral-200 bg-neutral-50">
               <div>
                 <span className="text-neutral-500 block text-[11px]">Device ID</span>
                 <span className="font-mono text-neutral-900 font-semibold">{selectedRecord.device_id}</span>
@@ -448,7 +448,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
               </div>
               <div>
                 <span className="text-neutral-500 block text-[11px]">Platform</span>
-                <span className="text-[#B8860B] font-semibold uppercase">{selectedRecord.platform}</span>
+                <span className="text-neutral-900 font-bold uppercase">{selectedRecord.platform}</span>
               </div>
               <div>
                 <span className="text-neutral-500 block text-[11px]">App Version</span>
