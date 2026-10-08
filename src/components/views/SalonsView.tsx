@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Store, Eye, ShieldCheck, MapPin, Phone, User, Calendar, Receipt, Filter, X, Sparkles, Plus, Key } from 'lucide-react';
+import { Store, Eye, ShieldCheck, MapPin, Phone, User, Calendar, Receipt, Filter, X, Sparkles, Plus, Key, Gauge } from 'lucide-react';
 import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
 import { ExportButton } from '../common/ExportButton';
@@ -222,15 +222,16 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
     },
     {
       key: 'bill_count',
-      header: '100 Free Quota',
+      header: 'Free Quota',
       render: (shop) => {
         const salesDone = shop.bill_count || 0;
-        const remaining = Math.max(0, 100 - salesDone);
-        const pct = Math.min(100, Math.round((salesDone / 100) * 100));
+        const limit = shop.free_sales_limit && shop.free_sales_limit > 0 ? shop.free_sales_limit : 100;
+        const remaining = Math.max(0, limit - salesDone);
+        const pct = Math.min(100, Math.round((salesDone / limit) * 100));
         return (
           <div className="space-y-1 min-w-[130px]">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="font-mono font-bold text-neutral-900">{salesDone}/100</span>
+              <span className="font-mono font-bold text-neutral-900">{salesDone}/{limit}</span>
               <span className={`font-mono text-[10px] font-bold ${salesDone >= 50 ? 'text-neutral-900' : 'text-neutral-500'}`}>
                 {remaining === 0 ? 'Limit Reached' : `${remaining} left`}
               </span>
@@ -283,6 +284,19 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
           >
             <Receipt className="w-3.5 h-3.5" />
             <span>Bills &amp; Payments</span>
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setModalTab('settings');
+              setInternalSelectedShop(shop);
+            }}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-800 hover:border-[#1c1f26] hover:bg-[#1c1f26] hover:text-white shadow-xs transition-colors cursor-pointer"
+            title="Increase or reset this salon's free sales limit"
+          >
+            <Gauge className="w-3.5 h-3.5" />
+            <span>Edit limit</span>
           </button>
         </div>
       ),

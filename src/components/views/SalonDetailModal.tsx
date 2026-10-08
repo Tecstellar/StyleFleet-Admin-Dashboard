@@ -112,6 +112,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
     }
     setDetails((prev) => (prev ? { ...prev, shop: { ...prev.shop, free_sales_limit: value } } : prev));
     setLimitMsg({ ok: true, text: value === null ? 'Reset to the default (100).' : `Free sales limit set to ${value}.` });
+    onStaffChange?.();
   };
 
   const handleSendWhatsAppInvite = async (st: Staff) => {
