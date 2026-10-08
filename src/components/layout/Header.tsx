@@ -289,20 +289,20 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onRefreshData}
             disabled={isRefreshing}
             title="Refresh Real Data from Supabase"
-            className="p-2 rounded-xl border border-[#E5E7EB] bg-white text-neutral-600 hover:text-[#1c1f26] hover:border-[#1c1f26] transition-colors cursor-pointer shadow-2xs"
+            className="p-2 rounded-xl border border-[#E5E7EB] bg-white text-neutral-600 hover:text-[#0F4C5C] hover:border-[#0F4C5C] transition-colors cursor-pointer shadow-2xs"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#1c1f26]' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#0F4C5C]' : ''}`} />
           </button>
         )}
 
         {/* Admin Chip */}
         <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-neutral-200">
           <div className="flex items-center gap-2 px-2.5 py-1 rounded-full border border-neutral-200 bg-neutral-50/80">
-            <div className="w-6 h-6 rounded-full bg-[#1c1f26] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-full bg-[#0F4C5C] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
               S
             </div>
             <div className="hidden sm:flex flex-col text-left leading-tight">
-              <span className="text-[9px] font-extrabold text-[#1c1f26] uppercase tracking-wider">
+              <span className="text-[9px] font-extrabold text-[#0F4C5C] uppercase tracking-wider">
                 ADMIN
               </span>
               <span className="text-[11px] font-medium text-neutral-600 truncate max-w-[140px]">
@@ -318,18 +318,18 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => {
               if (onOpenResetPassword) onOpenResetPassword();
             }}
-            className="px-2.5 py-1.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-[#1c1f26] font-semibold text-xs transition-colors cursor-pointer"
+            className="px-2.5 py-1.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold text-xs transition-colors cursor-pointer"
             title="Reset Admin Panel password"
           >
             Reset password
           </button>
         </div>
 
-        {/* Sign Out Button in Dark Gray Theme */}
+        {/* Sign Out Button in Petrol Teal Theme */}
         <button
           onClick={logout}
           title="Sign Out of Admin Console"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1c1f26] hover:bg-[#282d37] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0F4C5C] hover:bg-[#145B6E] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Sign out</span>

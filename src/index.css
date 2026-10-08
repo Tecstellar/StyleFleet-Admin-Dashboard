@@ -4,18 +4,18 @@
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --color-sidebar-bg: #1c1f26;
-  --color-sidebar-bg-elevated: #252932;
-  --color-sidebar-text: #a1a1aa;
-  --color-sidebar-text-active: #ffffff;
+  --color-sidebar-bg: #0F4C5C;
+  --color-sidebar-bg-elevated: #0A3641;
+  --color-sidebar-text: #e0f2fe;
+  --color-sidebar-text-active: #0F4C5C;
   --color-sidebar-accent: #ffffff;
-  --color-brand: #1c1f26;
-  --color-brand-hover: #282d37;
-  --color-brand-soft: #f4f4f5;
+  --color-brand: #0F4C5C;
+  --color-brand-hover: #145B6E;
+  --color-brand-soft: #f0fdfa;
   --color-bg-app: #f4f4f5;
   --color-surface: #ffffff;
   --color-surface-muted: #f8fafc;
-  --color-line: #e4e4e7;
+  --color-line: #cbd5e1;
 }
 
 :root {
@@ -27,22 +27,22 @@
   --surface: #ffffff;
   --surface-muted: #f8fafc;
   --surface-hover: #f1f5f9;
-  --sidebar-bg: #1c1f26;
-  --sidebar-bg-elevated: #252932;
-  --sidebar-text: #a1a1aa;
-  --sidebar-text-active: #ffffff;
-  --sidebar-border: #27272a;
+  --sidebar-bg: #0F4C5C;
+  --sidebar-bg-elevated: #0A3641;
+  --sidebar-text: #e0f2fe;
+  --sidebar-text-active: #0F4C5C;
+  --sidebar-border: #145B6E;
   --sidebar-accent: #ffffff;
-  --text: #09090b;
-  --text-secondary: #52525b;
-  --muted: #71717a;
-  --line: #e4e4e7;
-  --line-strong: #d4d4d8;
-  --brand: #1c1f26;
-  --brand-hover: #282d37;
-  --brand-soft: #f4f4f5;
-  --accent: #1c1f26;
-  --accent-soft: #f4f4f5;
+  --text: #000000;
+  --text-secondary: #0f172a;
+  --muted: #334155;
+  --line: #cbd5e1;
+  --line-strong: #94a3b8;
+  --brand: #0F4C5C;
+  --brand-hover: #145B6E;
+  --brand-soft: #f0fdfa;
+  --accent: #0F4C5C;
+  --accent-soft: #f0fdfa;
   --danger: #dc2626;
   --danger-soft: #fef2f2;
   --success: #059669;
@@ -53,8 +53,8 @@
   --radius: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
   --shadow-lg: 0 12px 24px -8px rgba(15, 23, 42, 0.12);
   --sidebar-width: 240px;
@@ -87,10 +87,10 @@ body {
 /* Metric Card - Clean White & Emerald/Teal Modern Style */
 .metric-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #cbd5e1;
   border-radius: 12px;
   padding: 14px 16px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
   transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
   display: flex;
   flex-direction: column;
@@ -101,57 +101,48 @@ body {
   box-sizing: border-box;
 }
 .metric-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  border-color: #94a3b8;
+  box-shadow: 0 4px 8px -1px rgba(15, 76, 92, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
   transform: translateY(-1px);
 }
 
 .metric-tone-revenue,
 .metric-tone-order-good {
   background: #ffffff;
-  border-color: #e2e8f0;
-  border-left: 3.5px solid #059669; /* Emerald Green */
+  border-color: #cbd5e1;
+  border-left: 4px solid #059669; /* Emerald Green */
 }
 
 .metric-tone-usage,
 .metric-tone-brand,
 .metric-tone-conversion {
   background: #ffffff;
-  border-color: #e2e8f0;
-  border-left: 3.5px solid #0d9488; /* Teal */
+  border-color: #cbd5e1;
+  border-left: 4px solid #0F4C5C; /* Deep Petrol Teal #0F4C5C */
 }
 
 .metric-tone-signup,
 .metric-tone-neutral {
   background: #ffffff;
-  border-color: #e2e8f0;
-  border-left: 3.5px solid #10b981; /* Light Emerald */
+  border-color: #cbd5e1;
+  border-left: 4px solid #0d9488; /* Teal */
 }
 
 .metric-tone-trial,
 .metric-tone-order-warn {
   background: #ffffff;
-  border-color: #e2e8f0;
-  border-left: 3.5px solid #d97706; /* Amber */
+  border-color: #cbd5e1;
+  border-left: 4px solid #d97706; /* Amber */
 }
 
 .metric-tone-order-risk {
   background: #ffffff;
-  border-color: #e2e8f0;
-  border-left: 3.5px solid #e11d48; /* Rose */
+  border-color: #cbd5e1;
+  border-left: 4px solid #dc2626; /* Rose/Red */
 }
 
-.metric-tone-revenue .metric-value,
-.metric-tone-usage .metric-value,
-.metric-tone-brand .metric-value,
-.metric-tone-signup .metric-value,
-.metric-tone-conversion .metric-value,
-.metric-tone-trial .metric-value,
-.metric-tone-neutral .metric-value,
-.metric-tone-order-good .metric-value,
-.metric-tone-order-warn .metric-value,
-.metric-tone-order-risk .metric-value {
-  color: #020617;
+.metric-card .metric-value {
+  color: #000000;
   font-weight: 800;
 }
 
