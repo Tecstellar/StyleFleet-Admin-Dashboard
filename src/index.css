@@ -151,7 +151,8 @@ body {
 .metric-tone-order-good .metric-value,
 .metric-tone-order-warn .metric-value,
 .metric-tone-order-risk .metric-value {
-  color: #0f172a;
+  color: #020617;
+  font-weight: 800;
 }
 
 /* IronDrobe Panel */

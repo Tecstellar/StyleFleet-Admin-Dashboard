@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { formatNumber } from '../../utils/formatters';
 import { formatDate } from '../../utils/dateUtils';
+import { KPICard } from '../common/KPICard';
 import { Shop, Profile, Staff, Customer, Bill, Appointment } from '../../types/database';
 
 interface DailyUserMetricsViewProps {
@@ -331,77 +332,34 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
 
       {/* 4 Metric KPI Cards - Clean White & Emerald/Teal Modern Style */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* CARD 1: TOTAL USERS */}
-        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-600 flex flex-col justify-between min-h-[105px] hover:shadow-sm transition-all">
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase leading-snug whitespace-normal break-words">
-              Total Users
-            </span>
-            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
-              <Users className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 font-mono tracking-tight my-1 whitespace-normal break-words leading-tight">
-            {formatNumber(totalUsersCount)}
-          </div>
-          <div className="pt-2 mt-auto border-t border-slate-100 text-[11px] text-slate-500 font-medium whitespace-normal break-words leading-tight">
-            As of {latestDateString} • all dates
-          </div>
-        </div>
-
-        {/* CARD 2: NEW SUBSCRIBERS */}
-        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-xs border-l-4 border-l-teal-600 flex flex-col justify-between min-h-[105px] hover:shadow-sm transition-all">
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase leading-snug whitespace-normal break-words">
-              New Subscribers
-            </span>
-            <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-100 shrink-0">
-              <UserCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 font-mono tracking-tight my-1 whitespace-normal break-words leading-tight">
-            {newSubscribersCount}
-          </div>
-          <div className="pt-2 mt-auto border-t border-slate-100 text-[11px] text-slate-500 font-medium whitespace-normal break-words leading-tight">
-            First completed payments
-          </div>
-        </div>
-
-        {/* CARD 3: TOTAL SUBSCRIBERS */}
-        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-500 flex flex-col justify-between min-h-[105px] hover:shadow-sm transition-all">
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase leading-snug whitespace-normal break-words">
-              Total Subscribers
-            </span>
-            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
-              <Users className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 font-mono tracking-tight my-1 whitespace-normal break-words leading-tight">
-            {totalSubscribersCount}
-          </div>
-          <div className="pt-2 mt-auto border-t border-slate-100 text-[11px] text-slate-500 font-medium whitespace-normal break-words leading-tight">
-            Active as of {latestDateString}
-          </div>
-        </div>
-
-        {/* CARD 4: USER GROWTH */}
-        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-xs border-l-4 border-l-teal-500 flex flex-col justify-between min-h-[105px] hover:shadow-sm transition-all">
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase leading-snug whitespace-normal break-words">
-              User Growth
-            </span>
-            <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-100 shrink-0">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 font-mono tracking-tight my-1 whitespace-normal break-words leading-tight">
-            {growthPercentage}
-          </div>
-          <div className="pt-2 mt-auto border-t border-slate-100 text-[11px] text-slate-500 font-medium whitespace-normal break-words leading-tight">
-            Over loaded date range
-          </div>
-        </div>
+        <KPICard
+          title="Total Users"
+          value={formatNumber(totalUsersCount)}
+          subtitle={`As of ${latestDateString} • all dates`}
+          icon={Users}
+          tone="revenue"
+        />
+        <KPICard
+          title="New Subscribers"
+          value={newSubscribersCount}
+          subtitle="First completed payments"
+          icon={UserCheck}
+          tone="conversion"
+        />
+        <KPICard
+          title="Total Subscribers"
+          value={totalSubscribersCount}
+          subtitle={`Active as of ${latestDateString}`}
+          icon={Users}
+          tone="signup"
+        />
+        <KPICard
+          title="User Growth"
+          value={growthPercentage}
+          subtitle="Over loaded date range"
+          icon={TrendingUp}
+          tone="usage"
+        />
       </div>
 
       {/* Main Table Panel: Select Daily User Metrics to change */}
