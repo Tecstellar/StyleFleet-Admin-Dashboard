@@ -65,7 +65,9 @@ export const CrmAddedUsersView: React.FC<CrmAddedUsersViewProps> = ({
         (c.phone && c.phone.includes(searchQuery)) ||
         c.salonName.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesSalon = selectedSalonId === 'all' || c.shop_id === selectedSalonId;
+      const selectedShop = shops.find((s) => s.id === selectedSalonId);
+      const allowedIds = selectedShop?.duplicate_ids ? selectedShop.duplicate_ids : [selectedSalonId];
+      const matchesSalon = selectedSalonId === 'all' || allowedIds.includes(c.shop_id);
 
       return matchesSearch && matchesSalon;
     });

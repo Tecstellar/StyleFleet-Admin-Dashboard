@@ -51,14 +51,18 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
     ? profiles.find((p) => p.id === activeShop.owner_profile_id)
     : null;
 
-  const linkedStaff = staff.filter((st) => st.shop_id === activeShop?.id);
-  const linkedCustomers = customers.filter((c) => c.shop_id === activeShop?.id);
-  const linkedAppointments = appointments.filter((a) => a.shop_id === activeShop?.id);
-  const linkedBills = bills.filter((b) => b.shop_id === activeShop?.id);
-  const linkedPayments = payments.filter((p) => p.shop_id === activeShop?.id);
-  const linkedSupport = supportMessages.filter((m) => m.shop_id === activeShop?.id);
+  const allowedShopIds = activeShop?.duplicate_ids && activeShop.duplicate_ids.length > 0
+    ? activeShop.duplicate_ids
+    : (activeShop?.id ? [activeShop.id] : []);
+
+  const linkedStaff = staff.filter((st) => allowedShopIds.includes(st.shop_id));
+  const linkedCustomers = customers.filter((c) => allowedShopIds.includes(c.shop_id));
+  const linkedAppointments = appointments.filter((a) => allowedShopIds.includes(a.shop_id));
+  const linkedBills = bills.filter((b) => allowedShopIds.includes(b.shop_id));
+  const linkedPayments = payments.filter((p) => allowedShopIds.includes(p.shop_id));
+  const linkedSupport = supportMessages.filter((m) => !!m.shop_id && allowedShopIds.includes(m.shop_id));
   const linkedDeletions = deletions.filter(
-    (d) => d.shop_id === activeShop?.id || (activeShop?.phone && d.phone === activeShop.phone)
+    (d) => (!!d.shop_id && allowedShopIds.includes(d.shop_id)) || (!!activeShop?.phone && d.phone === activeShop.phone)
   );
 
   return (

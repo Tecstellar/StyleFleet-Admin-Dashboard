@@ -188,13 +188,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     [baseFilteredShops, effectiveDateRange]
   );
 
+  // Helper to match a shopId against the selectedSalonFilter including duplicate merged IDs
+  const matchingShopIds = useMemo(() => {
+    if (selectedSalonFilter === 'all') return null;
+    const selectedShopObj = shops.find((s) => s.id === selectedSalonFilter);
+    return new Set(selectedShopObj?.duplicate_ids ? selectedShopObj.duplicate_ids : [selectedSalonFilter]);
+  }, [selectedSalonFilter, shops]);
+
   // Scoped Bills across Date, Salon, Method, Status, and Search Query
   const scopedBills = useMemo(() => {
     let list = bills;
 
     // 1. Salon filter
-    if (selectedSalonFilter !== 'all') {
-      list = list.filter((b) => b.shop_id === selectedSalonFilter);
+    if (matchingShopIds) {
+      list = list.filter((b) => matchingShopIds.has(b.shop_id));
     }
 
     // 2. Status filter
@@ -230,28 +237,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }
 
     return list;
-  }, [bills, selectedSalonFilter, billStatusFilter, paymentMethodFilter, effectiveDateRange, searchQuery, paymentByBillId]);
+  }, [bills, matchingShopIds, billStatusFilter, paymentMethodFilter, effectiveDateRange, searchQuery, paymentByBillId]);
 
   // Scoped Payments
   const scopedPayments = useMemo(() => {
     let list = payments;
-    if (selectedSalonFilter !== 'all') list = list.filter((p) => p.shop_id === selectedSalonFilter);
+    if (matchingShopIds) list = list.filter((p) => matchingShopIds.has(p.shop_id));
     if (paymentMethodFilter !== 'all') list = list.filter((p) => p.method === paymentMethodFilter);
     return filterByDateRange(list, 'paid_at', effectiveDateRange);
-  }, [payments, selectedSalonFilter, paymentMethodFilter, effectiveDateRange]);
+  }, [payments, matchingShopIds, paymentMethodFilter, effectiveDateRange]);
 
   // Scoped Appointments
   const scopedAppts = useMemo(() => {
     let list = appointments;
-    if (selectedSalonFilter !== 'all') list = list.filter((a) => a.shop_id === selectedSalonFilter);
+    if (matchingShopIds) list = list.filter((a) => matchingShopIds.has(a.shop_id));
     return filterByDateRange(list, 'starts_at', effectiveDateRange);
-  }, [appointments, selectedSalonFilter, effectiveDateRange]);
+  }, [appointments, matchingShopIds, effectiveDateRange]);
 
   // Scoped Staff
   const scopedStaff = useMemo(() => {
-    if (selectedSalonFilter !== 'all') return staff.filter((st) => st.shop_id === selectedSalonFilter);
+    if (matchingShopIds) return staff.filter((st) => matchingShopIds.has(st.shop_id));
     return staff;
-  }, [staff, selectedSalonFilter]);
+  }, [staff, matchingShopIds]);
 
   // Financial calculations
   const totalBilledMinor = scopedBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);

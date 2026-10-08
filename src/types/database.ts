@@ -34,6 +34,7 @@ export interface Shop {
   bill_count?: number;
   appointment_count?: number;
   duplicate_count?: number;
+  duplicate_ids?: string[];
 }
 
 export interface ShopMember {

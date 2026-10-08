@@ -10,8 +10,7 @@ export async function fetchBills(): Promise<{ data: Bill[]; error: string | null
       .order('issued_at', { ascending: false });
 
     if (error) throw error;
-    const validBills = (data || []).filter((b) => b.shop != null);
-    return { data: validBills, error: null };
+    return { data: data || [], error: null };
   } catch (err: any) {
     console.error('Error fetching bills:', err);
     return { data: [], error: err.message || 'Unable to load bills' };
@@ -27,8 +26,7 @@ export async function fetchPayments(): Promise<{ data: Payment[]; error: string 
       .order('paid_at', { ascending: false });
 
     if (error) throw error;
-    const validPayments = (data || []).filter((p) => p.shop != null);
-    return { data: validPayments, error: null };
+    return { data: data || [], error: null };
   } catch (err: any) {
     console.error('Error fetching payments:', err);
     return { data: [], error: err.message || 'Unable to load payment records' };

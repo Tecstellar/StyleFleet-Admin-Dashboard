@@ -92,8 +92,10 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
   const filteredCustomers = useMemo(() => {
     return customers.filter((c) => {
       // 1. Salon filter
-      if (salonFilter !== 'all' && c.shop_id !== salonFilter) {
-        return false;
+      if (salonFilter !== 'all') {
+        const selectedShop = shops.find((s) => s.id === salonFilter);
+        const allowedIds = selectedShop?.duplicate_ids ? selectedShop.duplicate_ids : [salonFilter];
+        if (!allowedIds.includes(c.shop_id)) return false;
       }
 
       // 2. Starred filter

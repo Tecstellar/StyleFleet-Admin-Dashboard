@@ -203,7 +203,9 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
     return baseRangeFiltered.filter((item) => {
       // 1. Salon filter
       if (salonFilter !== 'all') {
-        if (item.shopId !== salonFilter) return false;
+        const selectedShop = shops.find((s) => s.id === salonFilter);
+        const allowedIds = selectedShop?.duplicate_ids ? selectedShop.duplicate_ids : [salonFilter];
+        if (!item.shopId || !allowedIds.includes(item.shopId)) return false;
       }
 
       // 2. City filter (e.g. Coimbatore, Chennai, Bengaluru)

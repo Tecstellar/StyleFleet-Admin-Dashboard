@@ -89,7 +89,12 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
   // Shop Map
   const shopMap = useMemo(() => {
     const map = new Map<string, Shop>();
-    shops.forEach((s) => map.set(s.id, s));
+    shops.forEach((s) => {
+      map.set(s.id, s);
+      if (s.duplicate_ids) {
+        s.duplicate_ids.forEach((dupId) => map.set(dupId, s));
+      }
+    });
     return map;
   }, [shops]);
 
@@ -133,7 +138,13 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       if (p.status !== 'completed') return false;
 
       // 2. Salon Filter
-      if (salonFilter !== 'all' && p.shop_id !== salonFilter) return false;
+      if (salonFilter !== 'all') {
+        const selectedShop = shops.find((s) => s.id === salonFilter);
+        const allowedIds = selectedShop?.duplicate_ids && selectedShop.duplicate_ids.length > 0
+          ? selectedShop.duplicate_ids
+          : [salonFilter];
+        if (!allowedIds.includes(p.shop_id)) return false;
+      }
 
       // 3. City Filter
       if (cityFilter !== 'all') {
@@ -199,9 +210,12 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
   const salonRevenueSummaries: SalonRevenueSummary[] = useMemo(() => {
     const map = new Map<string, { totalMinor: number; txnCount: number; latestPaidAt: string | null; latestRef: string; methods: Set<string> }>();
 
-    // Aggregate from filtered payments
+    // Aggregate from filtered payments grouping by primary salon ID
     filteredPayments.forEach((p) => {
-      const entry = map.get(p.shop_id) || {
+      const primaryShop = shopMap.get(p.shop_id);
+      const primaryId = primaryShop?.id || p.shop_id;
+
+      const entry = map.get(primaryId) || {
         totalMinor: 0,
         txnCount: 0,
         latestPaidAt: null,
@@ -216,7 +230,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         entry.latestRef = p.reference || p.id.slice(0, 10);
       }
       if (p.method) entry.methods.add(p.method);
-      map.set(p.shop_id, entry);
+      map.set(primaryId, entry);
     });
 
     const list: SalonRevenueSummary[] = [];
@@ -226,7 +240,8 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       const shop = shopMap.get(shopId);
       if (!shop) return;
 
-      const shopBills = bills.filter((b) => b.shop_id === shopId && b.status === 'paid');
+      const allowedShopIds = shop.duplicate_ids && shop.duplicate_ids.length > 0 ? shop.duplicate_ids : [shopId];
+      const shopBills = bills.filter((b) => allowedShopIds.includes(b.shop_id) && b.status === 'paid');
       const invoicedMinor = shopBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
 
       list.push({
@@ -257,8 +272,12 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
   // Selected salon's specific payment entries for drilldown
   const drilldownPayments = useMemo(() => {
     if (!selectedSalonDrilldown) return [];
-    return filteredPayments.filter((p) => p.shop_id === selectedSalonDrilldown);
-  }, [filteredPayments, selectedSalonDrilldown]);
+    const selectedShop = shops.find((s) => s.id === selectedSalonDrilldown);
+    const allowedIds = selectedShop?.duplicate_ids && selectedShop.duplicate_ids.length > 0
+      ? selectedShop.duplicate_ids
+      : [selectedSalonDrilldown];
+    return filteredPayments.filter((p) => allowedIds.includes(p.shop_id));
+  }, [filteredPayments, selectedSalonDrilldown, shops]);
 
   const resetFilters = () => {
     setSalonFilter('all');

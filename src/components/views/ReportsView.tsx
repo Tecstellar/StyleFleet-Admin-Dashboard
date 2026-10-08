@@ -48,7 +48,12 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
   // Shop Map
   const shopMap = useMemo(() => {
     const map = new Map<string, Shop>();
-    shops.forEach((s) => map.set(s.id, s));
+    shops.forEach((s) => {
+      map.set(s.id, s);
+      if (s.duplicate_ids) {
+        s.duplicate_ids.forEach((dupId) => map.set(dupId, s));
+      }
+    });
     return map;
   }, [shops]);
 
@@ -94,44 +99,53 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
   const baseAppts = useMemo(() => filterByDateRange(appointments, 'starts_at', dateRange), [appointments, dateRange]);
   const baseDeletions = useMemo(() => filterByDateRange(deletions, 'created_at', dateRange), [deletions, dateRange]);
 
+  // Allowed IDs for selected salon filter (including duplicate IDs)
+  const allowedSalonIds = useMemo(() => {
+    if (salonFilter === 'all') return [];
+    const selected = shops.find((s) => s.id === salonFilter);
+    return selected?.duplicate_ids && selected.duplicate_ids.length > 0
+      ? selected.duplicate_ids
+      : [salonFilter];
+  }, [salonFilter, shops]);
+
   // Scoped lists with City, Salon, Exact Date filters
   const filteredShops = useMemo(() => {
     return baseShops.filter((s) => {
       if (cityFilter !== 'all' && s.city?.toLowerCase() !== cityFilter.toLowerCase()) return false;
-      if (salonFilter !== 'all' && s.id !== salonFilter) return false;
+      if (salonFilter !== 'all' && !allowedSalonIds.includes(s.id)) return false;
       if (exactDate) {
         const d = new Date(s.created_at).toISOString().split('T')[0];
         if (d !== exactDate) return false;
       }
       return true;
     });
-  }, [baseShops, cityFilter, salonFilter, exactDate]);
+  }, [baseShops, cityFilter, salonFilter, allowedSalonIds, exactDate]);
 
   const filteredBills = useMemo(() => {
     return baseBills.filter((b) => {
       const shop = shopMap.get(b.shop_id);
       if (cityFilter !== 'all' && shop?.city?.toLowerCase() !== cityFilter.toLowerCase()) return false;
-      if (salonFilter !== 'all' && b.shop_id !== salonFilter) return false;
+      if (salonFilter !== 'all' && !allowedSalonIds.includes(b.shop_id)) return false;
       if (exactDate) {
         const d = new Date(b.issued_at || b.created_at).toISOString().split('T')[0];
         if (d !== exactDate) return false;
       }
       return true;
     });
-  }, [baseBills, shopMap, cityFilter, salonFilter, exactDate]);
+  }, [baseBills, shopMap, cityFilter, salonFilter, allowedSalonIds, exactDate]);
 
   const filteredAppts = useMemo(() => {
     return baseAppts.filter((a) => {
       const shop = shopMap.get(a.shop_id);
       if (cityFilter !== 'all' && shop?.city?.toLowerCase() !== cityFilter.toLowerCase()) return false;
-      if (salonFilter !== 'all' && a.shop_id !== salonFilter) return false;
+      if (salonFilter !== 'all' && !allowedSalonIds.includes(a.shop_id)) return false;
       if (exactDate) {
         const d = new Date(a.starts_at || a.created_at).toISOString().split('T')[0];
         if (d !== exactDate) return false;
       }
       return true;
     });
-  }, [baseAppts, shopMap, cityFilter, salonFilter, exactDate]);
+  }, [baseAppts, shopMap, cityFilter, salonFilter, allowedSalonIds, exactDate]);
 
   const filteredDeletions = useMemo(() => {
     return baseDeletions.filter((d) => {

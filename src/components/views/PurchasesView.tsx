@@ -69,7 +69,9 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ payments, shops = 
     return baseFiltered.filter(p => {
       // 1. Salon-wise filter
       if (salonFilter !== 'all') {
-        const matchesShopId = p.shop_id === salonFilter;
+        const selectedShop = shops.find((s) => s.id === salonFilter || s.name.toLowerCase() === salonFilter.toLowerCase());
+        const allowedIds = selectedShop?.duplicate_ids ? selectedShop.duplicate_ids : [salonFilter];
+        const matchesShopId = allowedIds.includes(p.shop_id);
         const matchesShopName = p.shop?.name?.toLowerCase() === salonFilter.toLowerCase();
         if (!matchesShopId && !matchesShopName) return false;
       }

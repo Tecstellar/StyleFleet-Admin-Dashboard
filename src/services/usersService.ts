@@ -25,9 +25,7 @@ export async function fetchStaff(): Promise<{ data: Staff[]; error: string | nul
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    // Filter out any orphans where shop relation is null or not found
-    const validStaff = (data || []).filter((s) => s.shop != null);
-    return { data: validStaff, error: null };
+    return { data: data || [], error: null };
   } catch (err: any) {
     console.error('Error fetching staff:', err);
     return { data: [], error: err.message || 'Unable to load staff data' };
@@ -149,16 +147,33 @@ export async function deleteStaff(id: string): Promise<{ success: boolean; error
 
 export async function fetchCustomers(): Promise<{ data: Customer[]; error: string | null }> {
   try {
-    const { data, error } = await supabase
-      .from('customers')
-      .select('*, shop:shops(id, name)')
-      .not('shop_id', 'is', null)
-      .order('created_at', { ascending: false });
+    let allCustomers: Customer[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    let hasMore = true;
 
-    if (error) throw error;
-    // Filter out any orphans where shop relation is null or not found
-    const validCustomers = (data || []).filter((c) => c.shop != null);
-    return { data: validCustomers, error: null };
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*, shop:shops(id, name)')
+        .not('shop_id', 'is', null)
+        .order('created_at', { ascending: false })
+        .range(from, from + pageSize - 1);
+
+      if (error) throw error;
+      if (data && data.length > 0) {
+        allCustomers = allCustomers.concat(data);
+        if (data.length < pageSize) {
+          hasMore = false;
+        } else {
+          from += pageSize;
+        }
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return { data: allCustomers, error: null };
   } catch (err: any) {
     console.error('Error fetching customers:', err);
     return { data: [], error: err.message || 'Unable to load customer records' };

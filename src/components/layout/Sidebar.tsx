@@ -52,9 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
   onOpenPrivacyPolicy,
   onOpenDeleteAccount,
-  salonsCount = 3,
+  salonsCount = 0,
   staffCount = 0,
-  deletionsCount = 5,
+  deletionsCount = 0,
   supportCount = 0,
 }) => {
   const { logout } = useAuth();

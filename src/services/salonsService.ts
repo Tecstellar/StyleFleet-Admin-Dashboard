@@ -33,26 +33,10 @@ function normalizePhone(phone: string | null | undefined): string {
  * Validates that a salon is genuine real production data, not random/synthetic dummy data
  */
 function isRealSalon(shop: Shop): boolean {
-  const nameLower = (shop.name || '').toLowerCase().trim();
-  const addressLower = (shop.address || '').toLowerCase().trim();
-
-  // Synthetic / dummy patterns injected during manual testing
-  if (
-    !shop.owner_profile_id &&
-    (nameLower.includes('test salon') ||
-      nameLower === 'test' ||
-      nameLower === 'dummy' ||
-      addressLower.includes('123 main st') ||
-      addressLower.includes('123 main street'))
-  ) {
-    return false;
-  }
-
   // Must have a valid name
   if (!shop.name || shop.name.trim().length === 0) {
     return false;
   }
-
   return true;
 }
 
@@ -63,11 +47,12 @@ function isRealSalon(shop: Shop): boolean {
  */
 export async function fetchShops(): Promise<{ data: Shop[]; error: string | null }> {
   try {
-    const [shopsRes, staffRes, customersRes, billsRes] = await Promise.all([
+    const [shopsRes, staffRes, customersRes, billsRes, apptsRes] = await Promise.all([
       supabase.from('shops').select('*').order('created_at', { ascending: false }),
       supabase.from('staff').select('id, shop_id'),
       supabase.from('customers').select('id, shop_id'),
       supabase.from('bills').select('id, shop_id'),
+      supabase.from('appointments').select('id, shop_id'),
     ]);
 
     if (shopsRes.error) throw shopsRes.error;
@@ -77,10 +62,12 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
     const staffCountMap = new Map<string, number>();
     const custCountMap = new Map<string, number>();
     const billCountMap = new Map<string, number>();
+    const apptCountMap = new Map<string, number>();
 
     (staffRes.data || []).forEach((st) => staffCountMap.set(st.shop_id, (staffCountMap.get(st.shop_id) || 0) + 1));
     (customersRes.data || []).forEach((c) => custCountMap.set(c.shop_id, (custCountMap.get(c.shop_id) || 0) + 1));
     (billsRes.data || []).forEach((b) => billCountMap.set(b.shop_id, (billCountMap.get(b.shop_id) || 0) + 1));
+    (apptsRes.data || []).forEach((a) => apptCountMap.set(a.shop_id, (apptCountMap.get(a.shop_id) || 0) + 1));
 
     // 1. Filter out synthetic / dummy test salons
     const realShops = rawShops.filter(isRealSalon);
@@ -100,15 +87,14 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
       }
     }
 
-    // 3. Strict Multi-Attribute Clustering Deduplication
-    // Duplicates can share: Normalized Name, Normalized 10-Digit Phone, or Owner Profile ID
-    const cleanName = (n: string) => (n || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    // 3. Accurate Deduplication:
+    // Only merges records if they share the exact 10-digit phone number, or the exact trimmed business name.
+    const cleanName = (n: string) => (n || '').toLowerCase().trim();
     const groups: Shop[][] = [];
 
     for (const shop of realShops) {
       const sName = cleanName(shop.name);
       const sPhone = normalizePhone(shop.phone);
-      const sOwner = shop.owner_profile_id;
 
       let matchedGroupIndex = -1;
       for (let i = 0; i < groups.length; i++) {
@@ -116,13 +102,11 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
         const isMatch = group.some((g) => {
           const gName = cleanName(g.name);
           const gPhone = normalizePhone(g.phone);
-          const gOwner = g.owner_profile_id;
 
-          const nameMatch = sName.length >= 3 && gName.length >= 3 && (sName === gName || sName.includes(gName) || gName.includes(sName));
-          const phoneMatch = sPhone.length >= 10 && gPhone.length >= 10 && sPhone === gPhone;
-          const ownerMatch = !!sOwner && !!gOwner && sOwner === gOwner;
-
-          return nameMatch || phoneMatch || ownerMatch;
+          if (sPhone && gPhone && sPhone.length >= 10 && gPhone.length >= 10) {
+            return sPhone === gPhone;
+          }
+          return sName.length >= 2 && gName.length >= 2 && sName === gName;
         });
 
         if (isMatch) {
@@ -165,15 +149,18 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
 
       const canonical = shopGroup[0];
       const duplicatesMerged = shopGroup.length - 1;
+      const duplicateIds = shopGroup.map((s) => s.id);
 
       // Sum all relational counts across duplicate entries so no child records are lost
       let totalStaff = 0;
       let totalCust = 0;
       let totalBills = 0;
+      let totalAppts = 0;
       shopGroup.forEach((s) => {
         totalStaff += staffCountMap.get(s.id) || 0;
         totalCust += custCountMap.get(s.id) || 0;
         totalBills += billCountMap.get(s.id) || 0;
+        totalAppts += apptCountMap.get(s.id) || 0;
       });
 
       // Best owner profile among group
@@ -186,7 +173,9 @@ export async function fetchShops(): Promise<{ data: Shop[]; error: string | null
         staff_count: totalStaff || staffCountMap.get(canonical.id) || 0,
         customer_count: totalCust || custCountMap.get(canonical.id) || 0,
         bill_count: totalBills || billCountMap.get(canonical.id) || 0,
+        appointment_count: totalAppts || apptCountMap.get(canonical.id) || 0,
         duplicate_count: duplicatesMerged,
+        duplicate_ids: duplicateIds,
       });
     });
 

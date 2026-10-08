@@ -134,18 +134,19 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   // Salon list with performance stats (scoped to active date range, with lifetime quota metrics)
   const salonPerformance = useMemo(() => {
     return shops.map((s) => {
-      const salonBills = scopedBills.filter((b) => b.shop_id === s.id);
+      const allowedIds = s.duplicate_ids && s.duplicate_ids.length > 0 ? s.duplicate_ids : [s.id];
+      const salonBills = scopedBills.filter((b) => allowedIds.includes(b.shop_id));
       const salonPayments = scopedPayments.filter(
-        (p) => p.shop_id === s.id && (p.status === 'completed' || p.status === 'paid' || p.status === 'settled')
+        (p) => allowedIds.includes(p.shop_id) && (p.status === 'completed' || p.status === 'paid' || p.status === 'settled')
       );
-      const salonStaff = staff.filter((st) => st.shop_id === s.id);
-      const salonCustomers = scopedCustomers.filter((c) => c.shop_id === s.id);
+      const salonStaff = staff.filter((st) => allowedIds.includes(st.shop_id));
+      const salonCustomers = scopedCustomers.filter((c) => allowedIds.includes(c.shop_id));
 
       const billed = salonBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
       const collected = salonPayments.reduce((acc, p) => acc + (p.amount_minor || 0), 0);
 
       // Quota: 100 free lifetime sales logic
-      const lifetimeBills = bills.filter((b) => b.shop_id === s.id);
+      const lifetimeBills = bills.filter((b) => allowedIds.includes(b.shop_id));
       const salesCount = salonBills.length;
       const lifetimeSalesCount = lifetimeBills.length;
       const quotaRemaining = Math.max(0, 100 - lifetimeSalesCount);

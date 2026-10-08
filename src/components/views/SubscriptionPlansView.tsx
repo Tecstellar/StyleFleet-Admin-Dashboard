@@ -119,9 +119,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       }
     >();
 
-    // Deduplicate by clean salon name
+    // Deduplicate by phone or clean salon name
     shops.forEach((s) => {
-      const key = s.name.trim().toLowerCase();
+      const phoneKey = s.phone ? s.phone.replace(/[^0-9]/g, '').slice(-10) : '';
+      const key = (phoneKey && phoneKey.length >= 10 ? phoneKey : '') || s.name.trim().toLowerCase();
+      const allIds = s.duplicate_ids && s.duplicate_ids.length > 0 ? s.duplicate_ids : [s.id];
       const existing = aggByName.get(key);
       if (!existing) {
         aggByName.set(key, {
@@ -130,10 +132,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           city: s.city || 'Tamil Nadu',
           phone: s.phone || s.owner_profile?.phone || '—',
           earliestCreated: s.created_at,
-          associatedShopIds: [s.id],
+          associatedShopIds: Array.from(new Set(allIds)),
         });
       } else {
-        existing.associatedShopIds.push(s.id);
+        const mergedIds = new Set([...existing.associatedShopIds, ...allIds]);
+        existing.associatedShopIds = Array.from(mergedIds);
         if (s.created_at && new Date(s.created_at) < new Date(existing.earliestCreated)) {
           existing.earliestCreated = s.created_at;
           existing.shopId = s.id;

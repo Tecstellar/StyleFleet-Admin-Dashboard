@@ -121,8 +121,10 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
       }
 
       // 2. Shop filter
-      if (selectedShopFilter !== 'all' && st.shop_id !== selectedShopFilter) {
-        return false;
+      if (selectedShopFilter !== 'all') {
+        const selectedShop = shops.find((s) => s.id === selectedShopFilter);
+        const allowedIds = selectedShop?.duplicate_ids ? selectedShop.duplicate_ids : [selectedShopFilter];
+        if (!allowedIds.includes(st.shop_id)) return false;
       }
 
       // 3. Invitation status filter

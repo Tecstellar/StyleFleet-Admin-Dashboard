@@ -105,8 +105,10 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
   const filteredBills = useMemo(() => {
     return bills.filter((b) => {
       // 1. Salon filter
-      if (salonFilter !== 'all' && b.shop_id !== salonFilter) {
-        return false;
+      if (salonFilter !== 'all') {
+        const selectedShop = shops.find((s) => s.id === salonFilter);
+        const allowedIds = selectedShop?.duplicate_ids ? selectedShop.duplicate_ids : [salonFilter];
+        if (!allowedIds.includes(b.shop_id)) return false;
       }
 
       // 2. Status filter
