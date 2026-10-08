@@ -82,7 +82,7 @@ interface DashboardViewProps {
 }
 
 // Brand Design System Palette for Data Visualizations
-const CHART_PALETTE = ['#0F4C5C', '#0d9488', '#059669', '#d97706', '#64748b', '#94a3b8'];
+const CHART_PALETTE = ['#0F4C5C', '#3B7F8C', '#7FB0B8', '#B8D3D8', '#94a3b8', '#cbd5e1'];
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   shops,
@@ -113,6 +113,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [billStatusFilter, setBillStatusFilter] = useState<string>('all');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'overview' | 'daily_ledger' | 'all_bills' | 'salon_breakdown' | 'subscription_revenue'>(initialTab);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
   const [billsPageSize, setBillsPageSize] = useState<number>(10);
   const [billsPage, setBillsPage] = useState<number>(1);
 
@@ -607,7 +608,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* EXECUTIVE KPI SUMMARY CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div className="stat-strip grid-cols-2 lg:grid-cols-5">
         <KPICard
           title="Invoiced Sales"
           value={formatCurrency(totalBilledMinor)}
@@ -640,8 +641,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         />
       </div>
 
-      {/* FILTER PANEL */}
-      <div className="panel space-y-3.5">
+      {/* FILTER PANEL (collapsed by default; the scope summary stays visible) */}
+      <div className="panel space-y-3.5 !py-3">
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <div className="text-slate-600">
+            <span className="font-medium text-slate-900">{effectiveDateRange.label}</span>
+            <span className="mx-1.5 text-slate-300">|</span>
+            {scopedBills.length} bills · {formatCurrency(totalBilledMinor)}
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowFilters((v) => !v)}
+            className="px-2.5 py-1 rounded-md border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 cursor-pointer"
+          >
+            {showFilters ? 'Hide filters' : 'Filters'}
+          </button>
+        </div>
+        {showFilters && (
+        <>
         {/* Top Filter Controls: Salon, Exact Date, Payment Mode, Status */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* 1. Salon Selector Dropdown */}
@@ -830,15 +847,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {scopedBills.length} Bills matched • Total {formatCurrency(totalBilledMinor)}
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* NAVIGATION TABS */}
-      <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-5 border-b border-slate-200 overflow-x-auto">
         {[
-          { id: 'overview', label: 'Visual Overview & Trends', icon: Activity },
           { id: 'daily_ledger', label: `Daily Sales Matrix • ${dailyBillingBreakdown.length}`, icon: Calendar },
           { id: 'all_bills', label: `Sales Invoices • ${scopedBills.length}`, icon: Receipt },
           { id: 'salon_breakdown', label: `Salon Contribution • ${salonContributions.length}`, icon: Building2 },
+          { id: 'overview', label: 'Charts & Trends', icon: Activity },
           { id: 'subscription_revenue', label: '100 Quota & Revenue Tracker', icon: CreditCard },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
@@ -847,10 +866,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-2 px-0.5 pb-2.5 -mb-px border-b-2 text-xs transition-colors cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-[#0F4C5C] text-white font-semibold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium'
+                  ? 'border-[#0F4C5C] text-slate-900 font-semibold'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 font-medium'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -884,7 +903,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {dailyChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dailyChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" opacity={0.8} />
+                      <CartesianGrid vertical={false} stroke="#eef0f3" />
                       <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
                       <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                       <Tooltip
@@ -897,8 +916,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           color: '#0f172a',
                         }}
                       />
-                      <Bar dataKey="revenue" fill="#0F4C5C" radius={[4, 4, 0, 0]} name="Sales (₹)" />
-                      <Bar dataKey="bills" fill="#0d9488" radius={[4, 4, 0, 0]} name="Sales Count" />
+                      <Bar dataKey="revenue" fill="#0F4C5C" radius={[3, 3, 0, 0]} name="Sales (₹)" maxBarSize={28} />
+                      <Bar dataKey="bills" fill="#B8D3D8" radius={[3, 3, 0, 0]} name="Sales Count" maxBarSize={28} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -1375,7 +1394,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {monthlyRevenueTrend.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={monthlyRevenueTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" opacity={0.8} />
+                      <CartesianGrid vertical={false} stroke="#eef0f3" />
                       <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
                       <YAxis
                         stroke="#94a3b8"
