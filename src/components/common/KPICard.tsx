@@ -13,67 +13,74 @@ export const KPICard: React.FC<KPICardProps> = ({
   unavailableReason,
   icon: Icon,
   onClick,
-  tone,
+  tone = 'revenue',
 }) => {
-  const toneClass = tone ? `metric-tone-${tone}` : '';
+  const toneClass = tone ? `metric-tone-${tone}` : 'metric-tone-revenue';
+  const isEmerald = tone === 'revenue' || tone === 'order-good' || tone === 'signup';
 
   return (
     <div
       onClick={onClick}
-      className={`metric-card relative overflow-hidden transition-all duration-200 group flex flex-col justify-between aspect-square w-full max-w-[165px] min-w-[130px] flex-1 ${toneClass} ${
-        onClick ? 'cursor-pointer hover:shadow-sm hover:-translate-y-0.5' : ''
+      className={`metric-card group ${toneClass} ${
+        onClick ? 'cursor-pointer' : ''
       }`}
     >
       {/* Top row: Label and Icon */}
-      <div className="flex items-center justify-between gap-1.5 mb-1">
-        <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase truncate">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <span className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase leading-snug whitespace-normal break-words">
           {title}
         </span>
         {Icon && (
-          <div className="p-1 rounded-md bg-slate-900/5 text-slate-700 group-hover:scale-105 transition-transform shrink-0">
-            <Icon className="w-3.5 h-3.5" />
+          <div
+            className={`p-1.5 rounded-lg shrink-0 transition-colors ${
+              isEmerald
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-100 group-hover:bg-emerald-100/80'
+                : 'bg-teal-50 text-teal-700 border border-teal-100 group-hover:bg-teal-100/80'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
           </div>
         )}
       </div>
 
       {/* Main Metric Value */}
-      <div className="my-auto py-1">
+      <div className="my-1">
         {isUnavailable ? (
-          <div className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+          <div className="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block">
             Unavailable
           </div>
         ) : (
-          <div className="metric-value text-base sm:text-lg lg:text-xl font-bold tracking-tight font-mono text-[#1c1f26] truncate" title={String(value)}>
+          <div className="metric-value text-xl sm:text-2xl font-bold tracking-tight font-mono text-slate-900 whitespace-normal break-words leading-tight">
             {value}
           </div>
         )}
       </div>
 
       {/* Footer: Subtitle and Trend */}
-      <div className="pt-1 border-t border-neutral-100 flex items-center justify-between gap-1 text-[9.5px]">
+      <div className="pt-2 mt-auto border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
         {isUnavailable ? (
-          <span className="text-neutral-400 truncate text-[9.5px]">
+          <span className="text-slate-400 text-[11px] whitespace-normal break-words leading-tight">
             {unavailableReason || 'Source unavailable'}
           </span>
         ) : (
           <>
-            <span className="text-neutral-500 truncate text-[9.5px] font-medium" title={subtitle}>
-              {subtitle || (isDateFilterable ? 'Filtered' : 'All-time')}
+            <span className="text-slate-500 text-[11px] font-medium whitespace-normal break-words leading-tight">
+              {subtitle || (isDateFilterable ? 'Filtered period' : 'All-time')}
             </span>
 
             {change && (
               <div
-                className={`inline-flex items-center gap-0.5 font-semibold px-1 py-0.2 rounded text-[8.5px] shrink-0 ${
+                className={`inline-flex items-center gap-1 font-semibold px-1.5 py-0.5 rounded-md text-[10px] shrink-0 ${
                   changeType === 'positive'
-                    ? 'bg-neutral-100 text-neutral-900 border border-neutral-200'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     : changeType === 'negative'
-                    ? 'bg-neutral-100 text-neutral-700 border border-neutral-200'
-                    : 'bg-neutral-50 text-neutral-500'
+                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                    : 'bg-slate-100 text-slate-600'
                 }`}
               >
-                {changeType === 'positive' && <TrendingUp className="w-2.5 h-2.5 text-emerald-600" />}
-                {changeType === 'negative' && <TrendingDown className="w-2.5 h-2.5 text-rose-600" />}
-                {changeType === 'neutral' && <Minus className="w-2.5 h-2.5 text-neutral-400" />}
+                {changeType === 'positive' && <TrendingUp className="w-3 h-3 text-emerald-600" />}
+                {changeType === 'negative' && <TrendingDown className="w-3 h-3 text-rose-600" />}
+                {changeType === 'neutral' && <Minus className="w-3 h-3 text-slate-400" />}
                 <span>{change}</span>
               </div>
             )}

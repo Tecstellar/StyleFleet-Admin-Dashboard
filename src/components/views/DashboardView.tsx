@@ -589,8 +589,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* FOUNDER EXECUTIVE PULSE - COMPACT SQUARE KPI TILES */}
-      <div className="flex flex-wrap gap-2.5">
+      {/* FOUNDER EXECUTIVE PULSE - CLEAN WHITE & EMERALD/TEAL CARDS */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <KPICard
           title="Invoiced Sales"
           value={formatCurrency(totalBilledMinor)}
@@ -1359,61 +1359,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* TAB 5: 100 QUOTA & PRO UPGRADE TRACKER */}
       {activeTab === 'subscription_revenue' && (
         <div className="space-y-6">
-          {/* Top KPI Cards for Subscription & Revenue in IronDrobe Tones */}
-          <div className="flex flex-wrap gap-2.5">
-            <div className="metric-card metric-tone-revenue">
-              <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-                <span className="font-bold uppercase tracking-wider text-[10px]">Total Settled Revenue</span>
-                <DollarSign className="w-3.5 h-3.5 text-[#1c1f26]" />
-              </div>
-              <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
-                {formatCurrency(totalPaidMinor)}
-              </div>
-              <span className="text-[10px] text-neutral-500 mt-0.5 block">
-                {scopedPayments.length} verified completed transactions
-              </span>
-            </div>
-
-            <div className="metric-card metric-tone-brand">
-              <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-                <span className="font-bold uppercase tracking-wider text-[10px]">Active SaaS Salons</span>
-                <Building2 className="w-3.5 h-3.5 text-[#1c1f26]" />
-              </div>
-              <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
-                {salonTierLedger.filter((s) => s.tier !== 'Free Trial').length}
-              </div>
-              <span className="text-[10px] text-neutral-500 mt-0.5 block">
-                Active on Pro tiers (₹1,499 / ₹2,799 / ₹4,999)
-              </span>
-            </div>
-
-            <div className="metric-card metric-tone-trial">
-              <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-                <span className="font-bold uppercase tracking-wider text-[10px]">Free Trials &amp; Onboarding</span>
-                <Users className="w-3.5 h-3.5 text-[#1c1f26]" />
-              </div>
-              <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
-                {salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
-              </div>
-              <span className="text-[10px] text-neutral-500 mt-0.5 block">
-                Salons using 100 free sales quota
-              </span>
-            </div>
-
-            <div className="metric-card metric-tone-conversion">
-              <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-                <span className="font-bold uppercase tracking-wider text-[10px]">Average Revenue / Salon</span>
-                <TrendingUp className="w-3.5 h-3.5 text-[#1c1f26]" />
-              </div>
-              <div className="metric-value text-lg sm:text-xl font-bold font-mono tracking-tight text-[#1c1f26]">
-                {formatCurrency(
-                  salonTierLedger.length > 0 ? Math.round(totalPaidMinor / salonTierLedger.length) : 0
-                )}
-              </div>
-              <span className="text-[10px] text-neutral-500 mt-0.5 block">
-                Overall platform ARPU
-              </span>
-            </div>
+          {/* Top KPI Cards for Subscription & Revenue in Emerald/Teal Modern Style */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <KPICard
+              title="Total Settled Revenue"
+              value={formatCurrency(totalPaidMinor)}
+              subtitle={`${scopedPayments.length} verified completed transactions`}
+              tone="revenue"
+              icon={DollarSign}
+            />
+            <KPICard
+              title="Active SaaS Salons"
+              value={salonTierLedger.filter((s) => s.tier !== 'Free Trial').length}
+              subtitle="Active on Pro tiers (₹1,499 / ₹2,799 / ₹4,999)"
+              tone="brand"
+              icon={Building2}
+            />
+            <KPICard
+              title="Free Trials & Onboarding"
+              value={salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
+              subtitle="Salons using 100 free sales quota"
+              tone="trial"
+              icon={Users}
+            />
+            <KPICard
+              title="Average Revenue / Salon"
+              value={formatCurrency(
+                salonTierLedger.length > 0 ? Math.round(totalPaidMinor / salonTierLedger.length) : 0
+              )}
+              subtitle="Overall platform ARPU"
+              tone="conversion"
+              icon={TrendingUp}
+            />
           </div>
 
           {/* Charts Row: Monthly Revenue Trend + Tier Distribution */}

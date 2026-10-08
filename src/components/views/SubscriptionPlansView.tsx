@@ -27,6 +27,7 @@ import { Shop, Bill, Payment } from '../../types/database';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 import { formatDate, formatDateTime } from '../../utils/dateUtils';
 import { ExportButton } from '../common/ExportButton';
+import { KPICard } from '../common/KPICard';
 
 export type ProPlanTier = '3m' | '6m' | '1y';
 
@@ -361,57 +362,43 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         <Crown className="absolute -right-8 -bottom-10 w-56 h-56 text-white/5 pointer-events-none" />
       </div>
 
-      {/* KPI Cards in IronDrobe Tones - Compact Square Tiles */}
-      <div className="flex flex-wrap gap-2.5">
-        {/* Total Salons */}
-        <div className="metric-card metric-tone-usage aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Salons</span>
-            <Building2 className="w-3.5 h-3.5 text-[#0d9488] shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">{totalSalons}</div>
-          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">Registered</div>
-        </div>
-
-        {/* Free Tier Active */}
-        <div className="metric-card metric-tone-trial aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Free Active</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#d97706] shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">{freeActiveCount}</div>
-          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">&lt; 50 sales</div>
-        </div>
-
-        {/* Nearing Limit (High Usage) */}
-        <div className="metric-card metric-tone-order-warn aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 truncate">Near Limit</span>
-            <Clock className="w-3.5 h-3.5 text-[#ea580c] shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-orange-600 truncate">{nearingLimitCount}</div>
-          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">50-99 sales</div>
-        </div>
-
-        {/* Pro Required */}
-        <div className="metric-card metric-tone-order-risk aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 truncate">Pro Required</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-[#dc2626] shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-rose-600 truncate">{proRequiredCount}</div>
-          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">100+ sales</div>
-        </div>
-
-        {/* Platform Total Sales Done */}
-        <div className="metric-card metric-tone-revenue aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Sales Billed</span>
-            <Receipt className="w-3.5 h-3.5 text-[#059669] shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">{totalPlatformSalesDone}</div>
-          <div className="pt-1 border-t border-neutral-100 text-[9.5px] font-medium text-slate-500 truncate">In database</div>
-        </div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <KPICard
+          title="Salons"
+          value={totalSalons}
+          subtitle="Registered"
+          icon={Building2}
+          tone="usage"
+        />
+        <KPICard
+          title="Free Active"
+          value={freeActiveCount}
+          subtitle="< 50 sales"
+          icon={CheckCircle2}
+          tone="signup"
+        />
+        <KPICard
+          title="Near Limit"
+          value={nearingLimitCount}
+          subtitle="50-99 sales"
+          icon={Clock}
+          tone="conversion"
+        />
+        <KPICard
+          title="Pro Required"
+          value={proRequiredCount}
+          subtitle="100+ sales"
+          icon={AlertTriangle}
+          tone="neutral"
+        />
+        <KPICard
+          title="Sales Billed"
+          value={totalPlatformSalesDone}
+          subtitle="In database"
+          icon={Receipt}
+          tone="revenue"
+        />
       </div>
 
       {/* Filter and Control Bar */}

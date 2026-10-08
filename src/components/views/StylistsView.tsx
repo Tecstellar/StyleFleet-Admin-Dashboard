@@ -26,6 +26,7 @@ import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
 import { ExportButton } from '../common/ExportButton';
 import { EmptyState } from '../common/EmptyState';
+import { KPICard } from '../common/KPICard';
 import {
   Shop,
   Staff,
@@ -394,52 +395,43 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
         </div>
       )}
 
-      {/* Top Banner & KPI Stat Cards - Compact Square Tiles */}
-      <div className="flex flex-wrap gap-2.5">
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 truncate">Total Stylists</span>
-            <Scissors className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.total}</div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Across {shops.length} salons</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">App Active</span>
-            <Smartphone className="w-3.5 h-3.5 text-neutral-900 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.appActive}</div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Logged in app</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-neutral-700 bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">WA Invited</span>
-            <MessageCircle className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.invited}</div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Invite delivered</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-neutral-400 bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">Pending Invite</span>
-            <Users className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-700 font-mono tracking-tight truncate">{metrics.notInvited}</div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Needs invite</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 truncate">Active Roster</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold text-neutral-900 font-mono tracking-tight truncate">{metrics.activeAccounts}</div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Enabled work</span>
-        </div>
+      {/* Top Banner & KPI Stat Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <KPICard
+          title="Total Stylists"
+          value={metrics.total}
+          subtitle={`Across ${shops.length} salons`}
+          icon={Scissors}
+          tone="revenue"
+        />
+        <KPICard
+          title="App Active"
+          value={metrics.appActive}
+          subtitle="Logged in app"
+          icon={Smartphone}
+          tone="usage"
+        />
+        <KPICard
+          title="WA Invited"
+          value={metrics.invited}
+          subtitle="Invite delivered"
+          icon={MessageCircle}
+          tone="conversion"
+        />
+        <KPICard
+          title="Pending Invite"
+          value={metrics.notInvited}
+          subtitle="Needs invite"
+          icon={Users}
+          tone="neutral"
+        />
+        <KPICard
+          title="Active Roster"
+          value={metrics.activeAccounts}
+          subtitle="Enabled work"
+          icon={CheckCircle2}
+          tone="order-good"
+        />
       </div>
 
       {/* Control Bar: Search, Filters & Actions */}

@@ -18,6 +18,7 @@ import {
 import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
 import { ExportButton } from '../common/ExportButton';
+import { KPICard } from '../common/KPICard';
 import { useDateFilter } from '../../context/DateFilterContext';
 import { filterByDateRange, formatDateTime } from '../../utils/dateUtils';
 import { formatCurrency } from '../../utils/formatters';
@@ -378,57 +379,42 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
         />
       </div>
 
-      {/* Snapshot Cards - Compact Square Tiles */}
-      <div className="flex flex-wrap gap-2.5">
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Audit Records</span>
-            <History className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {filteredItems.length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Events in filter</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Active Scope</span>
-            <Building2 className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-xs sm:text-sm font-bold text-[#1c1f26] truncate">
-            {salonFilter !== 'all'
+      {/* Snapshot Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <KPICard
+          title="Audit Records"
+          value={filteredItems.length}
+          subtitle="Events in filter"
+          icon={History}
+          tone="revenue"
+        />
+        <KPICard
+          title="Active Scope"
+          value={
+            salonFilter !== 'all'
               ? shopMap.get(salonFilter)?.name || '1 Salon'
               : cityFilter !== 'all'
               ? `${cityFilter}`
-              : 'All Salons'}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">
-            {exactDate ? `${exactDate}` : 'All window'}
-          </span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Payments</span>
-            <CreditCard className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {filteredItems.filter((i) => i.type === 'Payment').length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Settled txns</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Invoices</span>
-            <FileSpreadsheet className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {filteredItems.filter((i) => i.type === 'Invoice').length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Issued bills</span>
-        </div>
+              : 'All Salons'
+          }
+          subtitle={exactDate ? `${exactDate}` : 'All window'}
+          icon={Building2}
+          tone="usage"
+        />
+        <KPICard
+          title="Payments"
+          value={filteredItems.filter((i) => i.type === 'Payment').length}
+          subtitle="Settled txns"
+          icon={CreditCard}
+          tone="conversion"
+        />
+        <KPICard
+          title="Invoices"
+          value={filteredItems.filter((i) => i.type === 'Invoice').length}
+          subtitle="Issued bills"
+          icon={FileSpreadsheet}
+          tone="signup"
+        />
       </div>
 
       {/* Multi-Attribute Filter Toolbar: City, Salon, Date, Presets, Search */}

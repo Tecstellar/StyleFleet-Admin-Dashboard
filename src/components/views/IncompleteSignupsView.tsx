@@ -17,6 +17,7 @@ import {
 import { Shop } from '../../types/database';
 import { DataTable, Column } from '../common/DataTable';
 import { ExportButton } from '../common/ExportButton';
+import { KPICard } from '../common/KPICard';
 import { formatDateTime } from '../../utils/dateUtils';
 
 interface IncompleteSignupsViewProps {
@@ -268,51 +269,36 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
         />
       </div>
 
-      {/* KPI Cards - Compact Square Tiles */}
-      <div className="flex flex-wrap gap-2.5">
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Incomplete</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-[#1c1f26] shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {incompleteShops.length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Needs outreach</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Zero Staff</span>
-            <Users className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {deduplicatedShops.filter((s) => (s.staff_count ?? 0) === 0).length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Needs team</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Zero Bills</span>
-            <Receipt className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {deduplicatedShops.filter((s) => (s.bill_count ?? 0) === 0).length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Awaiting 1st</span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-bold uppercase tracking-wider text-[10px] truncate">Onboarded</span>
-            <CheckCircle className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight text-[#1c1f26] truncate">
-            {deduplicatedShops.filter((s) => (s.staff_count ?? 0) > 0 && (s.bill_count ?? 0) > 0).length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-500 truncate block">Staff + billing</span>
-        </div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <KPICard
+          title="Incomplete"
+          value={incompleteShops.length}
+          subtitle="Needs outreach"
+          icon={AlertTriangle}
+          tone="revenue"
+        />
+        <KPICard
+          title="Zero Staff"
+          value={deduplicatedShops.filter((s) => (s.staff_count ?? 0) === 0).length}
+          subtitle="Needs team"
+          icon={Users}
+          tone="usage"
+        />
+        <KPICard
+          title="Zero Bills"
+          value={deduplicatedShops.filter((s) => (s.bill_count ?? 0) === 0).length}
+          subtitle="Awaiting 1st"
+          icon={Receipt}
+          tone="conversion"
+        />
+        <KPICard
+          title="Onboarded"
+          value={deduplicatedShops.filter((s) => (s.staff_count ?? 0) > 0 && (s.bill_count ?? 0) > 0).length}
+          subtitle="Staff + billing"
+          icon={CheckCircle}
+          tone="signup"
+        />
       </div>
 
       {/* Filter Control Box */}

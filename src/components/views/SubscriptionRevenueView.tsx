@@ -30,6 +30,7 @@ import {
 import { Shop, Payment, Bill } from '../../types/database';
 import { DataTable, Column } from '../common/DataTable';
 import { ExportButton } from '../common/ExportButton';
+import { KPICard } from '../common/KPICard';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 import { formatDateTime, formatDate } from '../../utils/dateUtils';
 
@@ -464,59 +465,36 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         </span>
       </div>
 
-      {/* True KPI Cards - Compact Square Tiles */}
-      <div className="flex flex-wrap gap-2.5">
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Real Revenue</span>
-            <DollarSign className="w-3.5 h-3.5 text-black shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
-            {formatCurrency(totalRevenueCollectedMinor)}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
-            Settled payments
-          </span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Txns Settled</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
-            {totalCompletedTransactions}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
-            Verified records
-          </span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Contributing</span>
-            <Building2 className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
-            {activeContributingSalons}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
-            Salons settled
-          </span>
-        </div>
-
-        <div className="p-2.5 rounded-lg border border-neutral-200 border-l-3 border-l-[#1c1f26] bg-white shadow-2xs aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Avg Settlement</span>
-            <TrendingUp className="w-3.5 h-3.5 text-neutral-900 shrink-0" />
-          </div>
-          <div className="my-auto py-1 text-base sm:text-lg lg:text-xl font-bold font-mono text-[#1c1f26] truncate">
-            {formatCurrency(avgTransactionAmountMinor)}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-neutral-400 truncate block">
-            Per transaction
-          </span>
-        </div>
+      {/* True KPI Cards - Clean White & Emerald/Teal Modern Style */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <KPICard
+          title="Real Revenue Collected"
+          value={formatCurrency(totalRevenueCollectedMinor)}
+          subtitle="Completed payment settlements"
+          tone="revenue"
+          icon={DollarSign}
+        />
+        <KPICard
+          title="Transactions Settled"
+          value={formatNumber(totalCompletedTransactions)}
+          subtitle="Verified records in public.payments"
+          tone="order-good"
+          icon={CheckCircle2}
+        />
+        <KPICard
+          title="Contributing Salons"
+          value={formatNumber(activeContributingSalons)}
+          subtitle="Salons with completed settlements"
+          tone="brand"
+          icon={Building2}
+        />
+        <KPICard
+          title="Average Settlement"
+          value={formatCurrency(avgTransactionAmountMinor)}
+          subtitle="Average collected per transaction"
+          tone="conversion"
+          icon={TrendingUp}
+        />
       </div>
 
       {/* True Revenue Trend Chart */}

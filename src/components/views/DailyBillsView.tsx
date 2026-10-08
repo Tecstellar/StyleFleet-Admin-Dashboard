@@ -18,6 +18,7 @@ import { Bill, Shop, Payment } from '../../types/database';
 import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
 import { ExportButton } from '../common/ExportButton';
+import { KPICard } from '../common/KPICard';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 import { formatDateTime, formatDate } from '../../utils/dateUtils';
 
@@ -412,59 +413,36 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         />
       </div>
 
-      {/* KPI Cards in IronDrobe Tone Palettes - Compact Square Tiles */}
-      <div className="flex flex-wrap gap-2.5">
-        <div className="metric-card metric-tone-usage aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Total Sales</span>
-            <Receipt className="w-3.5 h-3.5 text-black shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">
-            {filteredBills.length}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-slate-500 truncate block">
-            {exactDate ? `Date: ${exactDate}` : 'All dates'}
-          </span>
-        </div>
-
-        <div className="metric-card metric-tone-revenue aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Invoiced Volume</span>
-            <DollarSign className="w-3.5 h-3.5 text-black shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">
-            {formatCurrency(totalAmountMinor)}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-slate-500 truncate block">
-            Gross invoiced
-          </span>
-        </div>
-
-        <div className="metric-card metric-tone-conversion aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Avg Ticket</span>
-            <TrendingUp className="w-3.5 h-3.5 text-black shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">
-            {formatCurrency(avgBillSize)}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-slate-500 truncate block">
-            Per sale
-          </span>
-        </div>
-
-        <div className="metric-card metric-tone-brand aspect-square flex-1 min-w-[130px] max-w-[165px] flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[10px] truncate">Billing Salons</span>
-            <Building2 className="w-3.5 h-3.5 text-black shrink-0" />
-          </div>
-          <div className="my-auto py-1 metric-value text-base sm:text-lg lg:text-xl font-bold font-mono tracking-tight truncate">
-            {activeBillingSalonsCount}
-          </div>
-          <span className="pt-1 border-t border-neutral-100 text-[9.5px] text-slate-500 truncate block">
-            Actively billing
-          </span>
-        </div>
+      {/* KPI Cards - Clean White & Emerald/Teal Modern Style */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <KPICard
+          title="Total Sales in Scope"
+          value={formatNumber(filteredBills.length)}
+          subtitle={exactDate ? `On date: ${exactDate}` : 'Across all loaded dates'}
+          tone="usage"
+          icon={Receipt}
+        />
+        <KPICard
+          title="Invoiced Sales Volume"
+          value={formatCurrency(totalAmountMinor)}
+          subtitle="Gross invoiced value"
+          tone="revenue"
+          icon={DollarSign}
+        />
+        <KPICard
+          title="Average Ticket Size"
+          value={formatCurrency(avgBillSize)}
+          subtitle="Average value per sale"
+          tone="conversion"
+          icon={TrendingUp}
+        />
+        <KPICard
+          title="Billing Salons"
+          value={formatNumber(activeBillingSalonsCount)}
+          subtitle="Salons actively billing in scope"
+          tone="brand"
+          icon={Building2}
+        />
       </div>
 
       {/* Multi-Attribute Filter Toolbar (IronDrobe Panel) */}
