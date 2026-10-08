@@ -29,7 +29,7 @@ import {
 import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
 import { UnavailableBanner } from '../common/UnavailableBanner';
-import { fetchSalonDetails, updateStaffPermissions, SalonDetailedView } from '../../services/salonsService';
+import { fetchSalonDetails, updateStaffPermissions, updateShopFreeSalesLimit, SalonDetailedView } from '../../services/salonsService';
 import {
   createStaff,
   updateStaffInvitationStatus,
@@ -84,6 +84,35 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
   const [newStaffRole, setNewStaffRole] = useState('Stylist');
   const [newStaffLoading, setNewStaffLoading] = useState(false);
   const [staffActionMsg, setStaffActionMsg] = useState<string | null>(null);
+  const [limitInput, setLimitInput] = useState('');
+  const [savingLimit, setSavingLimit] = useState(false);
+  const [limitMsg, setLimitMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    const current = details?.shop.free_sales_limit;
+    setLimitInput(current ? String(current) : '');
+    setLimitMsg(null);
+  }, [details?.shop.id, details?.shop.free_sales_limit]);
+
+  const handleSaveLimit = async (clear: boolean) => {
+    if (!shop || savingLimit) return;
+    const trimmed = limitInput.trim();
+    const value = clear ? null : Number(trimmed);
+    if (!clear && (trimmed === '' || !Number.isInteger(value) || (value as number) < 1)) {
+      setLimitMsg({ ok: false, text: 'Enter a whole number of 1 or more.' });
+      return;
+    }
+    setSavingLimit(true);
+    setLimitMsg(null);
+    const res = await updateShopFreeSalesLimit(shop.id, value);
+    setSavingLimit(false);
+    if (!res.success) {
+      setLimitMsg({ ok: false, text: res.error || 'Could not save the limit.' });
+      return;
+    }
+    setDetails((prev) => (prev ? { ...prev, shop: { ...prev.shop, free_sales_limit: value } } : prev));
+    setLimitMsg({ ok: true, text: value === null ? 'Reset to the default (100).' : `Free sales limit set to ${value}.` });
+  };
 
   const handleSendWhatsAppInvite = async (st: Staff) => {
     if (!st.phone || !shop) return;
@@ -992,6 +1021,50 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
           {/* TAB 5: SETTINGS */}
           {activeTab === 'settings' && (
             <div className="space-y-3">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-3 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-600">Free sales limit:</span>
+                  <span className="font-semibold text-neutral-900">
+                    {details?.shop.free_sales_limit ?? 100}
+                    {details?.shop.free_sales_limit ? ' (custom)' : ' (default)'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
+                    inputMode="numeric"
+                    value={limitInput}
+                    onChange={(e) => setLimitInput(e.target.value)}
+                    placeholder="e.g. 500"
+                    disabled={savingLimit || !details}
+                    className="flex-1 px-3 py-2 rounded-lg border border-[#E5E7EB] text-xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSaveLimit(false)}
+                    disabled={savingLimit || !details}
+                    className="px-3 py-2 rounded-lg bg-neutral-900 text-white font-semibold disabled:opacity-50"
+                  >
+                    {savingLimit ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveLimit(true)}
+                    disabled={savingLimit || !details?.shop.free_sales_limit}
+                    className="px-3 py-2 rounded-lg border border-[#E5E7EB] text-neutral-700 font-semibold disabled:opacity-50"
+                  >
+                    Reset
+                  </button>
+                </div>
+                {limitMsg && (
+                  <p className={limitMsg.ok ? 'text-emerald-600' : 'text-red-600'}>{limitMsg.text}</p>
+                )}
+                <p className="text-neutral-500">
+                  How many bills this salon can create on the free plan before it needs Pro. Leave empty / Reset for the default of 100.
+                </p>
+              </div>
               {details?.settings ? (
                 <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-3 text-xs">
                   <div className="flex justify-between items-center">

@@ -278,6 +278,35 @@ export async function updateStaffPermissions(
   }
 }
 
+/**
+ * Company Admin Panel: sets (or clears, with null) a salon's free-plan sales limit.
+ * The app uses 100 when this is null.
+ */
+export async function updateShopFreeSalesLimit(
+  shopId: string,
+  limit: number | null
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    if (limit !== null && (!Number.isInteger(limit) || limit < 1)) {
+      return { success: false, error: 'Limit must be a whole number of 1 or more' };
+    }
+    const { data, error } = await supabase
+      .from('shops')
+      .update({ free_sales_limit: limit, updated_at: new Date().toISOString() })
+      .eq('id', shopId)
+      .select('id');
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: false, error: 'Salon was not updated (no matching row or no permission)' };
+    }
+    return { success: true, error: null };
+  } catch (err: any) {
+    console.error('Error updating free sales limit:', err);
+    return { success: false, error: err.message || 'Failed to update the free sales limit' };
+  }
+}
+
 export interface CreateSalonAccountParams {
   salonName: string;
   ownerName: string;
