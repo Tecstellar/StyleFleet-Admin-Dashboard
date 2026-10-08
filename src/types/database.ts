@@ -25,6 +25,8 @@ export interface Shop {
   accent_color: string;
   invoice_prefix: string;
   gst_rate: number;
+  /** Per-salon override of the free-plan sales limit; null means the app default (100) */
+  free_sales_limit?: number | null;
   created_at: string;
   updated_at: string;
   // Joined relation fields
