@@ -21,14 +21,11 @@ export const KPICard: React.FC<KPICardProps> = ({
         onClick ? 'cursor-pointer hover:-translate-y-0.5' : ''
       }`}
     >
-      {/* Top row: Label and Optional Subtle Icon */}
+      {/* Top row: Label */}
       <div className="flex items-center justify-between gap-2 mb-1">
         <span className="text-xs font-medium text-slate-500 truncate">
           {title}
         </span>
-        {Icon && (
-          <Icon className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />
-        )}
       </div>
 
       {/* Main Metric Value */}

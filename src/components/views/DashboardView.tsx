@@ -347,7 +347,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         salonCounts[b.shop_id].count++;
       });
 
-      let topSalonName = '—';
+      let topSalonName = 'None';
       let topSalonBills = 0;
       Object.values(salonCounts).forEach((sc) => {
         if (sc.count > topSalonBills) {
@@ -391,7 +391,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     scopedBills.forEach((b) => {
       const shop = b.shop || shops.find((s) => s.id === b.shop_id);
       const name = shop?.name || 'Unknown Salon';
-      const city = shop?.city || '—';
+      const city = shop?.city || 'Tamil Nadu';
 
       const entry = map.get(b.shop_id) || { name, city, count: 0, totalMinor: 0 };
       entry.count++;
@@ -594,7 +594,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               'Invoice Number': b.invoice_number,
               Salon: b.shop?.name || b.shop_id,
               Customer: b.customer?.name || 'Walk-in',
-              Phone: b.customer?.phone || '—',
+              Phone: b.customer?.phone || 'None',
               'Issued Date': formatDateTime(b.issued_at || b.created_at),
               'Subtotal (INR)': (b.subtotal_minor || 0) / 100,
               'Total (INR)': (b.total_minor || 0) / 100,
@@ -611,36 +611,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <KPICard
           title="Invoiced Sales"
           value={formatCurrency(totalBilledMinor)}
-          subtitle={`${scopedBills.length} sale invoice(s)`}
-          icon={DollarSign}
+          subtitle={`${scopedBills.length} sale invoices`}
           onClick={() => setActiveTab('all_bills')}
         />
         <KPICard
           title="Settled Collections"
           value={formatCurrency(totalPaidMinor)}
-          subtitle={`${scopedPayments.length} verified payment(s)`}
-          icon={Wallet}
+          subtitle={`${scopedPayments.length} verified payments`}
           onClick={() => setActiveTab('subscription_revenue')}
         />
         <KPICard
           title="Sales Put In"
           value={formatNumber(scopedBills.length)}
-          subtitle={`${activeSalonsWithBillsCount} active salon(s)`}
-          icon={Receipt}
+          subtitle={`${activeSalonsWithBillsCount} active salons`}
           onClick={() => setActiveTab('daily_ledger')}
         />
         <KPICard
           title="Active Salons"
           value={formatNumber(filteredShops.length)}
-          subtitle={`${shops.length} connected salon(s)`}
-          icon={Store}
+          subtitle={`${shops.length} connected salons`}
           onClick={() => onNavigate('salons_360')}
         />
         <KPICard
           title="Stylists On Fleet"
           value={formatNumber(scopedStaff.length)}
           subtitle={`${scopedStaff.filter((s) => s.invitation_status === 'active').length} active stylists`}
-          icon={Scissors}
           onClick={() => onNavigate('staff_access')}
         />
       </div>
@@ -663,10 +658,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               }}
               className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
             >
-              <option value="all">All Salons ({shops.length} Connected)</option>
+              <option value="all">All Salons • {shops.length} Connected</option>
               {shops.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.name} ({s.city || 'No City'})
+                  {s.name} • {s.city || 'Tamil Nadu'}
                 </option>
               ))}
             </select>
@@ -832,7 +827,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="text-[11px] font-medium text-slate-700">
-            {scopedBills.length} Bill(s) matched • Total {formatCurrency(totalBilledMinor)}
+            {scopedBills.length} Bills matched • Total {formatCurrency(totalBilledMinor)}
           </div>
         </div>
       </div>
@@ -841,9 +836,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2 overflow-x-auto">
         {[
           { id: 'overview', label: 'Visual Overview & Trends', icon: Activity },
-          { id: 'daily_ledger', label: `Daily Sales Matrix (${dailyBillingBreakdown.length})`, icon: Calendar },
-          { id: 'all_bills', label: `Sales Invoices (${scopedBills.length})`, icon: Receipt },
-          { id: 'salon_breakdown', label: `Salon Contribution (${salonContributions.length})`, icon: Building2 },
+          { id: 'daily_ledger', label: `Daily Sales Matrix • ${dailyBillingBreakdown.length}`, icon: Calendar },
+          { id: 'all_bills', label: `Sales Invoices • ${scopedBills.length}`, icon: Receipt },
+          { id: 'salon_breakdown', label: `Salon Contribution • ${salonContributions.length}`, icon: Building2 },
           { id: 'subscription_revenue', label: '100 Quota & Revenue Tracker', icon: CreditCard },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
@@ -998,7 +993,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <div className="text-xs text-slate-500">
-              {dailyBillingBreakdown.length} active date(s) recorded
+              {dailyBillingBreakdown.length} active dates recorded
             </div>
           </div>
 
@@ -1008,7 +1003,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <tr>
                   <th className="px-4 py-2.5">Calendar Date</th>
                   <th className="px-4 py-2.5">Sales Put In</th>
-                  <th className="px-4 py-2.5">Total Invoiced (INR)</th>
+                  <th className="px-4 py-2.5">Total Invoiced INR</th>
                   <th className="px-4 py-2.5">Average Ticket</th>
                   <th className="px-4 py-2.5">Paid vs Pending</th>
                   <th className="px-4 py-2.5">Top Submitting Salon</th>
@@ -1035,7 +1030,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </td>
 
                       <td className="px-4 py-2.5">
-                        <span className="text-slate-800 font-medium">{row.billsCount} sale(s)</span>
+                        <span className="text-slate-800 font-medium">{row.billsCount} sales</span>
                       </td>
 
                       <td className="px-4 py-2.5 font-semibold text-slate-900 tabular-nums">
@@ -1057,7 +1052,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <td className="px-4 py-2.5">
                         <div className="font-medium text-slate-800">{row.topSalonName}</div>
                         <span className="text-[11px] text-slate-400">
-                          {row.topSalonBills} sale(s)
+                          {row.topSalonBills} sales
                         </span>
                       </td>
 
@@ -1121,7 +1116,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <th className="px-4 py-3">Customer</th>
                   <th className="px-4 py-3">Date &amp; Time</th>
                   <th className="px-4 py-3">Payment Mode</th>
-                  <th className="px-4 py-3">Amount (INR)</th>
+                  <th className="px-4 py-3">Amount INR</th>
                   <th className="px-4 py-3">Status</th>
                 </tr>
               </thead>
@@ -1150,7 +1145,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                         <td className="px-4 py-3.5">
                           <span className="font-medium text-slate-900 block">{b.customer?.name || 'Walk-in Client'}</span>
-                          <span className="text-[11px] font-mono text-slate-500">{b.customer?.phone || '—'}</span>
+                          <span className="text-[11px] font-mono text-slate-500">{b.customer?.phone || 'None'}</span>
                         </td>
 
                         <td className="px-4 py-3.5">
@@ -1236,7 +1231,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </p>
             </div>
             <div className="text-xs font-mono text-slate-600">
-              {salonContributions.length} active contributor(s)
+              {salonContributions.length} active contributors
             </div>
           </div>
 
@@ -1247,7 +1242,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <th className="px-4 py-2.5">Salon Business</th>
                   <th className="px-4 py-2.5">Location</th>
                   <th className="px-4 py-2.5">Sales Put In</th>
-                  <th className="px-4 py-2.5">Total Invoiced (INR)</th>
+                  <th className="px-4 py-2.5">Total Invoiced INR</th>
                   <th className="px-4 py-2.5">Average Ticket</th>
                   <th className="px-4 py-2.5">Platform Share</th>
                   <th className="px-4 py-2.5 text-right">Quick Filter</th>
@@ -1331,19 +1326,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               title="Total Settled Revenue"
               value={formatCurrency(totalPaidMinor)}
               subtitle={`${scopedPayments.length} verified completed transactions`}
-              icon={DollarSign}
             />
             <KPICard
               title="Active SaaS Salons"
               value={salonTierLedger.filter((s) => s.tier !== 'Free Trial').length}
-              subtitle="Active on Pro tiers (₹1,499 / ₹2,799 / ₹4,999)"
-              icon={Building2}
+              subtitle="Active on Pro plans ₹1,499, ₹2,799, ₹4,999"
             />
             <KPICard
               title="Free Trials & Onboarding"
               value={salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
               subtitle="Salons using 100 free sales quota"
-              icon={Users}
             />
             <KPICard
               title="Average Revenue / Salon"
@@ -1351,7 +1343,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 salonTierLedger.length > 0 ? Math.round(totalPaidMinor / salonTierLedger.length) : 0
               )}
               subtitle="Overall platform ARPU"
-              icon={TrendingUp}
             />
           </div>
 
@@ -1371,11 +1362,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="flex items-center gap-3 text-xs font-medium">
                   <div className="flex items-center gap-1.5 text-slate-700">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#0F4C5C] inline-block" />
-                    <span>Collected (INR)</span>
+                    <span>Collected INR</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-slate-700">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#0d9488] inline-block" />
-                    <span>Invoiced (INR)</span>
+                    <span>Invoiced INR</span>
                   </div>
                 </div>
               </div>
