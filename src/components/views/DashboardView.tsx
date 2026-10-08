@@ -81,8 +81,8 @@ interface DashboardViewProps {
   initialTab?: 'overview' | 'daily_ledger' | 'all_bills' | 'salon_breakdown' | 'subscription_revenue';
 }
 
-// IronDrobe Palette for Data Visualizations (Monochrome Black & White)
-const CHART_PALETTE = ['#000000', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8'];
+// Brand Design System Palette for Data Visualizations
+const CHART_PALETTE = ['#0F4C5C', '#0d9488', '#059669', '#d97706', '#64748b', '#94a3b8'];
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   shops,
@@ -502,6 +502,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }).sort((a, b) => b.collectedMinor - a.collectedMinor);
   }, [shops, bills, payments]);
 
+  // Real Account Deletion Reasons Breakdown
+  const deletionReasonsBreakdown = useMemo(() => {
+    if (deletions.length === 0) return [];
+    const map = new Map<string, number>();
+    deletions.forEach((d) => {
+      const reason = d.reason?.trim() || 'No reason provided';
+      map.set(reason, (map.get(reason) || 0) + 1);
+    });
+    return Array.from(map.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [deletions]);
+
   // Reset all filters handler
   const handleResetFilters = () => {
     setSelectedSalonFilter('all');
@@ -531,29 +544,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* IronDrobe Founder Dashboard Page Header */}
+      {/* Dashboard Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
               Founder Dashboard
             </h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black text-white">
-              LIVE SYNC
-            </span>
             {exactDateInput && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-300">
+              <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                 Filtered: {effectiveDateRange.label}
               </span>
             )}
           </div>
-          <p className="text-xs text-neutral-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Real-time salon operations, sales trajectory, and partner performance metrics.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* IronDrobe Segmented Date Range Controls */}
+          {/* Segmented Date Range Controls */}
           <div className="segmented-control">
             {[
               { id: 'today', label: 'Today' },
@@ -596,13 +606,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* FOUNDER EXECUTIVE PULSE - CLEAN WHITE & EMERALD/TEAL CARDS */}
+      {/* EXECUTIVE KPI SUMMARY CARDS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <KPICard
           title="Invoiced Sales"
           value={formatCurrency(totalBilledMinor)}
           subtitle={`${scopedBills.length} sale invoice(s)`}
-          tone="revenue"
           icon={DollarSign}
           onClick={() => setActiveTab('all_bills')}
         />
@@ -610,7 +619,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           title="Settled Collections"
           value={formatCurrency(totalPaidMinor)}
           subtitle={`${scopedPayments.length} verified payment(s)`}
-          tone="brand"
           icon={Wallet}
           onClick={() => setActiveTab('subscription_revenue')}
         />
@@ -618,15 +626,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           title="Sales Put In"
           value={formatNumber(scopedBills.length)}
           subtitle={`${activeSalonsWithBillsCount} active salon(s)`}
-          tone="order-good"
           icon={Receipt}
           onClick={() => setActiveTab('daily_ledger')}
         />
         <KPICard
           title="Active Salons"
           value={formatNumber(filteredShops.length)}
-          subtitle={`${shops.length} partner salon(s)`}
-          tone="usage"
+          subtitle={`${shops.length} connected salon(s)`}
           icon={Store}
           onClick={() => onNavigate('salons_360')}
         />
@@ -634,20 +640,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           title="Stylists On Fleet"
           value={formatNumber(scopedStaff.length)}
           subtitle={`${scopedStaff.filter((s) => s.invitation_status === 'active').length} active stylists`}
-          tone="neutral"
           icon={Scissors}
           onClick={() => onNavigate('staff_access')}
         />
       </div>
 
-      {/* MASTER MULTI-ATTRIBUTE FILTER PANEL (IRON DROBE STYLE) */}
+      {/* FILTER PANEL */}
       <div className="panel space-y-3.5">
         {/* Top Filter Controls: Salon, Exact Date, Payment Mode, Status */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* 1. Salon Selector Dropdown */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-black" />
+            <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-slate-500" />
               <span>Filter Salon</span>
             </label>
             <select
@@ -656,7 +661,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 setSelectedSalonFilter(e.target.value);
                 setBillsPage(1);
               }}
-              className="w-full text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-black focus:bg-white cursor-pointer shadow-xs"
+              className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
             >
               <option value="all">All Salons ({shops.length} Connected)</option>
               {shops.map((s) => (
@@ -667,23 +672,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </select>
           </div>
 
-          {/* 2. EXACT SINGLE DATE PICKER ("Search this date how much bills they're putting") */}
+          {/* 2. Exact Single Date Picker */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-black" />
+              <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-500" />
                 <span>Search Exact Date</span>
               </label>
               {exactDateInput && (
                 <button
                   onClick={() => setExactDateInput('')}
-                  className="text-[10px] text-slate-500 hover:text-slate-900 font-semibold cursor-pointer underline"
+                  className="text-[10px] text-slate-500 hover:text-slate-900 font-medium cursor-pointer underline"
                 >
                   Clear Date
                 </button>
               )}
             </div>
-            <div className="relative">
+            <div>
               <input
                 type="date"
                 value={exactDateInput}
@@ -691,9 +696,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   setExactDateInput(e.target.value);
                   setBillsPage(1);
                 }}
-                className={`w-full text-xs font-mono font-semibold px-3 py-2 rounded-xl border ${
-                  exactDateInput ? 'border-black bg-neutral-100 ring-1 ring-black' : 'border-slate-200 bg-slate-50/70'
-                } text-slate-900 focus:outline-none focus:border-black cursor-pointer shadow-xs`}
+                className={`w-full text-xs font-medium px-3 py-2 rounded-lg border ${
+                  exactDateInput ? 'border-[#0F4C5C] bg-teal-50/40 text-slate-900' : 'border-slate-200 bg-slate-50/70 text-slate-900'
+                } focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer`}
                 placeholder="YYYY-MM-DD"
               />
             </div>
@@ -701,8 +706,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {/* 3. Payment Method Filter */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-black" />
+            <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-slate-500" />
               <span>Payment Mode</span>
             </label>
             <select
@@ -711,7 +716,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 setPaymentMethodFilter(e.target.value);
                 setBillsPage(1);
               }}
-              className="w-full text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-black focus:bg-white cursor-pointer shadow-xs"
+              className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
             >
               <option value="all">All Payment Modes</option>
               {availablePaymentMethods.map((m) => (
@@ -724,8 +729,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {/* 4. Bill Status Filter */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-              <Receipt className="w-3.5 h-3.5 text-black" />
+            <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+              <Receipt className="w-3.5 h-3.5 text-slate-500" />
               <span>Invoice Status</span>
             </label>
             <select
@@ -734,7 +739,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 setBillStatusFilter(e.target.value);
                 setBillsPage(1);
               }}
-              className="w-full text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-black focus:bg-white cursor-pointer shadow-xs"
+              className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
             >
               <option value="all">All Invoice Statuses</option>
               <option value="paid">Settled / Paid</option>
@@ -748,7 +753,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-3 border-t border-slate-100">
           {/* Omni Search */}
           <div className="relative flex-1 max-w-md">
-            <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               placeholder="Search by invoice #, salon, customer, phone..."
@@ -757,11 +762,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 setSearchQuery(e.target.value);
                 setBillsPage(1);
               }}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-black focus:bg-white shadow-xs"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white"
             />
           </div>
 
-          {/* Segmented Control Filter (IronDrobe Style) */}
+          {/* Segmented Control Filter */}
           <div className="segmented-control shrink-0">
             <button
               onClick={() => setSegmentFilter('all')}
@@ -793,7 +798,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer shrink-0"
               title="Reset all active filters"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -803,96 +808,61 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Active Filter Summary Bar */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 flex-wrap gap-2">
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-slate-900">Active Scope:</span>
-            <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 font-mono text-[11px] text-slate-800">
+            <span className="font-medium text-slate-700">Scope:</span>
+            <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
               {effectiveDateRange.label}
             </span>
             {selectedSalonFilter !== 'all' && (
-              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 font-mono text-[11px] text-slate-800">
+              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
                 Salon: {shops.find((s) => s.id === selectedSalonFilter)?.name || selectedSalonFilter}
               </span>
             )}
             {paymentMethodFilter !== 'all' && (
-              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 font-mono text-[11px] text-slate-800">
+              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
                 Method: {paymentMethodFilter.toUpperCase()}
               </span>
             )}
             {billStatusFilter !== 'all' && (
-              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 font-mono text-[11px] text-slate-800">
+              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
                 Status: {billStatusFilter.toUpperCase()}
               </span>
             )}
           </div>
 
-          <div className="font-mono text-[11px] font-bold text-slate-900">
+          <div className="text-[11px] font-medium text-slate-700">
             {scopedBills.length} Bill(s) matched • Total {formatCurrency(totalBilledMinor)}
           </div>
         </div>
       </div>
 
-      {/* INTERACTIVE NAVIGATION TABS */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'overview'
-              ? 'bg-black text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <Activity className="w-3.5 h-3.5" />
-          <span>Visual Overview &amp; Trends</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('daily_ledger')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'daily_ledger'
-              ? 'bg-black text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <Calendar className="w-3.5 h-3.5" />
-          <span>Daily Sales Matrix ({dailyBillingBreakdown.length} Days)</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('all_bills')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'all_bills'
-              ? 'bg-black text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <Receipt className="w-3.5 h-3.5" />
-          <span>Sales Invoices Ledger ({scopedBills.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('salon_breakdown')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'salon_breakdown'
-              ? 'bg-black text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>Salon Sales Contribution ({salonContributions.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('subscription_revenue')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'subscription_revenue'
-              ? 'bg-black text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <CreditCard className="w-3.5 h-3.5" />
-          <span>100 Quota &amp; Pro Tracker</span>
-        </button>
+      {/* NAVIGATION TABS */}
+      <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2 overflow-x-auto">
+        {[
+          { id: 'overview', label: 'Visual Overview & Trends', icon: Activity },
+          { id: 'daily_ledger', label: `Daily Sales Matrix (${dailyBillingBreakdown.length})`, icon: Calendar },
+          { id: 'all_bills', label: `Sales Invoices (${scopedBills.length})`, icon: Receipt },
+          { id: 'salon_breakdown', label: `Salon Contribution (${salonContributions.length})`, icon: Building2 },
+          { id: 'subscription_revenue', label: '100 Quota & Revenue Tracker', icon: CreditCard },
+        ].map((tab) => {
+          const isActive = activeTab === tab.id;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? 'bg-[#0F4C5C] text-white font-semibold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* TAB 1: VISUAL OVERVIEW & CHARTS */}
@@ -919,20 +889,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {dailyChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dailyChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.7} />
-                      <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
-                      <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" opacity={0.8} />
+                      <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: '#0b1220',
-                          borderColor: '#1e293b',
-                          borderRadius: '12px',
+                          backgroundColor: '#ffffff',
+                          borderColor: '#e2e8f0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.08)',
                           fontSize: '12px',
-                          color: '#f8fafc',
+                          color: '#0f172a',
                         }}
                       />
-                      <Bar dataKey="revenue" fill="#000000" radius={[4, 4, 0, 0]} name="Sales (₹)" />
-                      <Bar dataKey="bills" fill="#71717a" radius={[4, 4, 0, 0]} name="Sales Count" />
+                      <Bar dataKey="revenue" fill="#0F4C5C" radius={[4, 4, 0, 0]} name="Sales (₹)" />
+                      <Bar dataKey="bills" fill="#0d9488" radius={[4, 4, 0, 0]} name="Sales Count" />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -954,22 +925,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     Reasons from verified deletion submissions
                   </p>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-800">
+                <span className="text-xs font-mono font-medium text-slate-600">
                   {deletions.length} Requests
                 </span>
               </div>
 
-              {deletions.length > 0 ? (
+              {deletionReasonsBreakdown.length > 0 ? (
                 <div className="space-y-4">
                   <div className="h-44 w-full flex items-center justify-center">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={[
-                            { name: 'Switched Systems', value: deletions.filter((d) => d.reason?.toLowerCase().includes('switch')).length || 1 },
-                            { name: 'Cost Concerns', value: deletions.filter((d) => d.reason?.toLowerCase().includes('cost')).length || 1 },
-                            { name: 'Other / Testing', value: Math.max(1, deletions.length - 2) },
-                          ]}
+                          data={deletionReasonsBreakdown}
                           dataKey="value"
                           nameKey="name"
                           cx="50%"
@@ -978,31 +945,32 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           outerRadius={70}
                           paddingAngle={3}
                         >
-                          {CHART_PALETTE.map((color, index) => (
-                            <Cell key={`cell-${index}`} fill={color} />
+                          {deletionReasonsBreakdown.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_PALETTE[index % CHART_PALETTE.length]} />
                           ))}
                         </Pie>
                         <Tooltip
                           contentStyle={{
-                            backgroundColor: '#0b1220',
-                            borderColor: '#1e293b',
-                            borderRadius: '12px',
+                            backgroundColor: '#ffffff',
+                            borderColor: '#e2e8f0',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.08)',
                             fontSize: '11px',
-                            color: '#f8fafc',
+                            color: '#0f172a',
                           }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="pt-2 border-t border-neutral-200 text-xs space-y-1.5">
-                    <div className="flex items-center justify-between text-neutral-600">
+                  <div className="pt-2 border-t border-slate-100 text-xs space-y-1.5">
+                    <div className="flex items-center justify-between text-slate-600">
                       <span>Total Requests</span>
-                      <span className="font-mono font-bold text-neutral-900">{deletions.length}</span>
+                      <span className="font-semibold text-slate-900">{deletions.length}</span>
                     </div>
-                    <div className="flex items-center justify-between text-neutral-600">
+                    <div className="flex items-center justify-between text-slate-600">
                       <span>Audit Logs Preserved</span>
-                      <span className="font-mono font-bold text-neutral-900">100%</span>
+                      <span className="font-semibold text-slate-900">100%</span>
                     </div>
                   </div>
                 </div>
@@ -1021,31 +989,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="panel space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-black" />
-                <span>Date-by-Date Sales &amp; Invoicing Activity</span>
+              <h3 className="text-sm font-semibold text-slate-900">
+                Date-by-Date Sales &amp; Invoicing Activity
               </h3>
               <p className="text-xs text-slate-500">
                 Shows exact sales volume and revenue submitted by salons on each calendar date. Click any date to view sales invoices.
               </p>
             </div>
 
-            <div className="text-xs font-mono text-slate-600">
+            <div className="text-xs text-slate-500">
               {dailyBillingBreakdown.length} active date(s) recorded
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-[11px] border-b border-slate-200">
+              <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">Calendar Date</th>
-                  <th className="px-4 py-3">Sales Put In</th>
-                  <th className="px-4 py-3">Total Invoiced (INR)</th>
-                  <th className="px-4 py-3">Average Ticket</th>
-                  <th className="px-4 py-3">Paid vs Pending</th>
-                  <th className="px-4 py-3">Top Submitting Salon</th>
-                  <th className="px-4 py-3 text-right">Drilldown</th>
+                  <th className="px-4 py-2.5">Calendar Date</th>
+                  <th className="px-4 py-2.5">Sales Put In</th>
+                  <th className="px-4 py-2.5">Total Invoiced (INR)</th>
+                  <th className="px-4 py-2.5">Average Ticket</th>
+                  <th className="px-4 py-2.5">Paid vs Pending</th>
+                  <th className="px-4 py-2.5">Top Submitting Salon</th>
+                  <th className="px-4 py-2.5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-sans">
@@ -1059,57 +1026,50 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   dailyBillingBreakdown.map((row) => (
                     <tr
                       key={row.rawDate}
-                      className="hover:bg-slate-50 transition-colors group cursor-pointer"
+                      className="hover:bg-slate-50/80 transition-colors cursor-pointer"
                       onClick={() => handleSelectDayDrilldown(row.rawDate)}
                     >
-                      <td className="px-4 py-3.5">
-                        <div className="font-bold text-slate-900 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-black shrink-0" />
-                          <span>{row.displayDate}</span>
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-mono">{row.rawDate}</span>
+                      <td className="px-4 py-2.5">
+                        <div className="font-semibold text-slate-900">{row.displayDate}</div>
+                        <span className="text-[10px] text-slate-400">{row.rawDate}</span>
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-900 font-mono font-bold border border-neutral-200">
-                          <Receipt className="w-3 h-3 text-black" />
-                          <span>{row.billsCount} sale(s)</span>
-                        </div>
+                      <td className="px-4 py-2.5">
+                        <span className="text-slate-800 font-medium">{row.billsCount} sale(s)</span>
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono font-bold text-slate-900 text-sm">
+                      <td className="px-4 py-2.5 font-semibold text-slate-900 tabular-nums">
                         {formatCurrency(row.totalAmountMinor)}
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono text-slate-700">
+                      <td className="px-4 py-2.5 text-slate-600 tabular-nums">
                         {formatCurrency(row.avgBillMinor)}
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2 text-[11px] font-mono">
-                          <span className="text-neutral-900 font-semibold">{row.paidBillsCount} paid</span>
-                          <span className="text-slate-400">•</span>
-                          <span className="text-neutral-500">{row.pendingBillsCount} pending</span>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                          <span className="text-emerald-700 font-medium">{row.paidBillsCount} paid</span>
+                          <span className="text-slate-300">•</span>
+                          <span>{row.pendingBillsCount} pending</span>
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <div className="font-semibold text-slate-900">{row.topSalonName}</div>
-                        <span className="text-[11px] text-slate-500 font-mono">
-                          {row.topSalonBills} sale(s) on this date
+                      <td className="px-4 py-2.5">
+                        <div className="font-medium text-slate-800">{row.topSalonName}</div>
+                        <span className="text-[11px] text-slate-400">
+                          {row.topSalonBills} sale(s)
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-2.5 text-right">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSelectDayDrilldown(row.rawDate);
                           }}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-black text-white text-xs font-semibold hover:bg-neutral-800 transition-colors cursor-pointer shadow-xs"
+                          className="text-xs font-medium text-[#0F4C5C] hover:text-[#145B6E] hover:underline cursor-pointer"
                         >
-                          <span>View Sales</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
+                          View Sales
                         </button>
                       </td>
                     </tr>
@@ -1126,24 +1086,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="panel space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-black" />
-                <span>Verified Sales &amp; Invoices Ledger</span>
+              <h3 className="text-sm font-semibold text-slate-900">
+                Verified Sales &amp; Invoices Ledger
               </h3>
               <p className="text-xs text-slate-500">
-                Real-time records from <code className="font-mono font-bold text-slate-900">public.bills</code> with live status and amounts.
+                Real-time records from verified billing invoices with live status and amounts.
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500">Rows per page:</span>
+              <span className="text-xs text-slate-500">Rows:</span>
               <select
                 value={billsPageSize}
                 onChange={(e) => {
                   setBillsPageSize(Number(e.target.value));
                   setBillsPage(1);
                 }}
-                className="text-xs font-semibold px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none cursor-pointer"
+                className="text-xs font-medium px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none cursor-pointer"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -1281,17 +1240,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-[11px] border-b border-slate-200">
+              <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">Salon Business</th>
-                  <th className="px-4 py-3">Location</th>
-                  <th className="px-4 py-3">Sales Put In</th>
-                  <th className="px-4 py-3">Total Invoiced (INR)</th>
-                  <th className="px-4 py-3">Average Ticket</th>
-                  <th className="px-4 py-3">Platform Share</th>
-                  <th className="px-4 py-3 text-right">Quick Filter</th>
+                  <th className="px-4 py-2.5">Salon Business</th>
+                  <th className="px-4 py-2.5">Location</th>
+                  <th className="px-4 py-2.5">Sales Put In</th>
+                  <th className="px-4 py-2.5">Total Invoiced (INR)</th>
+                  <th className="px-4 py-2.5">Average Ticket</th>
+                  <th className="px-4 py-2.5">Platform Share</th>
+                  <th className="px-4 py-2.5 text-right">Quick Filter</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-sans">
@@ -1303,53 +1262,53 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </tr>
                 ) : (
                   salonContributions.map((sc, idx) => (
-                    <tr key={sc.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono text-slate-400 font-bold w-4">{idx + 1}</span>
+                    <tr key={sc.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-slate-400 font-medium w-4">{idx + 1}</span>
                           <div>
-                            <span className="font-bold text-slate-900 block">{sc.name}</span>
+                            <span className="font-semibold text-slate-900 block">{sc.name}</span>
                             <span className="text-[10px] text-slate-400 font-mono">ID: {sc.id.slice(0, 8)}...</span>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5 text-slate-700">{sc.city}</td>
+                      <td className="px-4 py-2.5 text-slate-600">{sc.city}</td>
 
-                      <td className="px-4 py-3.5">
-                        <span className="font-mono font-bold text-slate-900">{sc.billsCount} sales</span>
+                      <td className="px-4 py-2.5 font-medium text-slate-800">
+                        {sc.billsCount} sales
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono font-bold text-slate-900 text-sm">
+                      <td className="px-4 py-2.5 font-semibold text-slate-900 tabular-nums">
                         {formatCurrency(sc.totalAmountMinor)}
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono text-slate-700">
+                      <td className="px-4 py-2.5 text-slate-600 tabular-nums">
                         {formatCurrency(sc.avgBillMinor)}
                       </td>
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-2.5">
                         <div className="flex items-center gap-2">
-                          <div className="w-16 h-2 rounded-full bg-slate-100 overflow-hidden">
+                          <div className="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                             <div
-                              className="h-full bg-black rounded-full"
+                              className="h-full bg-[#0F4C5C] rounded-full"
                               style={{ width: `${Math.min(100, sc.percentShare)}%` }}
                             />
                           </div>
-                          <span className="font-mono font-bold text-slate-900 text-[11px]">
+                          <span className="font-medium text-slate-700 text-[11px] tabular-nums">
                             {sc.percentShare}%
                           </span>
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-2.5 text-right">
                         <button
                           onClick={() => {
                             setSelectedSalonFilter(sc.id);
                             setActiveTab('all_bills');
                             setBillsPage(1);
                           }}
-                          className="px-2.5 py-1 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold hover:border-black hover:text-black hover:bg-neutral-50 transition-colors cursor-pointer"
+                          className="px-2.5 py-1 rounded-md border border-slate-200 text-slate-700 text-xs font-medium hover:border-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
                         >
                           Filter Salon
                         </button>
@@ -1366,27 +1325,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* TAB 5: 100 QUOTA & PRO UPGRADE TRACKER */}
       {activeTab === 'subscription_revenue' && (
         <div className="space-y-6">
-          {/* Top KPI Cards for Subscription & Revenue in Emerald/Teal Modern Style */}
+          {/* Top KPI Cards for Subscription & Revenue */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <KPICard
               title="Total Settled Revenue"
               value={formatCurrency(totalPaidMinor)}
               subtitle={`${scopedPayments.length} verified completed transactions`}
-              tone="revenue"
               icon={DollarSign}
             />
             <KPICard
               title="Active SaaS Salons"
               value={salonTierLedger.filter((s) => s.tier !== 'Free Trial').length}
               subtitle="Active on Pro tiers (₹1,499 / ₹2,799 / ₹4,999)"
-              tone="brand"
               icon={Building2}
             />
             <KPICard
               title="Free Trials & Onboarding"
               value={salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
               subtitle="Salons using 100 free sales quota"
-              tone="trial"
               icon={Users}
             />
             <KPICard
@@ -1395,7 +1351,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 salonTierLedger.length > 0 ? Math.round(totalPaidMinor / salonTierLedger.length) : 0
               )}
               subtitle="Overall platform ARPU"
-              tone="conversion"
               icon={TrendingUp}
             />
           </div>
@@ -1406,20 +1361,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="lg:col-span-2 panel space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-semibold text-slate-900">
                     Monthly Revenue Trajectory &amp; Collections
                   </h3>
                   <p className="text-xs text-slate-500">
                     Real volume tracked from verified payment records and billing invoices in Supabase
                   </p>
                 </div>
-                <div className="flex items-center gap-3 text-xs font-semibold">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-black inline-block" />
+                <div className="flex items-center gap-3 text-xs font-medium">
+                  <div className="flex items-center gap-1.5 text-slate-700">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#0F4C5C] inline-block" />
                     <span>Collected (INR)</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-neutral-400 inline-block" />
+                  <div className="flex items-center gap-1.5 text-slate-700">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#0d9488] inline-block" />
                     <span>Invoiced (INR)</span>
                   </div>
                 </div>
@@ -1429,21 +1384,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {monthlyRevenueTrend.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={monthlyRevenueTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.7} />
-                      <XAxis dataKey="month" stroke="#64748b" fontSize={11} tickLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" opacity={0.8} />
+                      <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
                       <YAxis
-                        stroke="#64748b"
+                        stroke="#94a3b8"
                         fontSize={11}
                         tickLine={false}
                         tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                       />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: '#0b1220',
-                          borderColor: '#1e293b',
-                          color: '#f8fafc',
-                          borderRadius: '12px',
+                          backgroundColor: '#ffffff',
+                          borderColor: '#e2e8f0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.08)',
                           fontSize: '11px',
+                          color: '#0f172a',
                         }}
                         formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Amount']}
                       />
@@ -1451,20 +1407,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         type="monotone"
                         dataKey="collected"
                         name="Collected Revenue"
-                        stroke="#000000"
-                        strokeWidth={2.5}
-                        fill="#000000"
-                        fillOpacity={0.15}
+                        stroke="#0F4C5C"
+                        strokeWidth={2}
+                        fill="#0F4C5C"
+                        fillOpacity={0.12}
                       />
                       <Area
                         type="monotone"
                         dataKey="invoiced"
                         name="Invoiced Total"
-                        stroke="#71717a"
-                        strokeWidth={2}
+                        stroke="#0d9488"
+                        strokeWidth={1.75}
                         strokeDasharray="4 4"
-                        fill="#71717a"
-                        fillOpacity={0.08}
+                        fill="#0d9488"
+                        fillOpacity={0.06}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -1479,7 +1435,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* Subscription Tier Distribution */}
             <div className="panel space-y-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-semibold text-slate-900">
                   Subscription Tier Distribution
                 </h3>
                 <p className="text-xs text-slate-500">
@@ -1487,31 +1443,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </p>
               </div>
 
-              <div className="space-y-3.5 pt-1">
+              <div className="space-y-2.5 pt-1">
                 {[
                   {
                     name: 'Pro SaaS Tier',
                     desc: 'Multi-stylist (>2 staff) or high sales volume',
                     count: salonTierLedger.filter((s) => s.tier === 'Pro SaaS').length,
-                    badge: 'bg-black text-white border-black',
+                    badge: 'bg-teal-50 text-[#0F4C5C] border-teal-200/70',
                   },
                   {
                     name: 'Starter SaaS Tier',
                     desc: 'Independent stylist / boutique setup (1-2 staff)',
                     count: salonTierLedger.filter((s) => s.tier === 'Starter SaaS').length,
-                    badge: 'bg-neutral-800 text-white border-neutral-800',
+                    badge: 'bg-slate-100 text-slate-700 border-slate-200',
                   },
                   {
                     name: 'Free Trial (100 Sales Quota)',
                     desc: 'Newly registered salons using 100 free sales',
                     count: salonTierLedger.filter((s) => s.tier === 'Free Trial').length,
-                    badge: 'bg-neutral-100 text-neutral-900 border-neutral-300',
+                    badge: 'bg-amber-50 text-amber-700 border-amber-200/70',
                   },
                 ].map((tier, idx) => (
-                  <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
+                  <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-xs text-slate-900">{tier.name}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${tier.badge}`}>
+                      <span className="font-semibold text-xs text-slate-900">{tier.name}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${tier.badge}`}>
                         {tier.count} Salons
                       </span>
                     </div>
@@ -1526,7 +1482,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="panel overflow-hidden space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-semibold text-slate-900">
                   Salon Subscription Accounts &amp; Financial Contribution
                 </h3>
                 <p className="text-xs text-slate-500">
@@ -1549,60 +1505,60 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               />
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-[11px] border-b border-slate-200">
+                <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-3">Salon Business &amp; City</th>
-                    <th className="px-4 py-3">Subscription Tier</th>
-                    <th className="px-4 py-3">Collected Revenue</th>
-                    <th className="px-4 py-3">Invoiced Volume</th>
-                    <th className="px-4 py-3">Transactions</th>
-                    <th className="px-4 py-3">Last Active</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                    <th className="px-4 py-2.5">Salon Business &amp; City</th>
+                    <th className="px-4 py-2.5">Subscription Tier</th>
+                    <th className="px-4 py-2.5">Collected Revenue</th>
+                    <th className="px-4 py-2.5">Invoiced Volume</th>
+                    <th className="px-4 py-2.5">Transactions</th>
+                    <th className="px-4 py-2.5">Last Active</th>
+                    <th className="px-4 py-2.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-sans">
                   {salonTierLedger.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3.5">
-                        <div className="font-bold text-slate-900">{item.name}</div>
+                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-4 py-2.5">
+                        <div className="font-semibold text-slate-900">{item.name}</div>
                         <div className="text-[11px] text-slate-500 flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-slate-400" />
                           <span>{item.city}</span>
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${item.tierBadge}`}>
+                      <td className="px-4 py-2.5">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${item.tierBadge}`}>
                           {item.tier}
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono font-bold text-slate-900 text-sm">
+                      <td className="px-4 py-2.5 font-semibold text-slate-900 tabular-nums">
                         {formatCurrency(item.collectedMinor)}
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono text-slate-700">
+                      <td className="px-4 py-2.5 text-slate-600 tabular-nums">
                         {formatCurrency(item.billedMinor)}
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono text-slate-800">
+                      <td className="px-4 py-2.5 text-slate-600">
                         {item.txnCount} settled txns
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono text-slate-500">
+                      <td className="px-4 py-2.5 text-slate-500">
                         {formatDateTime(item.lastActive)}
                       </td>
 
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-2.5 text-right">
                         <button
                           onClick={() => {
                             setSelectedSalonFilter(item.id);
                             setActiveTab('all_bills');
                             setBillsPage(1);
                           }}
-                          className="px-2.5 py-1 rounded-lg border border-slate-300 text-xs font-semibold hover:border-black hover:text-black hover:bg-neutral-50 transition-colors cursor-pointer"
+                          className="text-xs font-medium text-[#0F4C5C] hover:underline cursor-pointer"
                         >
                           View Sales
                         </button>

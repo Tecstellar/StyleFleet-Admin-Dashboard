@@ -16,23 +16,23 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' })
 
   const normalized = status.toLowerCase().trim();
 
-  let styles = 'bg-neutral-100 text-neutral-700 border-neutral-200';
+  let styles = 'bg-slate-50 text-slate-600 border-slate-200';
 
   if (['active', 'completed', 'paid', 'resolved', 'processed', 'done'].includes(normalized)) {
-    styles = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    styles = 'bg-emerald-50 text-emerald-700 border-emerald-200/70';
   } else if (['pending', 'in_progress', 'open', 'not confirmed'].includes(normalized)) {
-    styles = 'bg-neutral-100 text-neutral-800 border-neutral-300 font-semibold';
+    styles = 'bg-amber-50 text-amber-700 border-amber-200/70';
   } else if (['cancelled', 'closed', 'expired', 'failed', 'deleted'].includes(normalized)) {
-    styles = 'bg-rose-50 text-rose-700 border-rose-200';
+    styles = 'bg-rose-50 text-rose-700 border-rose-200/70';
   } else if (['confirmed'].includes(normalized)) {
-    styles = 'bg-neutral-900 text-white border-neutral-900';
+    styles = 'bg-teal-50 text-[#0F4C5C] border-teal-200/70 font-semibold';
   }
 
-  const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs font-semibold';
+  const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
 
   return (
-    <span className={`inline-flex items-center rounded border font-medium capitalize tracking-wide transition-colors ${styles} ${sizeClasses}`}>
-      <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-80" />
+    <span className={`inline-flex items-center rounded-md border capitalize font-medium transition-colors ${styles} ${sizeClasses}`}>
+      <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-70" />
       {status}
     </span>
   );

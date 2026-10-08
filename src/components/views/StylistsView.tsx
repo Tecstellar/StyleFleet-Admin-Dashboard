@@ -437,84 +437,86 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
       </div>
 
       {/* Control Bar: Search, Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
-        <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search stylist by name, phone, salon, or role..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-black focus:bg-white transition-all"
+      <div className="panel">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search stylist by name, phone, salon, or role..."
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F4C5C] focus:bg-white transition-all"
+              />
+            </div>
+
+            {/* Salon Dropdown Filter */}
+            <div className="min-w-[160px]">
+              <select
+                value={selectedShopFilter}
+                onChange={(e) => setSelectedShopFilter(e.target.value)}
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              >
+                <option value="all">All Salons ({shops.length})</option>
+                {shops.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Invitation Status Filter */}
+            <div className="min-w-[140px]">
+              <select
+                value={inviteStatusFilter}
+                onChange={(e) => setInviteStatusFilter(e.target.value)}
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              >
+                <option value="all">All Invite Statuses</option>
+                <option value="active">App Active</option>
+                <option value="invited">Invited</option>
+                <option value="not_invited">Not Invited</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            <ExportButton
+              data={filteredStaff.map((s) => {
+                const perms = s.permissions || DEFAULT_STYLIST_PERMISSIONS;
+                return {
+                  Name: s.name,
+                  Role: s.role,
+                  Phone: s.phone ? `+91 ${s.phone}` : '—',
+                  Salon: s.shop?.name || '—',
+                  Status: s.is_active ? 'Active' : 'Inactive',
+                  Invitation: s.invitation_status || 'not_invited',
+                  InvitedAt: s.invited_at ? formatDate(s.invited_at) : '—',
+                  CustomersAccess: perms.customers ? 'Yes' : 'No',
+                  SalesAccess: perms.sales ? 'Yes' : 'No',
+                  AppointmentsAccess: perms.appointments ? 'Yes' : 'No',
+                  RemindersAccess: perms.reminders ? 'Yes' : 'No',
+                  ExpensesAccess: perms.expenses ? 'Yes' : 'No',
+                  ReportsAccess: perms.reports ? 'Yes' : 'No',
+                  TeamAccess: perms.team ? 'Yes' : 'No',
+                  ProfileAccess: perms.profile ? 'Yes' : 'No',
+                };
+              })}
+              filename="stylefleet_stylists_roster.csv"
             />
-          </div>
 
-          {/* Salon Dropdown Filter */}
-          <div className="min-w-[160px]">
-            <select
-              value={selectedShopFilter}
-              onChange={(e) => setSelectedShopFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-800 focus:outline-none focus:border-black transition-all"
+            <button
+              onClick={handleOpenAdd}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F4C5C] text-white hover:bg-[#0c3c49] text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
-              <option value="all">All Salons ({shops.length})</option>
-              {shops.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              <Plus className="w-3.5 h-3.5 text-white" />
+              <span>Add Stylist</span>
+            </button>
           </div>
-
-          {/* Invitation Status Filter */}
-          <div className="min-w-[140px]">
-            <select
-              value={inviteStatusFilter}
-              onChange={(e) => setInviteStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-800 focus:outline-none focus:border-black transition-all"
-            >
-              <option value="all">All Invite Statuses</option>
-              <option value="active">App Active</option>
-              <option value="invited">Invited</option>
-              <option value="not_invited">Not Invited</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <ExportButton
-            data={filteredStaff.map((s) => {
-              const perms = s.permissions || DEFAULT_STYLIST_PERMISSIONS;
-              return {
-                Name: s.name,
-                Role: s.role,
-                Phone: s.phone ? `+91 ${s.phone}` : '—',
-                Salon: s.shop?.name || '—',
-                Status: s.is_active ? 'Active' : 'Inactive',
-                Invitation: s.invitation_status || 'not_invited',
-                InvitedAt: s.invited_at ? formatDate(s.invited_at) : '—',
-                CustomersAccess: perms.customers ? 'Yes' : 'No',
-                SalesAccess: perms.sales ? 'Yes' : 'No',
-                AppointmentsAccess: perms.appointments ? 'Yes' : 'No',
-                RemindersAccess: perms.reminders ? 'Yes' : 'No',
-                ExpensesAccess: perms.expenses ? 'Yes' : 'No',
-                ReportsAccess: perms.reports ? 'Yes' : 'No',
-                TeamAccess: perms.team ? 'Yes' : 'No',
-                ProfileAccess: perms.profile ? 'Yes' : 'No',
-              };
-            })}
-            filename="stylefleet_stylists_roster.csv"
-          />
-
-          <button
-            onClick={handleOpenAdd}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-black text-white hover:bg-neutral-800 text-xs font-bold transition-all shadow-xs cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-white" />
-            <span>Add Stylist</span>
-          </button>
         </div>
       </div>
 

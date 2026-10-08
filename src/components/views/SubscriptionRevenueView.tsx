@@ -378,14 +378,14 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       render: (s) => (
         <button
           onClick={() => setSelectedSalonDrilldown(selectedSalonDrilldown === s.id ? null : s.id)}
-          className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
+          className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
             selectedSalonDrilldown === s.id
-              ? 'bg-black text-white'
-              : 'bg-neutral-100 text-neutral-900 hover:bg-black hover:text-white'
+              ? 'bg-[#0F4C5C] text-white shadow-xs'
+              : 'text-[#0F4C5C] hover:text-[#093540] hover:bg-teal-50'
           }`}
         >
           <span>{selectedSalonDrilldown === s.id ? 'Hide Payments' : 'View Payments'}</span>
-          <ArrowRight className="w-3 h-3" />
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       ),
     },
@@ -445,16 +445,16 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-black text-white shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-teal-50 text-[#0F4C5C] border border-teal-100 shadow-xs">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-neutral-900">
+              <h1 className="text-xl font-bold tracking-tight text-slate-900">
                 Revenue Trend &amp; Collections
               </h1>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                100% verified transactional collections from Supabase table <code className="text-black font-semibold font-mono">public.payments</code>.
+              <p className="text-xs text-slate-500 mt-0.5">
+                Verified transactional settlements from database table <code className="text-[#0F4C5C] font-semibold font-mono">public.payments</code>.
               </p>
             </div>
           </div>
@@ -475,12 +475,12 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         />
       </div>
 
-      {/* Honest Database Reality Banner */}
-      <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-xs text-neutral-700 shadow-2xs">
-        <ShieldCheck className="w-4 h-4 text-black shrink-0" />
-        <span className="font-semibold text-neutral-900">Verified Supabase Data Only:</span>
-        <span>
-          Rendering exact settlement records from {filteredPayments.length} transactions across {activeContributingSalons} salons. Zero artificial tiers or synthetic plans.
+      {/* Database Reality Banner */}
+      <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-teal-200/60 bg-teal-50/50 text-xs text-[#0F4C5C]">
+        <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F4C5C]" />
+        <span className="font-semibold">Verified Supabase Data Only:</span>
+        <span className="text-slate-600">
+          Rendering exact settlement records from {filteredPayments.length} transactions across {activeContributingSalons} salons. Zero artificial tiers.
         </span>
       </div>
 
@@ -517,17 +517,17 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       </div>
 
       {/* True Revenue Trend Chart */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-4 shadow-xs">
+      <div className="panel space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-neutral-900">
+            <h3 className="text-sm font-semibold text-slate-900">
               Daily Revenue Trend &amp; Collections Velocity
             </h3>
-            <p className="text-xs text-neutral-500">
-              Actual financial inflow calculated directly from timestamps in public.payments
+            <p className="text-xs text-slate-500">
+              Financial inflow calculated directly from timestamps in public.payments
             </p>
           </div>
-          <span className="text-xs font-mono font-bold text-neutral-900">
+          <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
             {dailyRevenueTrend.length} Settlement Days
           </span>
         </div>
@@ -536,36 +536,37 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           {dailyRevenueTrend.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dailyRevenueTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.6} />
-                <XAxis dataKey="displayDate" stroke="#71717A" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="displayDate" stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <YAxis
-                  stroke="#71717A"
+                  stroke="#94a3b8"
                   fontSize={11}
                   tickLine={false}
                   tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#09090B',
-                    borderColor: '#27272A',
-                    color: '#FFFFFF',
-                    borderRadius: '0.75rem',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                    borderRadius: '8px',
                     fontSize: '11px',
+                    color: '#0f172a',
                   }}
                   formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Collected Revenue']}
                 />
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#000000"
-                  strokeWidth={2.5}
-                  fill="#000000"
-                  fillOpacity={0.12}
+                  stroke="#0F4C5C"
+                  strokeWidth={2}
+                  fill="#0F4C5C"
+                  fillOpacity={0.08}
                 />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-xs text-neutral-400">
+            <div className="h-full flex items-center justify-center text-xs text-slate-400">
               No payment transactions match the active date or filter window.
             </div>
           )}
@@ -573,25 +574,20 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       </div>
 
       {/* Multi-Attribute Filter Toolbar */}
-      <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100">
-          <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
-            <Sparkles className="w-4 h-4 text-black" />
+      <div className="panel space-y-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+            <Filter className="w-3.5 h-3.5 text-[#0F4C5C]" />
             <span>Revenue Filters (Region, Salon, Method &amp; Exact Date)</span>
           </div>
 
           {/* Quick Date Presets */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-semibold text-neutral-400 mr-1">Presets:</span>
+          <div className="segmented-control">
             {(['all', 'today', 'yesterday', '7d', '30d'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => handlePreset(p)}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors capitalize ${
-                  datePreset === p && !exactDate
-                    ? 'bg-black text-white'
-                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                }`}
+                className={`segment capitalize ${datePreset === p && !exactDate ? 'active' : ''}`}
               >
                 {p === '7d' ? 'Last 7 Days' : p === '30d' ? 'Last 30 Days' : p}
               </button>
@@ -602,31 +598,31 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
           {/* 1. Omni Search */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1">
+            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
               Search Reference / ID
             </label>
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ID, reference note..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-black focus:bg-white transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F4C5C] focus:bg-white transition-all"
               />
             </div>
           </div>
 
           {/* 2. City Filter */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-[#0F4C5C]" />
               <span>City / Region</span>
             </label>
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
             >
               <option value="all">All Cities ({uniqueCities.length})</option>
               {uniqueCities.map((c) => (
@@ -639,14 +635,14 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
 
           {/* 3. Salon Dropdown */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <Building2 className="w-3 h-3 text-[#0F4C5C]" />
               <span>Filter by Salon</span>
             </label>
             <select
               value={salonFilter}
               onChange={(e) => setSalonFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
             >
               <option value="all">All Salons ({deduplicatedShops.length})</option>
               {deduplicatedShops.map((s) => (
@@ -659,14 +655,14 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
 
           {/* 4. Payment Method */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <CreditCard className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <CreditCard className="w-3 h-3 text-[#0F4C5C]" />
               <span>Payment Mode</span>
             </label>
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
             >
               <option value="all">All Payment Modes</option>
               {uniqueMethods.map((m) => (
@@ -679,8 +675,8 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
 
           {/* 5. Exact Date */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-[#0F4C5C]" />
               <span>Exact Date</span>
             </label>
             <input
@@ -690,22 +686,22 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 setExactDate(e.target.value);
                 setDatePreset('all');
               }}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
             />
           </div>
         </div>
 
         {/* Clear Filters */}
         {isAnyFilterActive && (
-          <div className="flex items-center justify-between pt-2 text-xs border-t border-neutral-100">
-            <span className="text-neutral-500 font-medium">
-              Showing <span className="font-bold text-black">{filteredPayments.length}</span> matching settlements
+          <div className="flex items-center justify-between pt-2 text-xs border-t border-slate-100">
+            <span className="text-slate-500 font-medium">
+              Showing <span className="font-semibold text-slate-900">{filteredPayments.length}</span> matching settlements
               {cityFilter !== 'all' && ` in ${cityFilter}`}
               {salonFilter !== 'all' && ` for ${shopMap.get(salonFilter)?.name}`}
             </span>
             <button
               onClick={resetFilters}
-              className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-lg bg-neutral-100 text-black hover:bg-neutral-200 font-semibold transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
               <span>Clear All Filters</span>

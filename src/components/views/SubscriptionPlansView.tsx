@@ -325,18 +325,18 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner / Header */}
-      <div className="bg-black text-white p-6 sm:p-8 rounded-2xl border border-black shadow-lg relative overflow-hidden">
+      <div className="bg-[#0F4C5C] text-white p-6 sm:p-7 rounded-2xl border border-[#145B6E] shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold border border-white/20">
-              <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-xs font-semibold border border-white/20">
+              <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
               <span>Free Tier Quota: 100 Sales per Registered Salon</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Subscription & Free Sales Quota Hub
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              Subscription &amp; Free Sales Quota Hub
             </h1>
-            <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
-              Every salon gets <strong>100 free sales from their registration date</strong>. Monitor completed sales, quota consumption, remaining free slots, and manage Pro Plan upgrades in real time.
+            <p className="text-teal-100/90 text-xs sm:text-sm leading-relaxed">
+              Every salon gets <strong>100 free sales from their registration date</strong>. Monitor completed sales, quota consumption, and manage Pro Plan upgrades in real time.
             </p>
           </div>
 
@@ -482,22 +482,22 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
         {/* Status Pills Quick Filter */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-100 text-xs">
-          <span className="text-[11px] font-extrabold uppercase text-neutral-400 mr-1">Quick View:</span>
+          <span className="text-[11px] font-semibold uppercase text-slate-400 mr-1">Quick View:</span>
           <button
             onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'all'
-                ? 'bg-black text-white'
-                : 'bg-neutral-100 text-neutral-600 hover:text-black hover:bg-neutral-200'
+                ? 'bg-[#0F4C5C] text-white shadow-xs'
+                : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
             }`}
           >
             All Salons ({quotaSummaries.length})
           </button>
           <button
             onClick={() => setStatusFilter('nearing_limit')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'nearing_limit'
-                ? 'bg-black text-amber-300 border border-black'
+                ? 'bg-amber-600 text-white shadow-xs'
                 : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
             }`}
           >
@@ -506,10 +506,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </button>
           <button
             onClick={() => setStatusFilter('free_active')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'free_active'
-                ? 'bg-black text-white'
-                : 'bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                ? 'bg-[#0F4C5C] text-white shadow-xs'
+                : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -517,10 +517,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </button>
           <button
             onClick={() => setStatusFilter('pro_required')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'pro_required'
-                ? 'bg-black text-white'
-                : 'bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                ? 'bg-rose-600 text-white shadow-xs'
+                : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
             }`}
           >
             <AlertTriangle className="w-3.5 h-3.5" />
@@ -529,13 +529,13 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           {upgradedCount > 0 && (
             <button
               onClick={() => setStatusFilter('upgraded')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'upgraded'
-                  ? 'bg-black text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                  ? 'bg-[#0F4C5C] text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
-              <Crown className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+              <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
               Pro Active ({upgradedCount})
             </button>
           )}

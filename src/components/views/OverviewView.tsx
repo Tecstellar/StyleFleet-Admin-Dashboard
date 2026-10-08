@@ -199,27 +199,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     <div className="space-y-6">
       {/* Overview Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-black text-white shadow-xs">
-            <LayoutGrid className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-                Overview
-              </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black text-white">
-                LIVE
-              </span>
-            </div>
-            <p className="text-xs text-neutral-500 mt-0.5">
-              High-level operational overview across all connected salons, stylists, customer footfall, and ecosystem health.
-            </p>
-          </div>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+            Operations Overview
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            High-level operational overview across all connected salons, stylists, customer footfall, and ecosystem health.
+          </p>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* IronDrobe Segmented Date Range Controls */}
+          {/* Segmented Date Range Controls */}
           <div className="segmented-control">
             {[
               { id: 'today', label: 'Today' },
@@ -263,11 +253,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       </div>
 
       {/* DOMAIN SECTION 1: PLATFORM ECOSYSTEM SUMMARY */}
-      <div className="overview-section overview-section--live">
+      <div className="overview-section">
         <div className="flex items-center justify-between">
           <span className="overview-section-title">Ecosystem Footprint</span>
-          <span className="text-[11px] font-mono font-medium text-neutral-600">
-            Window: <strong className="text-neutral-900">{dateRange.label}</strong> (Real-time Supabase sync)
+          <span className="text-[11px] text-slate-500">
+            Window: <span className="font-medium text-slate-800">{dateRange.label}</span>
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -275,7 +265,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="Connected Salons"
             value={formatNumber(shops.length)}
             subtitle="Registered partner salons"
-            tone="usage"
             icon={Store}
             onClick={() => onNavigate('salons_360')}
           />
@@ -283,15 +272,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="Sales Invoices"
             value={formatNumber(scopedBills.length)}
             subtitle={`${scopedBills.filter((b) => b.status === 'paid').length} settled • ${dateRange.label}`}
-            tone="order-good"
             icon={Receipt}
             onClick={() => onNavigate('daily_bills')}
           />
           <KPICard
             title="Active Stylists"
             value={formatNumber(staff.length)}
-            subtitle={`${staff.filter((s) => s.invitation_status === 'active').length} active on mobile app`}
-            tone="brand"
+            subtitle={`${staff.filter((s) => s.invitation_status === 'active').length} active stylists`}
             icon={Scissors}
             onClick={() => onNavigate('staff_access')}
           />
@@ -299,7 +286,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="Customer Footfall"
             value={formatNumber(scopedCustomers.length)}
             subtitle={`${selectedOption === 'all_time' ? 'Total client profiles' : `Tracked in ${dateRange.label}`}`}
-            tone="signup"
             icon={Users}
             onClick={() => onNavigate('customer_tracking')}
           />
@@ -307,11 +293,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       </div>
 
       {/* DOMAIN SECTION 2: FINANCIAL VELOCITY & QUOTA HEALTH */}
-      <div className="overview-section overview-section--revenue">
+      <div className="overview-section">
         <div className="flex items-center justify-between">
           <span className="overview-section-title">Financial Velocity &amp; Quota Health</span>
-          <span className="text-[11px] font-mono font-medium text-neutral-600">
-            Window: <strong className="text-neutral-900">{dateRange.label}</strong>
+          <span className="text-[11px] text-slate-500">
+            Window: <span className="font-medium text-slate-800">{dateRange.label}</span>
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -319,7 +305,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="Invoiced Sales"
             value={formatCurrency(totalBilledMinor)}
             subtitle={`Gross sales in ${dateRange.label}`}
-            tone="revenue"
             icon={DollarSign}
             onClick={() => onNavigate('revenue_trend')}
           />
@@ -327,7 +312,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="Collections Settled"
             value={formatCurrency(totalCollectedMinor)}
             subtitle={`${scopedPayments.length} verified transactions • ${dateRange.label}`}
-            tone="brand"
             icon={TrendingUp}
             onClick={() => onNavigate('revenue_trend')}
           />
@@ -335,7 +319,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="Average Ticket Size"
             value={formatCurrency(avgTicketMinor)}
             subtitle={`Per invoice • ${dateRange.label}`}
-            tone="conversion"
             icon={Receipt}
             onClick={() => onNavigate('daily_bills')}
           />
@@ -343,7 +326,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             title="In 100-Trial Quota"
             value={salonPerformance.filter((s) => s.quotaStatus === 'free').length}
             subtitle={`${salonPerformance.filter((s) => s.quotaStatus === 'limit').length} reached 100 sales limit`}
-            tone="trial"
             icon={CheckCircle2}
             onClick={() => onNavigate('subscription_plans')}
           />
@@ -356,16 +338,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         <div className="lg:col-span-2 panel space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-black" />
-                <span>Partner Salon Directory &amp; Quota Consumption</span>
+              <h3 className="text-sm font-semibold text-slate-900">
+                Partner Salon Directory &amp; Quota Consumption
               </h3>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-slate-500">
                 Live performance ranking, completed sales, and 100 free sales quota tracker.
               </p>
             </div>
 
-            <div className="text-xs font-mono text-neutral-600">
+            <div className="text-xs text-slate-500">
               {filteredSalons.length} salon(s) in scope
             </div>
           </div>
@@ -373,20 +354,20 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           {/* Search & City Filter Bar */}
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search by salon name, city, phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50/70 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-black focus:bg-white transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
               />
             </div>
 
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="w-full sm:w-auto px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50/70 text-neutral-900 font-semibold focus:outline-none focus:border-black"
+              className="w-full sm:w-auto px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 font-medium focus:outline-none focus:border-slate-400"
             >
               <option value="all">All Cities ({uniqueCities.length})</option>
               {uniqueCities.map((c) => (
@@ -398,16 +379,16 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-[11px] border-b border-slate-200">
+              <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                 <tr>
-                  <th className="px-3.5 py-3">Salon Business</th>
-                  <th className="px-3.5 py-3">Location</th>
-                  <th className="px-3.5 py-3">Sales Done ({dateRange.label})</th>
-                  <th className="px-3.5 py-3">100 Quota Usage</th>
-                  <th className="px-3.5 py-3">Invoiced Volume ({dateRange.label})</th>
-                  <th className="px-3.5 py-3 text-right">Action</th>
+                  <th className="px-3.5 py-2.5">Salon Business</th>
+                  <th className="px-3.5 py-2.5">Location</th>
+                  <th className="px-3.5 py-2.5">Sales Done ({dateRange.label})</th>
+                  <th className="px-3.5 py-2.5">100 Quota Usage</th>
+                  <th className="px-3.5 py-2.5">Invoiced Volume ({dateRange.label})</th>
+                  <th className="px-3.5 py-2.5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-sans">
@@ -419,53 +400,51 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   </tr>
                 ) : (
                   filteredSalons.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-3.5 py-3.5">
-                        <div className="font-bold text-slate-900">{s.name}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                    <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-3.5 py-2.5">
+                        <div className="font-semibold text-slate-900">{s.name}</div>
+                        <div className="text-[11px] text-slate-400">
                           {s.phone || 'No phone'}
                         </div>
                       </td>
 
-                      <td className="px-3.5 py-3.5">
-                        <div className="flex items-center gap-1 text-slate-700">
+                      <td className="px-3.5 py-2.5">
+                        <div className="flex items-center gap-1 text-slate-600">
                           <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{s.city || 'Kalugumalai'}</span>
                         </div>
                       </td>
 
-                      <td className="px-3.5 py-3.5">
-                        <span className="font-mono font-bold text-slate-900">
-                          {s.salesCount} sales
-                        </span>
+                      <td className="px-3.5 py-2.5 font-medium text-slate-800">
+                        {s.salesCount} sales
                       </td>
 
-                      <td className="px-3.5 py-3.5">
+                      <td className="px-3.5 py-2.5">
                         <div className="space-y-1 max-w-[140px]">
                           <div className="flex items-center justify-between text-[10px]">
-                            <span className="font-mono font-semibold text-slate-600">
+                            <span className="font-medium text-slate-600 tabular-nums">
                               {s.lifetimeSalesCount} / 100
                             </span>
                             <span
-                              className={`font-bold ${
+                              className={`font-semibold ${
                                 s.quotaStatus === 'limit'
                                   ? 'text-rose-600'
                                   : s.quotaStatus === 'warning'
                                   ? 'text-amber-600'
-                                  : 'text-neutral-900'
+                                  : 'text-emerald-700'
                               }`}
                             >
                               {s.quotaStatus === 'limit' ? 'Limit Reached' : `${s.quotaRemaining} free left`}
                             </span>
                           </div>
-                          <div className="w-full h-1.5 rounded-full bg-neutral-100 overflow-hidden">
+                          <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all ${
                                 s.quotaStatus === 'limit'
                                   ? 'bg-rose-500'
                                   : s.quotaStatus === 'warning'
                                   ? 'bg-amber-500'
-                                  : 'bg-[#1c1f26]'
+                                  : 'bg-[#0F4C5C]'
                               }`}
                               style={{ width: `${s.quotaPercent}%` }}
                             />
@@ -473,22 +452,21 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                         </div>
                       </td>
 
-                      <td className="px-3.5 py-3.5 font-mono font-bold text-neutral-900">
+                      <td className="px-3.5 py-2.5 font-semibold text-slate-900 tabular-nums">
                         {formatCurrency(s.billed)}
                       </td>
 
-                      <td className="px-3.5 py-3.5 text-right">
+                      <td className="px-3.5 py-2.5 text-right">
                         <button
                           onClick={() => {
                             if (onSelectSalon) onSelectSalon(s, 'billing');
                             else onNavigate('daily_bills');
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-neutral-100 hover:bg-[#1c1f26] text-neutral-800 hover:text-white transition-all cursor-pointer shadow-2xs"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md text-[#0F4C5C] bg-teal-50/70 hover:bg-teal-100/80 border border-teal-200/60 transition-colors cursor-pointer"
                           title="View Date-wise Billing & Payments"
                         >
-                          <Receipt className="w-3.5 h-3.5" />
+                          <Receipt className="w-3 h-3" />
                           <span>Manage</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                       </td>
                     </tr>
@@ -502,10 +480,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         {/* RIGHT COLUMN: QUICK LAUNCH & GEOGRAPHY */}
         <div className="space-y-6">
           {/* Quick Hub Navigation Cards */}
-          <div className="panel space-y-3.5">
-            <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-black" />
-              <span>Workspace Navigation</span>
+          <div className="panel space-y-3">
+            <h3 className="text-sm font-semibold text-slate-900">
+              Workspace Navigation
             </h3>
 
             <div className="grid grid-cols-1 gap-2">
@@ -546,20 +523,20 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   <button
                     key={idx}
                     onClick={() => onNavigate(item.view)}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl border border-neutral-200/80 hover:border-black bg-neutral-50/50 hover:bg-neutral-100 transition-all text-left cursor-pointer group"
+                    className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 hover:border-slate-300 bg-slate-50/40 hover:bg-slate-100/70 transition-all text-left cursor-pointer group"
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded-lg bg-white border border-neutral-200 text-black group-hover:bg-black group-hover:text-white transition-colors">
+                      <div className="p-1.5 rounded-md bg-white border border-slate-200 text-slate-700 group-hover:text-[#0F4C5C] transition-colors">
                         <Icon className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-neutral-900 group-hover:text-black transition-colors">
+                        <div className="text-xs font-semibold text-slate-900 group-hover:text-[#0F4C5C] transition-colors">
                           {item.title}
                         </div>
-                        <div className="text-[10px] text-neutral-500">{item.desc}</div>
+                        <div className="text-[10px] text-slate-500">{item.desc}</div>
                       </div>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0F4C5C] group-hover:translate-x-0.5 transition-all" />
                   </button>
                 );
               })}
@@ -567,24 +544,23 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
 
           {/* Geographic Distribution */}
-          <div className="panel space-y-3.5">
-            <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-black" />
-              <span>Geographic Distribution</span>
+          <div className="panel space-y-3">
+            <h3 className="text-sm font-semibold text-slate-900">
+              Geographic Distribution
             </h3>
 
             <div className="space-y-2.5">
               {cityDistribution.map((item, idx) => (
                 <div key={idx} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-neutral-800">{item.name}</span>
-                    <span className="font-mono text-neutral-500 text-[11px]">
+                    <span className="font-medium text-slate-800">{item.name}</span>
+                    <span className="text-slate-500 text-[11px] tabular-nums">
                       {item.count} salon(s) ({item.percent}%)
                     </span>
                   </div>
-                  <div className="w-full h-1.5 rounded-full bg-neutral-100 overflow-hidden">
+                  <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                     <div
-                      className="h-full bg-black rounded-full"
+                      className="h-full bg-[#0F4C5C] rounded-full"
                       style={{ width: `${item.percent}%` }}
                     />
                   </div>

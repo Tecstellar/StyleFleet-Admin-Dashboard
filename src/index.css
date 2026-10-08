@@ -84,75 +84,38 @@ body {
   background: rgba(148, 163, 184, 0.6);
 }
 
-/* Metric Card - Clean White & Emerald/Teal Modern Style */
+/* Metric Card - Clean Modern SaaS Card Style */
 .metric-card {
   background: #ffffff;
-  border: 1.5px solid #cbd5e1;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  padding: 16px 18px;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
   transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 108px;
+  min-height: 104px;
   position: relative;
-  overflow: hidden;
   box-sizing: border-box;
 }
 .metric-card:hover {
-  border-color: #94a3b8;
-  box-shadow: 0 4px 8px -1px rgba(15, 76, 92, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  transform: translateY(-1px);
-}
-
-.metric-tone-revenue,
-.metric-tone-order-good {
-  background: #ffffff;
   border-color: #cbd5e1;
-  border-left: 4px solid #059669; /* Emerald Green */
-}
-
-.metric-tone-usage,
-.metric-tone-brand,
-.metric-tone-conversion {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  border-left: 4px solid #0F4C5C; /* Deep Petrol Teal #0F4C5C */
-}
-
-.metric-tone-signup,
-.metric-tone-neutral {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  border-left: 4px solid #0d9488; /* Teal */
-}
-
-.metric-tone-trial,
-.metric-tone-order-warn {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  border-left: 4px solid #d97706; /* Amber */
-}
-
-.metric-tone-order-risk {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  border-left: 4px solid #dc2626; /* Rose/Red */
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 }
 
 .metric-card .metric-value {
-  color: #000000;
-  font-weight: 800;
+  color: #0f172a;
+  font-weight: 700;
 }
 
-/* IronDrobe Panel */
+/* Panel - Clean Surface */
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 16px 18px;
-  box-shadow: var(--shadow-sm);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
 }
 
 /* Overview Section Header */
@@ -160,73 +123,68 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  background: var(--surface);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
 }
 .overview-section-title {
   margin: 0;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-.overview-section--live,
-.overview-section--subscriptions,
-.overview-section--orders,
-.overview-section--revenue {
-  background: #ffffff;
-  border-color: #e4e4e7;
-}
-.overview-section--live .overview-section-title,
-.overview-section--subscriptions .overview-section-title,
-.overview-section--orders .overview-section-title,
-.overview-section--revenue .overview-section-title {
-  color: #09090b;
+  letter-spacing: 0.05em;
+  color: #64748b;
 }
 
-/* IronDrobe Controls */
+/* SaaS Controls */
 .btn-export {
-  border: 1px solid var(--brand);
-  background: var(--surface);
-  color: var(--brand);
-  font-size: 13px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12px;
   font-weight: 600;
   padding: 6px 12px;
-  border-radius: var(--radius);
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition: all 150ms ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
 }
 .btn-export:hover {
-  background: var(--brand);
-  color: #fff;
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
 }
 
 .segmented-control {
   display: inline-flex;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--surface-muted);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2px;
+  background: #f8fafc;
 }
 .segmented-control .segment {
   border: none;
   background: transparent;
-  color: var(--muted);
+  color: #64748b;
   font-size: 12px;
-  font-weight: 600;
-  padding: 6px 10px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition: all 150ms ease;
+}
+.segmented-control .segment:hover {
+  color: #0f172a;
 }
 .segmented-control .segment.active {
-  background: var(--brand);
-  color: #fff;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 /* Ensure input autofill maintains contrast */

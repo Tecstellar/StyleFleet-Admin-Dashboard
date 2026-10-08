@@ -13,74 +13,62 @@ export const KPICard: React.FC<KPICardProps> = ({
   unavailableReason,
   icon: Icon,
   onClick,
-  tone = 'revenue',
 }) => {
-  const toneClass = tone ? `metric-tone-${tone}` : 'metric-tone-revenue';
-  const isEmerald = tone === 'revenue' || tone === 'order-good' || tone === 'signup';
-
   return (
     <div
       onClick={onClick}
-      className={`metric-card group ${toneClass} ${
-        onClick ? 'cursor-pointer' : ''
+      className={`metric-card group ${
+        onClick ? 'cursor-pointer hover:-translate-y-0.5' : ''
       }`}
     >
-      {/* Top row: Label and Icon */}
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-[11px] font-bold tracking-wider text-black uppercase leading-snug whitespace-normal break-words">
+      {/* Top row: Label and Optional Subtle Icon */}
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span className="text-xs font-medium text-slate-500 truncate">
           {title}
         </span>
         {Icon && (
-          <div
-            className={`p-1.5 rounded-lg shrink-0 transition-colors ${
-              isEmerald
-                ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 group-hover:bg-emerald-100'
-                : 'bg-teal-50 text-[#0F4C5C] border border-teal-200 group-hover:bg-teal-100'
-            }`}
-          >
-            <Icon className="w-4 h-4 stroke-[2.25]" />
-          </div>
+          <Icon className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />
         )}
       </div>
 
       {/* Main Metric Value */}
-      <div className="my-1">
+      <div className="my-0.5">
         {isUnavailable ? (
-          <div className="text-[11px] font-bold text-black bg-slate-100 px-2 py-0.5 rounded border border-slate-300 inline-block">
+          <div className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded inline-block">
             Unavailable
           </div>
         ) : (
-          <div className="metric-value text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight font-mono text-black whitespace-normal break-words leading-tight">
+          <div className="metric-value text-2xl sm:text-[26px] font-bold tracking-tight text-slate-900 font-sans tabular-nums leading-tight">
             {value}
           </div>
         )}
       </div>
 
       {/* Footer: Subtitle and Trend */}
-      <div className="pt-2 mt-auto border-t border-slate-200 flex items-center justify-between gap-2 text-[11px]">
+      <div className="pt-2 mt-auto border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
         {isUnavailable ? (
-          <span className="text-black text-[11px] font-bold whitespace-normal break-words leading-tight">
+          <span className="text-slate-400 text-[11px]">
             {unavailableReason || 'Source unavailable'}
           </span>
         ) : (
           <>
-            <span className="text-black text-[11px] font-bold whitespace-normal break-words leading-tight">
+            <span className="text-slate-500 text-[11px] truncate">
               {subtitle || (isDateFilterable ? 'Filtered period' : 'All-time')}
             </span>
 
             {change && (
               <div
-                className={`inline-flex items-center gap-1 font-bold px-1.5 py-0.5 rounded-md text-[10.5px] shrink-0 ${
+                className={`inline-flex items-center gap-1 font-semibold text-[11px] shrink-0 ${
                   changeType === 'positive'
-                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    ? 'text-emerald-600'
                     : changeType === 'negative'
-                    ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                    : 'bg-slate-100 text-black border border-slate-200'
+                    ? 'text-rose-600'
+                    : 'text-slate-500'
                 }`}
               >
-                {changeType === 'positive' && <TrendingUp className="w-3 h-3 text-emerald-700 stroke-[2.5]" />}
-                {changeType === 'negative' && <TrendingDown className="w-3 h-3 text-rose-700 stroke-[2.5]" />}
-                {changeType === 'neutral' && <Minus className="w-3 h-3 text-slate-600 stroke-[2.5]" />}
+                {changeType === 'positive' && <TrendingUp className="w-3 h-3 stroke-[2.2]" />}
+                {changeType === 'negative' && <TrendingDown className="w-3 h-3 stroke-[2.2]" />}
+                {changeType === 'neutral' && <Minus className="w-3 h-3 stroke-[2.2]" />}
                 <span>{change}</span>
               </div>
             )}

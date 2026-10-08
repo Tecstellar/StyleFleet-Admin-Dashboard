@@ -32,6 +32,7 @@ import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
 import { Modal } from '../common/Modal';
 import { ExportButton } from '../common/ExportButton';
+import { KPICard } from '../common/KPICard';
 import { checkSupabaseConnection, SUPABASE_URL } from '../../services/supabase';
 import { formatDateTime } from '../../utils/dateUtils';
 import { SystemHealthRecord, SystemLogRecord, Shop, Bill } from '../../types/database';
@@ -478,15 +479,15 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-black text-white shadow-xs">
+          <div className="p-2 rounded-xl bg-teal-50 text-[#0F4C5C] border border-teal-100 shadow-xs">
             <Activity className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">
               Salon Shop Health &amp; Diagnostics
             </h1>
-            <p className="text-xs text-neutral-500 mt-0.5">
-              Live tracking matrix measuring how all {totalSalons} salon shops are performing across Tamil Nadu.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Live tracking matrix measuring performance across {totalSalons} registered salon locations.
             </p>
           </div>
         </div>
@@ -516,7 +517,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
               onRefresh?.();
             }}
             disabled={isChecking}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-neutral-200 bg-white text-xs font-semibold text-neutral-800 hover:border-black transition-colors disabled:opacity-50 shadow-xs"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:text-slate-900 hover:border-slate-300 transition-colors disabled:opacity-50 shadow-xs cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
             <span>Re-evaluate</span>
@@ -525,60 +526,45 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       </div>
 
       {/* Primary KPI Cards for Salon Shops Health */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Total Salon Shops</span>
-            <Building2 className="w-4 h-4 text-black" />
-          </div>
-          <div className="text-3xl font-black font-mono text-black">
-            {totalSalons}
-          </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Active connected salon locations</span>
-        </div>
-
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Thriving &amp; Active</span>
-            <CheckCircle2 className="w-4 h-4 text-neutral-800" />
-          </div>
-          <div className="text-3xl font-black font-mono text-black">
-            {thrivingCount}
-          </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Staff &amp; billing cadence active</span>
-        </div>
-
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Needs Attention</span>
-            <AlertTriangle className="w-4 h-4 text-neutral-700" />
-          </div>
-          <div className="text-3xl font-black font-mono text-black">
-            {attentionCount}
-          </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Missing staff or low bill volume</span>
-        </div>
-
-        <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs">
-          <div className="flex items-center justify-between text-neutral-500 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Avg Health Score</span>
-            <TrendingUp className="w-4 h-4 text-neutral-900" />
-          </div>
-          <div className="text-3xl font-black font-mono text-black">
-            {avgHealthScore}%
-          </div>
-          <span className="text-[11px] text-neutral-400 mt-1 block">Network vitality index</span>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <KPICard
+          title="Total Salon Shops"
+          value={totalSalons}
+          subtitle="Active connected locations"
+          icon={Building2}
+          tone="brand"
+        />
+        <KPICard
+          title="Thriving & Active"
+          value={thrivingCount}
+          subtitle="Staff & billing cadence active"
+          icon={CheckCircle2}
+          tone="signup"
+        />
+        <KPICard
+          title="Needs Attention"
+          value={attentionCount}
+          subtitle="Missing staff or low bills"
+          icon={AlertTriangle}
+          tone="order-warn"
+        />
+        <KPICard
+          title="Avg Health Score"
+          value={`${avgHealthScore}%`}
+          subtitle="Network vitality index"
+          icon={TrendingUp}
+          tone="revenue"
+        />
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 pb-3 overflow-x-auto text-xs">
+      <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2 overflow-x-auto text-xs">
         <button
           onClick={() => setActiveTab('salon_health')}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
             activeTab === 'salon_health'
-              ? 'bg-black text-white shadow-xs'
-              : 'bg-white text-neutral-600 hover:text-black border border-neutral-200 hover:border-black'
+              ? 'bg-[#0F4C5C] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <Building2 className="w-3.5 h-3.5" />
@@ -587,10 +573,10 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
 
         <button
           onClick={() => setActiveTab('components')}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
             activeTab === 'components'
-              ? 'bg-black text-white shadow-xs'
-              : 'bg-white text-neutral-600 hover:text-black border border-neutral-200 hover:border-black'
+              ? 'bg-[#0F4C5C] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <Server className="w-3.5 h-3.5" />
@@ -599,10 +585,10 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
 
         <button
           onClick={() => setActiveTab('logs')}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
             activeTab === 'logs'
-              ? 'bg-black text-white shadow-xs'
-              : 'bg-white text-neutral-600 hover:text-black border border-neutral-200 hover:border-black'
+              ? 'bg-[#0F4C5C] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <Terminal className="w-3.5 h-3.5" />
@@ -614,25 +600,20 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
       {activeTab === 'salon_health' && (
         <div className="space-y-4">
           {/* Filter Toolbar: City, Health Level, Exact Date, Presets */}
-          <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100">
-              <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
-                <Sparkles className="w-4 h-4 text-black" />
+          <div className="panel space-y-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                <Filter className="w-3.5 h-3.5 text-[#0F4C5C]" />
                 <span>Filter Salon Shops by Region &amp; Performance</span>
               </div>
 
               {/* Quick Date Presets */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-semibold text-neutral-400 mr-1">Presets:</span>
+              <div className="segmented-control">
                 {(['all', 'today', 'yesterday', '7d', '30d'] as const).map((p) => (
                   <button
                     key={p}
                     onClick={() => handlePreset(p)}
-                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors capitalize ${
-                      datePreset === p && !exactDate
-                        ? 'bg-black text-white'
-                        : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                    }`}
+                    className={`segment capitalize ${datePreset === p && !exactDate ? 'active' : ''}`}
                   >
                     {p === '7d' ? 'Last 7 Days' : p === '30d' ? 'Last 30 Days' : p}
                   </button>
@@ -643,31 +624,31 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               {/* 1. Search */}
               <div>
-                <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1">
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
                   Search Salon
                 </label>
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-2.5" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Name, city, phone..."
-                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-black focus:bg-white transition-all"
+                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F4C5C] focus:bg-white transition-all"
                   />
                 </div>
               </div>
 
               {/* 2. City Filter (e.g. Coimbatore) */}
               <div>
-                <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-neutral-400" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-[#0F4C5C]" />
                   <span>City / Region (e.g. Coimbatore)</span>
                 </label>
                 <select
                   value={cityFilter}
                   onChange={(e) => setCityFilter(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
                 >
                   <option value="all">All Cities ({uniqueCities.length})</option>
                   {uniqueCities.map((c) => (
@@ -680,14 +661,14 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
 
               {/* 3. Health Level Filter */}
               <div>
-                <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-                  <Activity className="w-3 h-3 text-neutral-400" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-[#0F4C5C]" />
                   <span>Health Classification</span>
                 </label>
                 <select
                   value={healthStatusFilter}
                   onChange={(e) => setHealthStatusFilter(e.target.value as any)}
-                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
                 >
                   <option value="all">All Health Tiers</option>
                   <option value="thriving">Thriving &amp; Active (&gt;65%)</option>
@@ -698,8 +679,8 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
 
               {/* 4. Exact Registration Date */}
               <div>
-                <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-neutral-400" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <Calendar className="w-3 h-3 text-[#0F4C5C]" />
                   <span>Exact Registration Date</span>
                 </label>
                 <input
@@ -709,20 +690,20 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
                     setExactDate(e.target.value);
                     setDatePreset('all');
                   }}
-                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
                 />
               </div>
             </div>
 
             {/* Clear Filters */}
             {isAnyFilterActive && (
-              <div className="flex items-center justify-between pt-2 text-xs border-t border-neutral-100">
-                <span className="text-neutral-500 font-medium">
-                  Showing <span className="font-bold text-black">{filteredSalonHealth.length}</span> matching salon health entries
+              <div className="flex items-center justify-between pt-2 text-xs border-t border-slate-100">
+                <span className="text-slate-500 font-medium">
+                  Showing <span className="font-semibold text-slate-900">{filteredSalonHealth.length}</span> matching salon health entries
                 </span>
                 <button
                   onClick={resetFilters}
-                  className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-lg bg-neutral-100 text-black hover:bg-neutral-200 font-semibold transition-colors"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Clear All Filters</span>
