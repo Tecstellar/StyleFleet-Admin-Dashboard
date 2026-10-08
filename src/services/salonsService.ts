@@ -307,6 +307,109 @@ export async function updateShopFreeSalesLimit(
   }
 }
 
+export type ManualProPlan = '3_months' | '6_months' | '12_months';
+
+export interface ShopSubscriptionRow {
+  id: string;
+  shop_id: string;
+  plan_id: string;
+  status: string;
+  subscription_start_date: string | null;
+  subscription_end_date: string | null;
+  cashfree_order_id: string | null;
+  amount_minor: number;
+  created_at: string;
+}
+
+const MANUAL_GRANT_MARKER = 'manual-admin-grant';
+
+/** Company Admin Panel: the salon's newest subscription row, if any. */
+export async function fetchShopSubscription(
+  shopId: string
+): Promise<{ data: ShopSubscriptionRow | null; error: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('id, shop_id, plan_id, status, subscription_start_date, subscription_end_date, cashfree_order_id, amount_minor, created_at')
+      .eq('shop_id', shopId)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (error) throw error;
+    return { data: (data && data[0]) || null, error: null };
+  } catch (err: any) {
+    console.error('Error loading subscription:', err);
+    return { data: null, error: err.message || 'Failed to load subscription' };
+  }
+}
+
+/** True when the app would treat this row as an active Pro plan. */
+export function isSubscriptionActive(sub: ShopSubscriptionRow | null): boolean {
+  if (!sub) return false;
+  if (sub.status !== 'active' && sub.status !== 'cancelled') return false;
+  if (!sub.subscription_end_date) return true;
+  return new Date(sub.subscription_end_date).getTime() > Date.now();
+}
+
+/**
+ * Company Admin Panel: gives a salon a complimentary Pro plan (no payment) for 3, 6 or 12 months.
+ * The row is marked so it can be told apart from paid plans.
+ */
+export async function grantProPlan(
+  shopId: string,
+  planId: ManualProPlan
+): Promise<{ data: ShopSubscriptionRow | null; error: string | null }> {
+  try {
+    const months = planId === '3_months' ? 3 : planId === '6_months' ? 6 : 12;
+    const start = new Date();
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + months);
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .insert({
+        shop_id: shopId,
+        plan_id: planId,
+        status: 'active',
+        subscription_start_date: start.toISOString(),
+        subscription_end_date: end.toISOString(),
+        cashfree_order_id: MANUAL_GRANT_MARKER,
+        amount_minor: 0,
+        currency: 'INR',
+      })
+      .select('id, shop_id, plan_id, status, subscription_start_date, subscription_end_date, cashfree_order_id, amount_minor, created_at')
+      .single();
+    if (error) throw error;
+    return { data: data as ShopSubscriptionRow, error: null };
+  } catch (err: any) {
+    console.error('Error granting Pro:', err);
+    return { data: null, error: err.message || 'Failed to grant Pro' };
+  }
+}
+
+/** Company Admin Panel: ends a salon's Pro plan now. The row is kept (status becomes expired). */
+export async function revokeProPlan(
+  subscriptionId: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .update({
+        status: 'expired',
+        subscription_end_date: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', subscriptionId)
+      .select('id');
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: false, error: 'Subscription was not updated (no matching row or no permission)' };
+    }
+    return { success: true, error: null };
+  } catch (err: any) {
+    console.error('Error revoking Pro:', err);
+    return { success: false, error: err.message || 'Failed to end the Pro plan' };
+  }
+}
+
 export interface CreateSalonAccountParams {
   salonName: string;
   ownerName: string;
