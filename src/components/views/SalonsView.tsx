@@ -4,8 +4,7 @@ import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
 import { ExportButton } from '../common/ExportButton';
 import { SalonDetailModal } from './SalonDetailModal';
-import { useDateFilter } from '../../context/DateFilterContext';
-import { filterByDateRange, formatDateTime, formatDate } from '../../utils/dateUtils';
+import { formatDateTime, formatDate } from '../../utils/dateUtils';
 import { Shop } from '../../types/database';
 
 interface SalonsViewProps {
@@ -25,7 +24,6 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
   onStaffChange,
   initialModalTab = 'overview',
 }) => {
-  const { dateRange } = useDateFilter();
   const [internalSelectedShop, setInternalSelectedShop] = useState<Shop | null>(null);
   const [modalTab, setModalTab] = useState<'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry'>(
     initialModalTab
@@ -72,8 +70,8 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
   }, [shops]);
 
   const filteredShops = useMemo(() => {
-    const base = filterByDateRange(shops, 'created_at', dateRange);
-    return base.filter((s) => {
+    // The directory uses its own date filters below; the top-bar range (default Today) must not hide salons.
+    return shops.filter((s) => {
       // Exact date
       if (exactDate) {
         if (!s.created_at) return false;
@@ -101,7 +99,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
 
       return true;
     });
-  }, [shops, dateRange, exactDate, datePreset, cityFilter, staffFilter]);
+  }, [shops, exactDate, datePreset, cityFilter, staffFilter]);
 
   const resetFilters = () => {
     setExactDate('');
