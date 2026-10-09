@@ -77,94 +77,100 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         return cleaned || null;
       };
 
-      // 1. Strictly deduplicate individual human accounts across profiles, staff, and customers
-      // Keyed by normalized 10-digit phone number or trimmed name if phone is missing
-      interface UniqueIndividual {
+      // 1. Map Salon Owner Users strictly from profiles and shops (NO CRM customer records)
+      interface SalonOwnerUser {
         key: string;
         id: string;
         name: string;
         phone: string;
+        salonName: string;
+        salonCity?: string;
         role: string;
         type: string;
         first_created_at: string;
+        shopIds: Set<string>;
         allIds: Set<string>;
       }
 
-      const uniqueUsersMap = new Map<string, UniqueIndividual>();
-      const idToUniqueUser = new Map<string, UniqueIndividual>();
+      const uniqueOwnersMap = new Map<string, SalonOwnerUser>();
+      const shopIdToOwnerKey = new Map<string, string>();
 
-      const registerUser = (
-        rawId: string,
-        type: string,
-        role: string,
-        name?: string | null,
-        phone?: string | null,
-        createdAt?: string | null
-      ) => {
-        if (!rawId) return;
-        const cleanPhone = getCleanPhone(phone);
-        const trimmedName = (name || '').trim();
-        const key = cleanPhone
-          ? `phone:${cleanPhone}`
-          : `name:${trimmedName.toLowerCase() || 'unnamed'}`;
+      // Index shops by owner_profile_id and by phone
+      const shopByOwnerProfId = new Map<string, Shop>();
+      const shopByPhone = new Map<string, Shop>();
+      shops.forEach((s) => {
+        if (s.owner_profile_id) shopByOwnerProfId.set(s.owner_profile_id, s);
+        const cp = getCleanPhone(s.phone);
+        if (cp) shopByPhone.set(cp, s);
+      });
 
-        if (!uniqueUsersMap.has(key)) {
-          const u: UniqueIndividual = {
-            key,
-            id: rawId,
-            name: trimmedName || 'User',
-            phone: cleanPhone || phone || 'No phone',
-            role,
-            type,
-            first_created_at: createdAt || new Date().toISOString(),
-            allIds: new Set([rawId]),
-          };
-          uniqueUsersMap.set(key, u);
-          idToUniqueUser.set(rawId, u);
-        } else {
-          const existing = uniqueUsersMap.get(key)!;
-          existing.allIds.add(rawId);
-          idToUniqueUser.set(rawId, existing);
+      // Register all owner profiles
+      profiles.forEach((p) => {
+        const cp = getCleanPhone(p.phone);
+        const key = cp ? `phone:${cp}` : `prof:${p.id}`;
+        const shop = shopByOwnerProfId.get(p.id) || (cp ? shopByPhone.get(cp) : null);
 
-          // Keep earliest timestamp as genuine registration date
-          if (
-            createdAt &&
-            (!existing.first_created_at ||
-              new Date(createdAt).getTime() < new Date(existing.first_created_at).getTime())
-          ) {
-            existing.first_created_at = createdAt;
-          }
-
-          // Prioritize account hierarchy: Salon Owner > Stylist > Client
-          if (type === 'Owner Profile') {
-            existing.role = 'Salon Owner';
-            existing.type = 'Owner Profile';
-            if (trimmedName) existing.name = trimmedName;
-          } else if (type === 'Stylist' && existing.type !== 'Owner Profile') {
-            existing.role = role;
-            existing.type = 'Stylist';
-            if (trimmedName) existing.name = trimmedName;
+        const owner: SalonOwnerUser = {
+          key,
+          id: p.id,
+          name: p.full_name?.trim() || (shop ? `${shop.name} Owner` : 'Salon Owner'),
+          phone: p.phone || shop?.phone || 'No phone',
+          salonName: shop?.name || 'Unassigned',
+          salonCity: shop?.city || '',
+          role: 'Salon Owner',
+          type: 'Salon Owner',
+          first_created_at: p.created_at || new Date().toISOString(),
+          shopIds: new Set(shop ? [shop.id] : []),
+          allIds: new Set([p.id]),
+        };
+        uniqueOwnersMap.set(key, owner);
+        if (shop) {
+          shopIdToOwnerKey.set(shop.id, key);
+          if (shop.duplicate_ids) {
+            shop.duplicate_ids.forEach((dId) => shopIdToOwnerKey.set(dId, key));
           }
         }
-      };
+      });
 
-      profiles.forEach((p) =>
-        registerUser(p.id, 'Owner Profile', 'Salon Owner', p.full_name, p.phone, p.created_at)
-      );
-      staff.forEach((s) =>
-        registerUser(s.id, 'Stylist', `Stylist (${s.role || 'Staff'})`, s.name, s.phone, s.created_at)
-      );
-      customers.forEach((c) =>
-        registerUser(c.id, 'CRM Customer', 'Salon Client', c.name, c.phone, c.created_at)
-      );
+      // Also register canonical shops if owner account is directly attached to shop record
+      shops.forEach((s) => {
+        const cp = getCleanPhone(s.phone);
+        const key = cp ? `phone:${cp}` : `shop:${s.id}`;
+        if (!uniqueOwnersMap.has(key)) {
+          const owner: SalonOwnerUser = {
+            key,
+            id: s.id,
+            name: s.name ? `${s.name} Owner` : 'Salon Owner',
+            phone: s.phone || 'No phone',
+            salonName: s.name,
+            salonCity: s.city || '',
+            role: 'Salon Owner',
+            type: 'Salon Owner',
+            first_created_at: s.created_at || new Date().toISOString(),
+            shopIds: new Set([s.id]),
+            allIds: new Set([s.id]),
+          };
+          uniqueOwnersMap.set(key, owner);
+          shopIdToOwnerKey.set(s.id, key);
+        } else {
+          const existing = uniqueOwnersMap.get(key)!;
+          existing.shopIds.add(s.id);
+          shopIdToOwnerKey.set(s.id, key);
+          if (s.name && existing.salonName === 'Unassigned') existing.salonName = s.name;
+          if (s.city && !existing.salonCity) existing.salonCity = s.city;
+        }
+        if (s.duplicate_ids) {
+          s.duplicate_ids.forEach((dId) => shopIdToOwnerKey.set(dId, key));
+        }
+      });
 
-      const allUniqueUsers = Array.from(uniqueUsersMap.values());
+      const allUniqueOwners = Array.from(uniqueOwnersMap.values());
 
-      // 2. Map date-by-date activity strictly from Supabase created_at timestamps
+      // 2. Map date-by-date activity strictly for salon owner users
       const dateMap = new Map<
         string,
         {
-          newUsers: UniqueIndividual[];
+          newUsers: SalonOwnerUser[];
           activeUserKeys: Set<string>;
           conversions: number;
           churned: number;
@@ -183,8 +189,8 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         return dateMap.get(key)!;
       };
 
-      // Group genuine new user registrations on their first signup date
-      allUniqueUsers.forEach((u) => {
+      // Group genuine new salon owner registrations on their first signup date
+      allUniqueOwners.forEach((u) => {
         if (!u.first_created_at) return;
         const key = u.first_created_at.split('T')[0];
         const entry = getOrCreateDate(key);
@@ -192,29 +198,25 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         entry.activeUserKeys.add(u.key);
       });
 
-      // Track active unique users from bills (sales transactions)
+      // Track active salon owners from bills (sales submitted by their salon)
       bills.forEach((b) => {
-        if (!b.created_at) return;
+        if (!b.created_at || !b.shop_id) return;
         const key = b.created_at.split('T')[0];
-        const entry = getOrCreateDate(key);
-        if (b.customer_id && idToUniqueUser.has(b.customer_id)) {
-          entry.activeUserKeys.add(idToUniqueUser.get(b.customer_id)!.key);
-        }
-        if (b.staff_id && idToUniqueUser.has(b.staff_id)) {
-          entry.activeUserKeys.add(idToUniqueUser.get(b.staff_id)!.key);
+        const ownerKey = shopIdToOwnerKey.get(b.shop_id);
+        if (ownerKey) {
+          const entry = getOrCreateDate(key);
+          entry.activeUserKeys.add(ownerKey);
         }
       });
 
-      // Track active unique users from appointments
+      // Track active salon owners from appointments
       appointments.forEach((a) => {
-        if (!a.created_at) return;
+        if (!a.created_at || !a.shop_id) return;
         const key = a.created_at.split('T')[0];
-        const entry = getOrCreateDate(key);
-        if (a.customer_id && idToUniqueUser.has(a.customer_id)) {
-          entry.activeUserKeys.add(idToUniqueUser.get(a.customer_id)!.key);
-        }
-        if (a.staff_id && idToUniqueUser.has(a.staff_id)) {
-          entry.activeUserKeys.add(idToUniqueUser.get(a.staff_id)!.key);
+        const ownerKey = shopIdToOwnerKey.get(a.shop_id);
+        if (ownerKey) {
+          const entry = getOrCreateDate(key);
+          entry.activeUserKeys.add(ownerKey);
         }
       });
 
@@ -281,11 +283,11 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
       return {
         dailyRows: rows,
         monthTabs: Array.from(monthsSet),
-        totalUsersCount: allUniqueUsers.length,
+        totalUsersCount: allUniqueOwners.length,
         newSubscribersCount: newSubs,
         totalSubscribersCount: totalSubs,
       };
-    }, [profiles, staff, customers, bills, appointments, subscriptions]);
+    }, [profiles, shops, bills, appointments, subscriptions]);
 
   // Filter rows by selected month
   const filteredRows = useMemo(() => {
@@ -314,7 +316,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
             Daily User Metrics
           </h1>
           <p className="text-sm text-neutral-500 mt-0.5">
-            Daily signups, active users, premium conversions, churn, and totals.
+            Daily salon owner signups, active salon owners, premium conversions, churn, and totals.
           </p>
           <div className="text-xs text-neutral-400 mt-2 font-medium">
             {formattedUpdatedTime}
@@ -333,7 +335,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
       {/* 4 Metric KPI Cards - Clean White & Emerald/Teal Modern Style */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <KPICard
-          title="Total Users"
+          title="Total Salon Owners"
           value={formatNumber(totalUsersCount)}
           subtitle={`As of ${latestDateString} • all dates`}
           icon={Users}
@@ -422,7 +424,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
                       <button
                         onClick={() =>
                           setDrilldownData({
-                            title: 'Registered Users on this date',
+                            title: 'Registered Salon Owners on this date',
                             date: row.formattedDate,
                             users: row.newUsersList,
                           })
@@ -483,7 +485,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
             <div className="flex items-center justify-between mb-4 border-b border-neutral-100 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-neutral-900">{drilldownData.title}</h3>
-                <p className="text-xs text-neutral-500">{drilldownData.date} • {drilldownData.users.length} accounts</p>
+                <p className="text-xs text-neutral-500">{drilldownData.date} • {drilldownData.users.length} salon owners</p>
               </div>
               <button
                 onClick={() => setDrilldownData(null)}
@@ -496,17 +498,19 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
             <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100">
               {drilldownData.users.length === 0 ? (
                 <div className="py-6 text-center text-xs text-neutral-400">
-                  No individual accounts registered on this date.
+                  No salon owners registered on this date.
                 </div>
               ) : (
                 drilldownData.users.map((u, i) => (
                   <div key={i} className="py-2.5 flex items-center justify-between text-xs">
                     <div>
                       <div className="font-semibold text-neutral-900">{u.name}</div>
-                      <div className="text-[11px] text-neutral-500">{u.phone} • {u.role}</div>
+                      <div className="text-[11px] text-neutral-500">
+                        {u.phone} • {u.salonName}{u.salonCity ? ` (${u.salonCity})` : ''}
+                      </div>
                     </div>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-700">
-                      {u.type}
+                      Salon Owner
                     </span>
                   </div>
                 ))
