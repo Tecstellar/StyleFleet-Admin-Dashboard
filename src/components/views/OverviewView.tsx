@@ -298,12 +298,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Window: <span className="font-medium text-slate-800">{dateRange.label}</span>
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
           <KPICard
             title="Connected Salons"
             value={formatNumber(shops.length)}
             subtitle="Registered partner salons"
             icon={Store}
+            size="sm"
             onClick={() => onNavigate('salons_360')}
           />
           <KPICard
@@ -311,6 +312,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatNumber(scopedBills.length)}
             subtitle={`${scopedBills.filter((b) => b.status === 'paid').length} settled • ${dateRange.label}`}
             icon={Receipt}
+            size="sm"
             onClick={() => onNavigate('daily_bills')}
           />
           <KPICard
@@ -318,6 +320,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatNumber(staff.length)}
             subtitle={`${staff.filter((s) => s.invitation_status === 'active').length} active stylists`}
             icon={Scissors}
+            size="sm"
             onClick={() => onNavigate('staff_access')}
           />
           <KPICard
@@ -325,6 +328,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatNumber(scopedCustomers.length)}
             subtitle={`${selectedOption === 'all_time' ? 'Total client profiles' : `Tracked in ${dateRange.label}`}`}
             icon={Users}
+            size="sm"
             onClick={() => onNavigate('customer_tracking')}
           />
         </div>
@@ -338,12 +342,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Window: <span className="font-medium text-slate-800">{dateRange.label}</span>
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
           <KPICard
             title="Invoiced Sales"
             value={formatCurrency(totalBilledMinor)}
             subtitle={`Gross sales in ${dateRange.label}`}
             icon={DollarSign}
+            size="sm"
             onClick={() => onNavigate('revenue_trend')}
           />
           <KPICard
@@ -351,6 +356,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatCurrency(totalCollectedMinor)}
             subtitle={`${scopedPayments.length} verified transactions • ${dateRange.label}`}
             icon={TrendingUp}
+            size="sm"
             onClick={() => onNavigate('revenue_trend')}
           />
           <KPICard
@@ -358,6 +364,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatCurrency(avgTicketMinor)}
             subtitle={`Per invoice • ${dateRange.label}`}
             icon={Receipt}
+            size="sm"
             onClick={() => onNavigate('daily_bills')}
           />
           <KPICard
@@ -365,6 +372,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={salonPerformance.filter((s) => s.quotaStatus === 'free').length}
             subtitle={`${salonPerformance.filter((s) => s.quotaStatus === 'limit').length} reached 100 sales limit`}
             icon={CheckCircle2}
+            size="sm"
             onClick={() => onNavigate('subscription_plans')}
           />
         </div>

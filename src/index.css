@@ -103,6 +103,12 @@ body {
   border-color: #cbd5e1;
 }
 
+.metric-card.metric-card-sm {
+  padding: 10px 14px;
+  min-height: 0;
+  border-radius: 8px;
+}
+
 /* Stat strip - one joined row of key numbers, numbers first */
 .stat-strip {
   display: grid;
