@@ -4,39 +4,39 @@
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --color-sidebar-bg: #0F4C5C;
-  --color-sidebar-bg-elevated: #0A3641;
+  --color-sidebar-bg: #0B1F26;
+  --color-sidebar-bg-elevated: #08171C;
   --color-sidebar-text: #e0f2fe;
   --color-sidebar-text-active: #0F4C5C;
   --color-sidebar-accent: #ffffff;
   --color-brand: #0F4C5C;
   --color-brand-hover: #145B6E;
   --color-brand-soft: #f0fdfa;
-  --color-bg-app: #f4f4f5;
+  --color-bg-app: #f6f7f9;
   --color-surface: #ffffff;
   --color-surface-muted: #f8fafc;
-  --color-line: #cbd5e1;
+  --color-line: #e5e7eb;
 }
 
 :root {
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --bg-app: #f4f4f5;
+  --bg-app: #f6f7f9;
   --bg-subtle: #e4e4e7;
   --surface: #ffffff;
   --surface-muted: #f8fafc;
   --surface-hover: #f1f5f9;
-  --sidebar-bg: #0F4C5C;
-  --sidebar-bg-elevated: #0A3641;
+  --sidebar-bg: #0B1F26;
+  --sidebar-bg-elevated: #08171C;
   --sidebar-text: #e0f2fe;
   --sidebar-text-active: #0F4C5C;
-  --sidebar-border: #145B6E;
+  --sidebar-border: #17313A;
   --sidebar-accent: #ffffff;
-  --text: #000000;
+  --text: #0f172a;
   --text-secondary: #0f172a;
-  --muted: #334155;
-  --line: #cbd5e1;
+  --muted: #64748b;
+  --line: #e5e7eb;
   --line-strong: #94a3b8;
   --brand: #0F4C5C;
   --brand-hover: #145B6E;
@@ -88,10 +88,10 @@ body {
 .metric-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 16px 18px;
-  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
-  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+  box-shadow: none;
+  transition: border-color 150ms ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -101,7 +101,34 @@ body {
 }
 .metric-card:hover {
   border-color: #cbd5e1;
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+}
+
+/* Stat strip - one joined row of key numbers, numbers first */
+.stat-strip {
+  display: grid;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.stat-strip .metric-card {
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  padding: 14px 18px;
+  background: transparent;
+  box-shadow: none;
+}
+.stat-strip .metric-card + .metric-card {
+  border-left: 1px solid #eef0f3;
+}
+@media (max-width: 1023px) {
+  .stat-strip .metric-card:nth-child(n + 3) {
+    border-top: 1px solid #eef0f3;
+  }
+  .stat-strip .metric-card:nth-child(odd) {
+    border-left: none;
+  }
 }
 
 .metric-card .metric-value {
@@ -113,9 +140,9 @@ body {
 .panel {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 18px 20px;
-  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: none;
 }
 
 /* Overview Section Header */
@@ -151,7 +178,6 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
 }
 .btn-export:hover {
   background: #f8fafc;
@@ -184,7 +210,8 @@ body {
   background: #ffffff;
   color: #0f172a;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  box-shadow: none;
+  border: 1px solid #e5e7eb;
 }
 
 /* Ensure input autofill maintains contrast */

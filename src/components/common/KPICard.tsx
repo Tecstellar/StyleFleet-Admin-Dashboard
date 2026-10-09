@@ -23,7 +23,7 @@ export const KPICard: React.FC<KPICardProps> = ({
     >
       {/* Top row: Label */}
       <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-xs font-medium text-slate-500 truncate">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500 truncate">
           {title}
         </span>
       </div>
@@ -35,14 +35,14 @@ export const KPICard: React.FC<KPICardProps> = ({
             Unavailable
           </div>
         ) : (
-          <div className="metric-value text-2xl sm:text-[26px] font-bold tracking-tight text-slate-900 font-sans tabular-nums leading-tight">
+          <div className="metric-value text-2xl sm:text-[28px] font-semibold tracking-tight text-slate-900 font-sans tabular-nums leading-tight">
             {value}
           </div>
         )}
       </div>
 
       {/* Footer: Subtitle and Trend */}
-      <div className="pt-2 mt-auto border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+      <div className="mt-1 flex items-center justify-between gap-2 text-xs">
         {isUnavailable ? (
           <span className="text-slate-400 text-[11px]">
             {unavailableReason || 'Source unavailable'}

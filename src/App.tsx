@@ -494,7 +494,7 @@ export const App: React.FC = () => {
               supportMessages={supportMessages}
               subscriptions={subscriptions}
               loading={loading}
-              initialTab="overview"
+              initialTab="daily_ledger"
               onNavigate={(v) => setCurrentView(v)}
               onSelectSalon={handleSelectSalonDrilldown}
               onNavigateToStylists={handleNavigateToStylists}

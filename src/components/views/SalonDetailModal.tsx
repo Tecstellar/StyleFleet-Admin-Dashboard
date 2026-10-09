@@ -29,7 +29,18 @@ import {
 import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
 import { UnavailableBanner } from '../common/UnavailableBanner';
-import { fetchSalonDetails, updateStaffPermissions, updateShopFreeSalesLimit, SalonDetailedView } from '../../services/salonsService';
+import {
+  fetchSalonDetails,
+  updateStaffPermissions,
+  updateShopFreeSalesLimit,
+  fetchShopSubscription,
+  grantProPlan,
+  revokeProPlan,
+  isSubscriptionActive,
+  ManualProPlan,
+  ShopSubscriptionRow,
+  SalonDetailedView,
+} from '../../services/salonsService';
 import {
   createStaff,
   updateStaffInvitationStatus,
@@ -87,6 +98,59 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
   const [limitInput, setLimitInput] = useState('');
   const [savingLimit, setSavingLimit] = useState(false);
   const [limitMsg, setLimitMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [proSub, setProSub] = useState<ShopSubscriptionRow | null>(null);
+  const [proLoading, setProLoading] = useState(false);
+  const [proBusy, setProBusy] = useState(false);
+  const [proPlan, setProPlan] = useState<ManualProPlan>('3_months');
+  const [proMsg, setProMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    if (!isOpen || !shop) return;
+    let cancelled = false;
+    setProLoading(true);
+    setProMsg(null);
+    fetchShopSubscription(shop.id).then((res) => {
+      if (cancelled) return;
+      setProSub(res.data);
+      if (res.error) setProMsg({ ok: false, text: res.error });
+      setProLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, shop?.id]);
+
+  const handleGrantPro = async () => {
+    if (!shop || proBusy) return;
+    if (!window.confirm(`Give ${shop.name} a free Pro plan for ${proPlan.replace('_months', ' months')}? No payment is recorded.`)) return;
+    setProBusy(true);
+    setProMsg(null);
+    const res = await grantProPlan(shop.id, proPlan);
+    setProBusy(false);
+    if (res.error || !res.data) {
+      setProMsg({ ok: false, text: res.error || 'Could not grant Pro.' });
+      return;
+    }
+    setProSub(res.data);
+    setProMsg({ ok: true, text: 'Pro plan granted.' });
+    onStaffChange?.();
+  };
+
+  const handleRevokePro = async () => {
+    if (!proSub || proBusy) return;
+    if (!window.confirm('End this salon\'s Pro plan now?')) return;
+    setProBusy(true);
+    setProMsg(null);
+    const res = await revokeProPlan(proSub.id);
+    setProBusy(false);
+    if (!res.success) {
+      setProMsg({ ok: false, text: res.error || 'Could not end the Pro plan.' });
+      return;
+    }
+    setProSub({ ...proSub, status: 'expired', subscription_end_date: new Date().toISOString() });
+    setProMsg({ ok: true, text: 'Pro plan ended.' });
+    onStaffChange?.();
+  };
 
   useEffect(() => {
     const current = details?.shop.free_sales_limit;
@@ -112,6 +176,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
     }
     setDetails((prev) => (prev ? { ...prev, shop: { ...prev.shop, free_sales_limit: value } } : prev));
     setLimitMsg({ ok: true, text: value === null ? 'Reset to the default (100).' : `Free sales limit set to ${value}.` });
+    onStaffChange?.();
   };
 
   const handleSendWhatsAppInvite = async (st: Staff) => {
@@ -1063,6 +1128,53 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                 )}
                 <p className="text-neutral-500">
                   How many bills this salon can create on the free plan before it needs Pro. Leave empty / Reset for the default of 100.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-3 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-600">Pro plan:</span>
+                  <span className="font-semibold text-neutral-900">
+                    {proLoading
+                      ? 'Loading…'
+                      : isSubscriptionActive(proSub)
+                      ? `Active until ${proSub?.subscription_end_date ? formatDate(proSub.subscription_end_date) : 'no end date'}${
+                          proSub?.cashfree_order_id === 'manual-admin-grant' ? ' (granted manually)' : ''
+                        }`
+                      : 'Not on Pro'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={proPlan}
+                    onChange={(e) => setProPlan(e.target.value as ManualProPlan)}
+                    disabled={proBusy || proLoading}
+                    className="flex-1 px-3 py-2 rounded-lg border border-[#E5E7EB] text-xs bg-white"
+                  >
+                    <option value="3_months">3 months</option>
+                    <option value="6_months">6 months</option>
+                    <option value="12_months">12 months</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleGrantPro}
+                    disabled={proBusy || proLoading}
+                    className="px-3 py-2 rounded-lg bg-neutral-900 text-white font-semibold disabled:opacity-50"
+                  >
+                    {proBusy ? 'Working…' : isSubscriptionActive(proSub) ? 'Extend / replace' : 'Grant Pro'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRevokePro}
+                    disabled={proBusy || proLoading || !isSubscriptionActive(proSub)}
+                    className="px-3 py-2 rounded-lg border border-[#E5E7EB] text-neutral-700 font-semibold disabled:opacity-50"
+                  >
+                    End Pro
+                  </button>
+                </div>
+                {proMsg && <p className={proMsg.ok ? 'text-emerald-600' : 'text-red-600'}>{proMsg.text}</p>}
+                <p className="text-neutral-500">
+                  Gives the salon unlimited bills, appointments and report downloads with no payment recorded. Works on every app version.
                 </p>
               </div>
               {details?.settings ? (
