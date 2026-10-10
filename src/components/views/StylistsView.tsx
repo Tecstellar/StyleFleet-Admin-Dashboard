@@ -448,7 +448,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search stylist by name, phone, salon, or role..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F4C5C] focus:bg-white transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1D4ED8] focus:bg-white transition-all"
               />
             </div>
 
@@ -457,7 +457,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               <select
                 value={selectedShopFilter}
                 onChange={(e) => setSelectedShopFilter(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#0F4C5C] transition-all"
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#1D4ED8] transition-all"
               >
                 <option value="all">All Salons ({shops.length})</option>
                 {shops.map((s) => (
@@ -473,7 +473,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               <select
                 value={inviteStatusFilter}
                 onChange={(e) => setInviteStatusFilter(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#0F4C5C] transition-all"
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#1D4ED8] transition-all"
               >
                 <option value="all">All Invite Statuses</option>
                 <option value="active">App Active</option>
@@ -511,7 +511,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
             <button
               onClick={handleOpenAdd}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F4C5C] text-white hover:bg-[#0c3c49] text-xs font-semibold transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1D4ED8] text-white hover:bg-[#0c3c49] text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 text-white" />
               <span>Add Stylist</span>

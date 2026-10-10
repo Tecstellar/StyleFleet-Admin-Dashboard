@@ -260,7 +260,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-teal-50 text-[#0F4C5C] border border-teal-100 shadow-xs">
+          <div className="p-2 rounded-xl bg-blue-50 text-[#1D4ED8] border border-blue-100 shadow-xs">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -268,7 +268,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
               Customer Tracking &amp; CRM Directory
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Live customer records stored across all partner salons in <code className="text-[#0F4C5C] font-semibold font-mono">public.customers</code>.
+              Live customer records stored across all partner salons in <code className="text-[#1D4ED8] font-semibold font-mono">public.customers</code>.
             </p>
           </div>
         </div>
@@ -323,7 +323,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
       <div className="panel space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-            <Users className="w-3.5 h-3.5 text-[#0F4C5C]" />
+            <Users className="w-3.5 h-3.5 text-[#1D4ED8]" />
             <span>Search &amp; Target Filters</span>
           </div>
 
@@ -354,7 +354,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Name, phone number..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F4C5C] focus:bg-white transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1D4ED8] focus:bg-white transition-all"
               />
             </div>
           </div>
@@ -362,13 +362,13 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
           {/* 2. Salon Dropdown */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-[#0F4C5C]" />
+              <Building2 className="w-3 h-3 text-[#1D4ED8]" />
               <span>Filter by Salon</span>
             </label>
             <select
               value={salonFilter}
               onChange={(e) => setSalonFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
             >
               <option value="all">All Salons ({deduplicatedShops.length})</option>
               {deduplicatedShops.map((s) => (
@@ -382,7 +382,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
           {/* 3. Exact Date Picker */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-[#0F4C5C]" />
+              <Calendar className="w-3 h-3 text-[#1D4ED8]" />
               <span>Exact Registration Date</span>
             </label>
             <input
@@ -392,21 +392,21 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
                 setExactDate(e.target.value);
                 setDatePreset('all');
               }}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
             />
           </div>
 
           {/* 4. VIP Starred Filter */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Star className="w-3 h-3 text-[#0F4C5C]" />
+              <Star className="w-3 h-3 text-[#1D4ED8]" />
               <span>Customer Tier</span>
             </label>
             <button
               onClick={() => setStarredOnly(!starredOnly)}
               className={`w-full px-3 py-1.5 text-xs rounded-lg font-semibold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 starredOnly
-                  ? 'bg-[#0F4C5C] text-white border-[#0F4C5C]'
+                  ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]'
                   : 'bg-slate-50/70 text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
             >

@@ -325,7 +325,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner / Header */}
-      <div className="bg-[#0F4C5C] text-white p-6 sm:p-7 rounded-2xl border border-[#145B6E] shadow-sm relative overflow-hidden">
+      <div className="bg-[#1D4ED8] text-white p-6 sm:p-7 rounded-2xl border border-[#1E40AF] shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-xs font-semibold border border-white/20">
@@ -335,7 +335,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Subscription &amp; Free Sales Quota Hub
             </h1>
-            <p className="text-teal-100/90 text-xs sm:text-sm leading-relaxed">
+            <p className="text-blue-100/90 text-xs sm:text-sm leading-relaxed">
               Every salon gets <strong>100 free sales from their registration date</strong>. Monitor completed sales, quota consumption, and manage Pro Plan upgrades in real time.
             </p>
           </div>
@@ -415,7 +415,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by salon name, city, or phone..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-hidden focus:border-[#0d9488] transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-hidden focus:border-[#3B82F6] transition-all"
             />
             {searchQuery && (
               <button
@@ -487,7 +487,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('all')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'all'
-                ? 'bg-[#0F4C5C] text-white shadow-xs'
+                ? 'bg-[#1D4ED8] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
             }`}
           >
@@ -508,7 +508,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('free_active')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'free_active'
-                ? 'bg-[#0F4C5C] text-white shadow-xs'
+                ? 'bg-[#1D4ED8] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
             }`}
           >
@@ -531,7 +531,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               onClick={() => setStatusFilter('upgraded')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'upgraded'
-                  ? 'bg-[#0F4C5C] text-white shadow-xs'
+                  ? 'bg-[#1D4ED8] text-white shadow-xs'
                   : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >

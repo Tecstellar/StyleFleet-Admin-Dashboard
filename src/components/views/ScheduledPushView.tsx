@@ -82,7 +82,7 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-[0.08em] text-[#0d9488] uppercase font-mono">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-[#3B82F6] uppercase font-mono">
               AUTOMATION ENGINE
             </span>
             <span className="text-neutral-300">•</span>
@@ -159,7 +159,7 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                     r.status === 'active'
                       ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
-                      : 'bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200'
+                      : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
                   }`}
                 >
                   {r.status === 'active' ? (

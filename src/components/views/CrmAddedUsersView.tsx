@@ -87,7 +87,7 @@ export const CrmAddedUsersView: React.FC<CrmAddedUsersViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-[0.08em] text-[#0d9488] uppercase font-mono">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-[#3B82F6] uppercase font-mono">
               CLIENT RELATIONSHIP MANAGEMENT
             </span>
             <span className="text-neutral-300">•</span>
@@ -144,7 +144,7 @@ export const CrmAddedUsersView: React.FC<CrmAddedUsersViewProps> = ({
             placeholder="Search by client name, phone number, email or salon..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-neutral-200 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-neutral-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
@@ -153,7 +153,7 @@ export const CrmAddedUsersView: React.FC<CrmAddedUsersViewProps> = ({
           <select
             value={selectedSalonId}
             onChange={(e) => setSelectedSalonId(e.target.value)}
-            className="text-xs bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-neutral-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="text-xs bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="all">All Salons ({shops.length})</option>
             {shops.map((s) => (
@@ -213,7 +213,7 @@ export const CrmAddedUsersView: React.FC<CrmAddedUsersViewProps> = ({
                     </td>
                     <td className="px-4 py-3 font-medium text-neutral-800">
                       <div className="flex items-center gap-1.5">
-                        <Store className="w-3 h-3 text-[#0d9488]" />
+                        <Store className="w-3 h-3 text-[#3B82F6]" />
                         <span>{c.salonName}</span>
                       </div>
                       {c.salonCity && <div className="text-[10px] text-neutral-400 pl-4">{c.salonCity}</div>}
@@ -224,7 +224,7 @@ export const CrmAddedUsersView: React.FC<CrmAddedUsersViewProps> = ({
                     <td className="px-4 py-3 font-mono font-bold text-neutral-800">
                       {c.visitCount} visits
                     </td>
-                    <td className="px-4 py-3 font-mono font-bold text-teal-700">
+                    <td className="px-4 py-3 font-mono font-bold text-blue-700">
                       {formatCurrency(c.totalSpent)}
                     </td>
                     <td className="px-4 py-3 text-right">

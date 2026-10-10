@@ -458,8 +458,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           <div className="flex items-center gap-2">
                             <div
                               className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10"
-                              style={{ backgroundColor: s.accent_color || '#0F4C5C' }}
-                              title={`Accent: ${s.accent_color || '#0F4C5C'}`}
+                              style={{ backgroundColor: s.accent_color || '#1D4ED8' }}
+                              title={`Accent: ${s.accent_color || '#1D4ED8'}`}
                             />
                             <div>
                               <div className="font-semibold text-slate-900 text-xs">{s.name}</div>
@@ -573,7 +573,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                                     ? 'bg-rose-500'
                                     : s.quotaStatus === 'warning'
                                     ? 'bg-amber-500'
-                                    : 'bg-[#0F4C5C]'
+                                    : 'bg-[#1D4ED8]'
                                 }`}
                                 style={{ width: `${s.quotaPercent}%` }}
                               />
@@ -592,7 +592,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                                 if (onSelectSalon) onSelectSalon(s, 'overview');
                                 else onNavigate('salons_360');
                               }}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md text-[#0F4C5C] bg-teal-50/70 hover:bg-teal-100/80 border border-teal-200/60 transition-colors cursor-pointer"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md text-[#1D4ED8] bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/60 transition-colors cursor-pointer"
                               title="View Complete Salon 360"
                             >
                               <ExternalLink className="w-3 h-3" />
@@ -782,17 +782,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 hover:border-slate-300 bg-slate-50/40 hover:bg-slate-100/70 transition-all text-left cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-md bg-white border border-slate-200 text-slate-700 group-hover:text-[#0F4C5C] transition-colors">
+                    <div className="p-1.5 rounded-md bg-white border border-slate-200 text-slate-700 group-hover:text-[#1D4ED8] transition-colors">
                       <Icon className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-slate-900 group-hover:text-[#0F4C5C] transition-colors">
+                      <div className="text-xs font-semibold text-slate-900 group-hover:text-[#1D4ED8] transition-colors">
                         {item.title}
                       </div>
                       <div className="text-[10px] text-slate-500">{item.desc}</div>
                     </div>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0F4C5C] group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1D4ED8] group-hover:translate-x-0.5 transition-all" />
                 </button>
               );
             })}
@@ -816,7 +816,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full bg-[#0F4C5C] rounded-full"
+                    className="h-full bg-[#1D4ED8] rounded-full"
                     style={{ width: `${item.percent}%` }}
                   />
                 </div>

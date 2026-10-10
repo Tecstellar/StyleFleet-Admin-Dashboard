@@ -25,7 +25,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' })
   } else if (['cancelled', 'closed', 'expired', 'failed', 'deleted'].includes(normalized)) {
     styles = 'bg-rose-50 text-rose-700 border-rose-200/70';
   } else if (['confirmed'].includes(normalized)) {
-    styles = 'bg-teal-50 text-[#0F4C5C] border-teal-200/70 font-semibold';
+    styles = 'bg-blue-50 text-[#1D4ED8] border-blue-200/70 font-semibold';
   }
 
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
