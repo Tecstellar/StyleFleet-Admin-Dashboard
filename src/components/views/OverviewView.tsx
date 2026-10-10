@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   RotateCcw,
   Search,
-  ExternalLink,
   ChevronDown,
   Calendar,
   Filter,
@@ -10,17 +9,7 @@ import {
   MessageCircle,
   ArrowUpDown,
   X,
-  Store,
-  Users,
-  Receipt,
-  TrendingUp,
   Activity,
-  CreditCard,
-  CheckCircle2,
-  ArrowRight,
-  Scissors,
-  DollarSign,
-  Download,
   MapPin,
 } from 'lucide-react';
 import { ExportButton } from '../common/ExportButton';
@@ -887,90 +876,31 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
       </div>
 
-      {/* 6. BOTTOM TWO-COLUMN: WORKSPACE NAVIGATION & GEOGRAPHY */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Workspace Navigation */}
+      {/* 6. GEOGRAPHIC DISTRIBUTION */}
+      {cityDistribution.length > 0 && (
         <div className="panel space-y-3">
-          <h3 className="text-sm font-semibold text-slate-900">
-            Workspace Navigation
-          </h3>
-
-          <div className="grid grid-cols-1 gap-2">
-            {[
-              {
-                title: 'Founder Dashboard',
-                desc: 'Executive KPIs, cadence & date filters',
-                view: 'dashboard' as NavView,
-                icon: Activity,
-              },
-              {
-                title: 'Daily Sales Metrics',
-                desc: 'Date-by-date sales volume matrix',
-                view: 'daily_bills' as NavView,
-                icon: Receipt,
-              },
-              {
-                title: 'Revenue Trend',
-                desc: 'Monthly collections vs invoiced trends',
-                view: 'revenue_trend' as NavView,
-                icon: TrendingUp,
-              },
-              {
-                title: 'Subscription & 100 Quotas',
-                desc: '100 free sales tracking & Pro plans',
-                view: 'subscription_plans' as NavView,
-                icon: CheckCircle2,
-              },
-              {
-                title: 'Customer Tracking',
-                desc: 'Client profiles & visit history',
-                view: 'customer_tracking' as NavView,
-                icon: Users,
-              },
-            ].map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => onNavigate(item.view)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 hover:border-slate-300 bg-slate-50/40 hover:bg-slate-100/70 transition-all text-left cursor-pointer group"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-md bg-white border border-slate-200 text-slate-700 group-hover:text-[#0F4C5C] transition-colors">
-                      <Icon className="w-3.5 h-3.5" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-slate-900 group-hover:text-[#0F4C5C] transition-colors">
-                        {item.title}
-                      </div>
-                      <div className="text-[10px] text-slate-500">{item.desc}</div>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0F4C5C] group-hover:translate-x-0.5 transition-all" />
-                </button>
-              );
-            })}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-slate-500" />
+              Geographic Distribution
+            </h3>
+            <span className="text-xs text-slate-500">
+              {cityDistribution.length} distinct locations
+            </span>
           </div>
-        </div>
 
-        {/* Geographic Distribution */}
-        <div className="panel space-y-3">
-          <h3 className="text-sm font-semibold text-slate-900">
-            Geographic Distribution
-          </h3>
-
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {cityDistribution.map((item, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="p-2.5 rounded-lg border border-slate-200/80 bg-slate-50/50 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-slate-800">{item.name}</span>
-                  <span className="text-slate-500 text-[11px] tabular-nums">
+                  <span className="font-semibold text-slate-800">{item.name}</span>
+                  <span className="text-slate-600 font-mono text-[11px] tabular-nums">
                     {item.count} shop(s) ({item.percent}%)
                   </span>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
                   <div
-                    className="h-full bg-[#0F4C5C] rounded-full"
+                    className="h-full bg-blue-600 rounded-full"
                     style={{ width: `${item.percent}%` }}
                   />
                 </div>
@@ -978,7 +908,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
