@@ -11,6 +11,13 @@ import {
   X,
   Activity,
   MapPin,
+  Copy,
+  Check,
+  ExternalLink,
+  Phone,
+  ShieldCheck,
+  Building2,
+  Receipt,
 } from 'lucide-react';
 import { ExportButton } from '../common/ExportButton';
 import { useDateFilter } from '../../context/DateFilterContext';
@@ -68,6 +75,8 @@ type SortField =
   | 'lifetimeSalesCount'
   | 'billed';
 
+const cleanDigits = (p?: string | null) => (p ? p.replace(/\D/g, '').slice(-10) : '');
+
 export const OverviewView: React.FC<OverviewViewProps> = ({
   shops,
   profiles,
@@ -88,6 +97,14 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const [activePillFilter, setActivePillFilter] = useState<PillFilterType>('all');
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [selectedDetailSalon, setSelectedDetailSalon] = useState<any | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const handleCopy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 1500);
+  };
 
   // Filter scoped data by selected date range
   const scopedBills = useMemo(() => {
@@ -488,11 +505,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Shops w/ Customers <span className="font-mono ml-1">{pillCounts.withCustomers}</span>
           </button>
 
-          {/* Total Shoppers Captured Pill */}
-          <div className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-800">
-            Total Shoppers Captured <span className="font-mono ml-1 font-bold">{formatNumber(pillCounts.totalShoppers)}</span>
-          </div>
-
           {/* Near 100 Limit (>80) Pill */}
           <button
             onClick={() => setActivePillFilter(activePillFilter === 'near_limit' ? 'all' : 'near_limit')}
@@ -744,9 +756,23 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
                       {/* 2. SHOP (Business Name) */}
                       <td className="px-3 py-2.5 whitespace-nowrap">
-                        <span className="font-medium text-slate-800 text-xs">
-                          {s.name}
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDetailSalon(s)}
+                          className="group inline-flex items-center gap-1.5 text-left cursor-pointer hover:opacity-90 transition-all focus:outline-hidden"
+                          title="Touch to view complete salon details"
+                        >
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 transition-transform group-hover:scale-110"
+                            style={{ backgroundColor: s.accent_color || '#1D4ED8' }}
+                          />
+                          <span className="font-semibold text-blue-600 group-hover:text-blue-800 group-hover:underline text-xs">
+                            {s.name}
+                          </span>
+                          <span className="text-[10px] text-blue-500 bg-blue-50 px-1 rounded-sm border border-blue-200/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Details
+                          </span>
+                        </button>
                       </td>
 
                       {/* 3. PHONE (WhatsApp icon + number) */}
@@ -906,6 +932,344 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* COMPLETE SHOP DETAILS MODAL */}
+      {selectedDetailSalon && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setSelectedDetailSalon(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between bg-slate-50/70">
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-xs shrink-0"
+                  style={{ backgroundColor: selectedDetailSalon.accent_color || '#1D4ED8' }}
+                >
+                  {selectedDetailSalon.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-bold text-slate-900 truncate">
+                      {selectedDetailSalon.name}
+                    </h3>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        selectedDetailSalon.quotaStatus === 'limit'
+                          ? 'bg-rose-100 text-rose-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {selectedDetailSalon.quotaStatus === 'limit' ? 'PRO PLAN' : 'FREE PLAN'}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                        selectedDetailSalon.salesCount > 0
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          selectedDetailSalon.salesCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                        }`}
+                      />
+                      {selectedDetailSalon.salesCount > 0 ? 'Live Activity' : 'Inactive'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">
+                    Owner: <span className="font-semibold text-slate-700">{selectedDetailSalon.ownerName}</span>
+                    {selectedDetailSalon.city ? ` • ${selectedDetailSalon.city}, Tamil Nadu` : ''}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedDetailSalon(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body - Scrollable */}
+            <div className="p-5 overflow-y-auto space-y-4 text-xs divide-y divide-slate-100">
+              {/* Section 1: Premises & Location */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 text-slate-400 font-semibold uppercase tracking-wider text-[10.5px]">
+                  <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Premises &amp; Location Details</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Physical Address</span>
+                    <span className="font-medium text-slate-900 mt-0.5 block">
+                      {selectedDetailSalon.address || 'Address not registered'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">City / Region</span>
+                    <span className="font-medium text-slate-900 mt-0.5 block">
+                      {selectedDetailSalon.city || 'Kalugumalai'}, Tamil Nadu
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Postal PIN Code</span>
+                    <span className="font-mono font-medium text-slate-900 mt-0.5 block">
+                      {selectedDetailSalon.pin_code || '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Platform Device</span>
+                    <span className="font-medium text-slate-900 mt-0.5 flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5 text-slate-500" />
+                      Android POS (Terminal)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Contact & Communications */}
+              <div className="pt-4 space-y-2">
+                <div className="flex items-center gap-1.5 text-slate-400 font-semibold uppercase tracking-wider text-[10.5px]">
+                  <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Contact &amp; Owner Channels</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Salon Phone</span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="font-mono font-semibold text-slate-900">
+                        {selectedDetailSalon.phone || 'No phone'}
+                      </span>
+                      {selectedDetailSalon.phone && (
+                        <a
+                          href={`https://wa.me/91${cleanDigits(selectedDetailSalon.phone)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded text-[11px] font-medium border border-emerald-200"
+                        >
+                          <MessageCircle className="w-3 h-3 text-emerald-600" />
+                          WhatsApp
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Owner Name &amp; Contact</span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="font-semibold text-slate-900">
+                        {selectedDetailSalon.ownerName}
+                      </span>
+                      {selectedDetailSalon.ownerPhone && selectedDetailSalon.ownerPhone !== '—' && (
+                        <span className="font-mono text-slate-600 text-[11px]">
+                          ({selectedDetailSalon.ownerPhone})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: System & Registration Records */}
+              <div className="pt-4 space-y-2">
+                <div className="flex items-center gap-1.5 text-slate-400 font-semibold uppercase tracking-wider text-[10.5px]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                  <span>System Identifiers &amp; Registration</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Registered Date &amp; Time</span>
+                    <span className="font-medium text-slate-900 mt-0.5 block">
+                      {selectedDetailSalon.created_at ? formatDateTime(selectedDetailSalon.created_at) : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Last Updated Date</span>
+                    <span className="font-medium text-slate-900 mt-0.5 block">
+                      {selectedDetailSalon.updated_at ? formatDateTime(selectedDetailSalon.updated_at) : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Shop ID</span>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="font-mono text-[11px] text-slate-800 bg-white px-1.5 py-0.5 rounded border border-slate-200 select-all truncate max-w-[200px]">
+                        {selectedDetailSalon.id}
+                      </span>
+                      <button
+                        onClick={() => handleCopy(selectedDetailSalon.id, 'shop_id')}
+                        className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+                        title="Copy Shop ID"
+                      >
+                        {copiedKey === 'shop_id' ? (
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[11px]">Owner Profile ID</span>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="font-mono text-[11px] text-slate-800 bg-white px-1.5 py-0.5 rounded border border-slate-200 select-all truncate max-w-[200px]">
+                        {selectedDetailSalon.owner_profile_id || 'Direct Register'}
+                      </span>
+                      {selectedDetailSalon.owner_profile_id && (
+                        <button
+                          onClick={() => handleCopy(selectedDetailSalon.owner_profile_id, 'owner_id')}
+                          className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+                          title="Copy Profile ID"
+                        >
+                          {copiedKey === 'owner_id' ? (
+                            <Check className="w-3 h-3 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: Billing, Tax & Quota Tracking */}
+              <div className="pt-4 space-y-2">
+                <div className="flex items-center gap-1.5 text-slate-400 font-semibold uppercase tracking-wider text-[10.5px]">
+                  <Receipt className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Tax, Invoicing &amp; 100 Sales Quota</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                  <div className="bg-white p-2 rounded-lg border border-slate-200/70">
+                    <span className="text-slate-400 block text-[10px] uppercase">Invoice Prefix</span>
+                    <span className="font-mono font-bold text-slate-900 text-xs">
+                      {selectedDetailSalon.invoice_prefix || 'INV'}
+                    </span>
+                  </div>
+                  <div className="bg-white p-2 rounded-lg border border-slate-200/70">
+                    <span className="text-slate-400 block text-[10px] uppercase">GSTIN Tax ID</span>
+                    <span className="font-mono font-medium text-slate-900 text-xs truncate block">
+                      {selectedDetailSalon.gstin || 'Non-GST'}
+                    </span>
+                  </div>
+                  <div className="bg-white p-2 rounded-lg border border-slate-200/70">
+                    <span className="text-slate-400 block text-[10px] uppercase">GST Rate</span>
+                    <span className="font-mono font-semibold text-slate-900 text-xs">
+                      {selectedDetailSalon.gst_rate ?? 0}%
+                    </span>
+                  </div>
+                  <div className="bg-white p-2 rounded-lg border border-slate-200/70">
+                    <span className="text-slate-400 block text-[10px] uppercase">Accent Brand</span>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span
+                        className="w-3 h-3 rounded-full border border-black/10 shrink-0"
+                        style={{ backgroundColor: selectedDetailSalon.accent_color || '#1D4ED8' }}
+                      />
+                      <span className="font-mono text-slate-700 text-[11px]">
+                        {selectedDetailSalon.accent_color || '#1D4ED8'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quota Progress Card */}
+                <div className="bg-white p-3 rounded-xl border border-slate-200/80 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-semibold text-slate-800">Free 100 Sales Quota</span>
+                      <span className="text-slate-500 ml-1.5 font-mono text-[11px]">
+                        ({selectedDetailSalon.lifetimeSalesCount} / {selectedDetailSalon.freeLimit} bills)
+                      </span>
+                    </div>
+                    <span className="font-mono font-bold text-blue-700">{selectedDetailSalon.quotaPercent}% Used</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        selectedDetailSalon.quotaPercent >= 100
+                          ? 'bg-rose-500'
+                          : selectedDetailSalon.quotaPercent >= 80
+                          ? 'bg-amber-500'
+                          : 'bg-blue-600'
+                      }`}
+                      style={{ width: `${selectedDetailSalon.quotaPercent}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <span>
+                      Quota status:{' '}
+                      <span className="font-semibold text-slate-700">
+                        {selectedDetailSalon.quotaRemaining === 0 ? 'Limit Reached' : `${selectedDetailSalon.quotaRemaining} free bills left`}
+                      </span>
+                    </span>
+                    <span>Plan: {selectedDetailSalon.quotaStatus === 'limit' ? 'Pro Tier' : 'Free Starter Tier'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 5: Performance & Traction */}
+              <div className="pt-4 space-y-2">
+                <div className="flex items-center gap-1.5 text-slate-400 font-semibold uppercase tracking-wider text-[10.5px]">
+                  <Activity className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Activity &amp; Traction Summary ({dateRange.label})</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <div className="bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 block text-[10px] uppercase">Lifetime Bills</span>
+                    <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block">
+                      {selectedDetailSalon.lifetimeSalesCount}
+                    </span>
+                  </div>
+                  <div className="bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 block text-[10px] uppercase">Invoiced ({dateRange.label})</span>
+                    <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block">
+                      {formatCurrency(selectedDetailSalon.billed)}
+                    </span>
+                  </div>
+                  <div className="bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 block text-[10px] uppercase">Stylists / Staff</span>
+                    <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block">
+                      {selectedDetailSalon.staffCount}
+                    </span>
+                  </div>
+                  <div className="bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 block text-[10px] uppercase">Total Clients</span>
+                    <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block">
+                      {selectedDetailSalon.totalCustomerCount}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between">
+              <button
+                onClick={() => setSelectedDetailSalon(null)}
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  const s = selectedDetailSalon;
+                  setSelectedDetailSalon(null);
+                  if (onSelectSalon) onSelectSalon(s, 'overview');
+                  else onNavigate('salons_360');
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer shadow-xs"
+              >
+                <span>Open Salon 360 Deep-Dive</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       )}
