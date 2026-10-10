@@ -380,8 +380,8 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           onClick={() => setSelectedSalonDrilldown(selectedSalonDrilldown === s.id ? null : s.id)}
           className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
             selectedSalonDrilldown === s.id
-              ? 'bg-[#0F4C5C] text-white shadow-xs'
-              : 'text-[#0F4C5C] hover:text-[#093540] hover:bg-teal-50'
+              ? 'bg-[#1D4ED8] text-white shadow-xs'
+              : 'text-[#1D4ED8] hover:text-[#093540] hover:bg-blue-50'
           }`}
         >
           <span>{selectedSalonDrilldown === s.id ? 'Hide Payments' : 'View Payments'}</span>
@@ -446,7 +446,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-teal-50 text-[#0F4C5C] border border-teal-100 shadow-xs">
+            <div className="p-2 rounded-xl bg-blue-50 text-[#1D4ED8] border border-blue-100 shadow-xs">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
@@ -454,7 +454,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 Revenue Trend &amp; Collections
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Verified transactional settlements from database table <code className="text-[#0F4C5C] font-semibold font-mono">public.payments</code>.
+                Verified transactional settlements from database table <code className="text-[#1D4ED8] font-semibold font-mono">public.payments</code>.
               </p>
             </div>
           </div>
@@ -476,8 +476,8 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       </div>
 
       {/* Database Reality Banner */}
-      <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-teal-200/60 bg-teal-50/50 text-xs text-[#0F4C5C]">
-        <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F4C5C]" />
+      <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-blue-200/60 bg-blue-50/50 text-xs text-[#1D4ED8]">
+        <ShieldCheck className="w-4 h-4 shrink-0 text-[#1D4ED8]" />
         <span className="font-semibold">Verified Supabase Data Only:</span>
         <span className="text-slate-600">
           Rendering exact settlement records from {filteredPayments.length} transactions across {activeContributingSalons} salons. Zero artificial tiers.
@@ -558,9 +558,9 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#0F4C5C"
+                  stroke="#1D4ED8"
                   strokeWidth={2}
-                  fill="#0F4C5C"
+                  fill="#1D4ED8"
                   fillOpacity={0.08}
                 />
               </AreaChart>
@@ -577,7 +577,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       <div className="panel space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-            <Filter className="w-3.5 h-3.5 text-[#0F4C5C]" />
+            <Filter className="w-3.5 h-3.5 text-[#1D4ED8]" />
             <span>Revenue Filters (Region, Salon, Method &amp; Exact Date)</span>
           </div>
 
@@ -608,7 +608,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ID, reference note..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F4C5C] focus:bg-white transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1D4ED8] focus:bg-white transition-all"
               />
             </div>
           </div>
@@ -616,13 +616,13 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           {/* 2. City Filter */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-[#0F4C5C]" />
+              <MapPin className="w-3 h-3 text-[#1D4ED8]" />
               <span>City / Region</span>
             </label>
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
             >
               <option value="all">All Cities ({uniqueCities.length})</option>
               {uniqueCities.map((c) => (
@@ -636,13 +636,13 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           {/* 3. Salon Dropdown */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-[#0F4C5C]" />
+              <Building2 className="w-3 h-3 text-[#1D4ED8]" />
               <span>Filter by Salon</span>
             </label>
             <select
               value={salonFilter}
               onChange={(e) => setSalonFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
             >
               <option value="all">All Salons ({deduplicatedShops.length})</option>
               {deduplicatedShops.map((s) => (
@@ -656,13 +656,13 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           {/* 4. Payment Method */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <CreditCard className="w-3 h-3 text-[#0F4C5C]" />
+              <CreditCard className="w-3 h-3 text-[#1D4ED8]" />
               <span>Payment Mode</span>
             </label>
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
             >
               <option value="all">All Payment Modes</option>
               {uniqueMethods.map((m) => (
@@ -676,7 +676,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           {/* 5. Exact Date */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-[#0F4C5C]" />
+              <Calendar className="w-3 h-3 text-[#1D4ED8]" />
               <span>Exact Date</span>
             </label>
             <input
@@ -686,7 +686,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 setExactDate(e.target.value);
                 setDatePreset('all');
               }}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#0F4C5C] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
             />
           </div>
         </div>
