@@ -226,7 +226,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   }, [shops]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Overview Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
         <div>
@@ -294,17 +294,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       <div className="overview-section">
         <div className="flex items-center justify-between">
           <span className="overview-section-title">Ecosystem Footprint</span>
-          <span className="text-[11px] text-slate-500">
+          <span className="text-[10.5px] text-slate-500">
             Window: <span className="font-medium text-slate-800">{dateRange.label}</span>
           </span>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           <KPICard
             title="Connected Salons"
             value={formatNumber(shops.length)}
             subtitle="Registered partner salons"
             icon={Store}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('salons_360')}
           />
           <KPICard
@@ -312,7 +312,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatNumber(scopedBills.length)}
             subtitle={`${scopedBills.filter((b) => b.status === 'paid').length} settled • ${dateRange.label}`}
             icon={Receipt}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('daily_bills')}
           />
           <KPICard
@@ -320,7 +320,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatNumber(staff.length)}
             subtitle={`${staff.filter((s) => s.invitation_status === 'active').length} active stylists`}
             icon={Scissors}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('staff_access')}
           />
           <KPICard
@@ -328,7 +328,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatNumber(scopedCustomers.length)}
             subtitle={`${selectedOption === 'all_time' ? 'Total client profiles' : `Tracked in ${dateRange.label}`}`}
             icon={Users}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('customer_tracking')}
           />
         </div>
@@ -338,17 +338,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       <div className="overview-section">
         <div className="flex items-center justify-between">
           <span className="overview-section-title">Financial Velocity &amp; Quota Health</span>
-          <span className="text-[11px] text-slate-500">
+          <span className="text-[10.5px] text-slate-500">
             Window: <span className="font-medium text-slate-800">{dateRange.label}</span>
           </span>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           <KPICard
             title="Invoiced Sales"
             value={formatCurrency(totalBilledMinor)}
             subtitle={`Gross sales in ${dateRange.label}`}
             icon={DollarSign}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('revenue_trend')}
           />
           <KPICard
@@ -356,7 +356,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatCurrency(totalCollectedMinor)}
             subtitle={`${scopedPayments.length} verified transactions • ${dateRange.label}`}
             icon={TrendingUp}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('revenue_trend')}
           />
           <KPICard
@@ -364,7 +364,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={formatCurrency(avgTicketMinor)}
             subtitle={`Per invoice • ${dateRange.label}`}
             icon={Receipt}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('daily_bills')}
           />
           <KPICard
@@ -372,7 +372,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             value={salonPerformance.filter((s) => s.quotaStatus === 'free').length}
             subtitle={`${salonPerformance.filter((s) => s.quotaStatus === 'limit').length} reached 100 sales limit`}
             icon={CheckCircle2}
-            size="sm"
+            size="xs"
             onClick={() => onNavigate('subscription_plans')}
           />
         </div>

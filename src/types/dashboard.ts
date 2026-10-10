@@ -52,5 +52,5 @@ export interface KPICardProps {
   trendData?: number[];
   onClick?: () => void;
   tone?: 'revenue' | 'usage' | 'brand' | 'signup' | 'conversion' | 'trial' | 'neutral' | 'order-good' | 'order-warn' | 'order-risk';
-  size?: 'default' | 'sm';
+  size?: 'default' | 'sm' | 'xs';
 }
