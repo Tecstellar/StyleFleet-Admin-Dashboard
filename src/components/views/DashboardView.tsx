@@ -84,6 +84,22 @@ interface DashboardViewProps {
 // Brand Design System Palette for Data Visualizations
 const CHART_PALETTE = ['#0F4C5C', '#3B7F8C', '#7FB0B8', '#B8D3D8', '#94a3b8', '#cbd5e1'];
 
+const Metric: React.FC<{ label: string; value: string; sub?: string; onClick?: () => void }> = ({
+  label,
+  value,
+  sub,
+  onClick,
+}) => (
+  <div
+    onClick={onClick}
+    className={`px-4 py-3 min-w-0 ${onClick ? 'cursor-pointer hover:bg-slate-50' : ''}`}
+  >
+    <div className="text-[11px] text-slate-500 truncate">{label}</div>
+    <div className="text-lg font-semibold text-slate-900 tabular-nums truncate">{value}</div>
+    {sub && <div className="text-[11px] text-slate-400 truncate">{sub}</div>}
+  </div>
+);
+
 export const DashboardView: React.FC<DashboardViewProps> = ({
   shops,
   profiles,
@@ -544,110 +560,103 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Dashboard Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-              Founder Dashboard
-            </h1>
-            {exactDateInput && (
-              <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                Filtered: {effectiveDateRange.label}
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Real-time salon operations, sales trajectory, and partner performance metrics.
-          </p>
+    <div className="space-y-5">
+      {/* Page header: title, active exact-date chip, export */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
+          {exactDateInput && (
+            <button
+              type="button"
+              onClick={() => {
+                setExactDateInput('');
+                setBillsPage(1);
+              }}
+              title="Clear date"
+              className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 cursor-pointer"
+            >
+              {effectiveDateRange.label} ✕
+            </button>
+          )}
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Segmented Date Range Controls */}
-          <div className="segmented-control">
-            {[
-              { id: 'today', label: 'Today' },
-              { id: 'yesterday', label: 'Yesterday' },
-              { id: 'last_7_days', label: '7D' },
-              { id: 'last_30_days', label: '30D' },
-              { id: 'all_time', label: 'All Time' },
-            ].map((p) => {
-              const isSelected = selectedOption === p.id && !exactDateInput;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    setExactDateInput('');
-                    setSelectedOption(p.id as DateFilterOption);
-                    setBillsPage(1);
-                  }}
-                  className={`segment ${isSelected ? 'active' : ''}`}
-                >
-                  {p.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <ExportButton
-            data={scopedBills.map((b) => ({
-              'Invoice Number': b.invoice_number,
-              Salon: b.shop?.name || b.shop_id,
-              Customer: b.customer?.name || 'Walk-in',
-              Phone: b.customer?.phone || 'None',
-              'Issued Date': formatDateTime(b.issued_at || b.created_at),
-              'Subtotal (INR)': (b.subtotal_minor || 0) / 100,
-              'Total (INR)': (b.total_minor || 0) / 100,
-              Status: b.status,
-            }))}
-            filename={`stylefleet_sales_report_${exactDateInput || 'all'}`}
-            label="Export CSV"
-          />
-        </div>
+        <ExportButton
+          data={scopedBills.map((b) => ({
+            'Invoice Number': b.invoice_number,
+            Salon: b.shop?.name || b.shop_id,
+            Customer: b.customer?.name || 'Walk-in',
+            Phone: b.customer?.phone || 'None',
+            'Issued Date': formatDateTime(b.issued_at || b.created_at),
+            'Subtotal (INR)': (b.subtotal_minor || 0) / 100,
+            'Total (INR)': (b.total_minor || 0) / 100,
+            Status: b.status,
+          }))}
+          filename={`stylefleet_sales_report_${exactDateInput || 'all'}`}
+          label="Export CSV"
+        />
       </div>
 
-      {/* EXECUTIVE KPI SUMMARY CARDS */}
-      <div className="stat-strip grid-cols-2 lg:grid-cols-5">
-        <KPICard
-          title="Invoiced Sales"
+      {/* Summary: one flat row of figures */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 border-y border-slate-200 divide-x divide-slate-100 [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:border-slate-100 sm:[&>*:nth-child(n+3)]:border-t-0 sm:[&>*:nth-child(n+5)]:border-t">
+        <Metric
+          label="Revenue"
           value={formatCurrency(totalBilledMinor)}
-          subtitle={`${scopedBills.length} sale invoices`}
+          sub={`${scopedBills.length} bills`}
           onClick={() => setActiveTab('all_bills')}
         />
-        <KPICard
-          title="Settled Collections"
+        <Metric
+          label="Collected"
           value={formatCurrency(totalPaidMinor)}
-          subtitle={`${scopedPayments.length} verified payments`}
+          sub={`${scopedPayments.length} payments`}
           onClick={() => setActiveTab('subscription_revenue')}
         />
-        <KPICard
-          title="Sales Put In"
+        <Metric
+          label="Bills"
           value={formatNumber(scopedBills.length)}
-          subtitle={`${activeSalonsWithBillsCount} active salons`}
+          sub={`${activeSalonsWithBillsCount} salons`}
           onClick={() => setActiveTab('daily_ledger')}
         />
-        <KPICard
-          title="Active Salons"
+        <Metric
+          label="Pending dues"
+          value={formatCurrency(pendingAmountMinor)}
+          sub={`${pendingBills.length} bills`}
+          onClick={() => {
+            setBillStatusFilter('pending');
+            setBillsPage(1);
+            setActiveTab('all_bills');
+          }}
+        />
+        <Metric label="Appointments" value={formatNumber(scopedAppts.length)} />
+        <Metric
+          label="Salons"
           value={formatNumber(filteredShops.length)}
-          subtitle={`${shops.length} connected salons`}
+          sub={`${shops.length} total`}
           onClick={() => onNavigate('salons_360')}
         />
-        <KPICard
-          title="Stylists On Fleet"
+        <Metric
+          label="Stylists"
           value={formatNumber(scopedStaff.length)}
-          subtitle={`${scopedStaff.filter((s) => s.invitation_status === 'active').length} active stylists`}
+          sub={`${scopedStaff.filter((s) => s.invitation_status === 'active').length} active`}
           onClick={() => onNavigate('staff_access')}
         />
       </div>
 
-      {/* FILTER PANEL (collapsed by default; the scope summary stays visible) */}
-      <div className="panel space-y-3.5 !py-3">
+      {/* Filters: collapsed by default; scope summary stays visible */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between gap-3 text-xs">
           <div className="text-slate-600">
             <span className="font-medium text-slate-900">{effectiveDateRange.label}</span>
             <span className="mx-1.5 text-slate-300">|</span>
             {scopedBills.length} bills · {formatCurrency(totalBilledMinor)}
+            {hasActiveFilters && (
+              <button
+                onClick={handleResetFilters}
+                className="ml-3 text-slate-500 hover:text-slate-900 underline cursor-pointer"
+                title="Reset all active filters"
+              >
+                Reset
+              </button>
+            )}
           </div>
           <button
             type="button"
@@ -658,222 +667,146 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </button>
         </div>
         {showFilters && (
-        <>
-        {/* Top Filter Controls: Salon, Exact Date, Payment Mode, Status */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* 1. Salon Selector Dropdown */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-slate-500" />
-              <span>Filter Salon</span>
-            </label>
-            <select
-              value={selectedSalonFilter}
-              onChange={(e) => {
-                setSelectedSalonFilter(e.target.value);
-                setBillsPage(1);
-              }}
-              className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
-            >
-              <option value="all">All Salons • {shops.length} Connected</option>
-              {shops.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} • {s.city || 'Tamil Nadu'}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 2. Exact Single Date Picker */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                <span>Search Exact Date</span>
-              </label>
-              {exactDateInput && (
-                <button
-                  onClick={() => setExactDateInput('')}
-                  className="text-[10px] text-slate-500 hover:text-slate-900 font-medium cursor-pointer underline"
+          <div className="space-y-3 border border-slate-200 rounded-lg bg-white p-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Salon</label>
+                <select
+                  value={selectedSalonFilter}
+                  onChange={(e) => {
+                    setSelectedSalonFilter(e.target.value);
+                    setBillsPage(1);
+                  }}
+                  className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
                 >
-                  Clear Date
-                </button>
-              )}
+                  <option value="all">All salons ({shops.length})</option>
+                  {shops.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} • {s.city || 'Tamil Nadu'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-slate-600">Date</label>
+                  {exactDateInput && (
+                    <button
+                      onClick={() => setExactDateInput('')}
+                      className="text-[10px] text-slate-500 hover:text-slate-900 font-medium cursor-pointer underline"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="date"
+                  value={exactDateInput}
+                  onChange={(e) => {
+                    setExactDateInput(e.target.value);
+                    setBillsPage(1);
+                  }}
+                  className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Payment</label>
+                <select
+                  value={paymentMethodFilter}
+                  onChange={(e) => {
+                    setPaymentMethodFilter(e.target.value);
+                    setBillsPage(1);
+                  }}
+                  className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
+                >
+                  <option value="all">All</option>
+                  {availablePaymentMethods.map((m) => (
+                    <option key={m} value={m}>
+                      {m.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Status</label>
+                <select
+                  value={billStatusFilter}
+                  onChange={(e) => {
+                    setBillStatusFilter(e.target.value);
+                    setBillsPage(1);
+                  }}
+                  className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
+                >
+                  <option value="all">All</option>
+                  <option value="paid">Paid</option>
+                  <option value="pending">Pending</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <input
-                type="date"
-                value={exactDateInput}
-                onChange={(e) => {
-                  setExactDateInput(e.target.value);
-                  setBillsPage(1);
-                }}
-                className={`w-full text-xs font-medium px-3 py-2 rounded-lg border ${
-                  exactDateInput ? 'border-[#0F4C5C] bg-teal-50/40 text-slate-900' : 'border-slate-200 bg-slate-50/70 text-slate-900'
-                } focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer`}
-                placeholder="YYYY-MM-DD"
-              />
+
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search invoice, salon, customer, phone"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setBillsPage(1);
+                  }}
+                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-slate-400"
+                />
+              </div>
+
+              <div className="segmented-control shrink-0">
+                {(
+                  [
+                    ['all', 'All'],
+                    ['with_staff', 'With Staff'],
+                    ['with_appts', 'With Bookings'],
+                    ['deduplicated', 'Unique'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    onClick={() => setSegmentFilter(id)}
+                    className={`segment ${segmentFilter === id ? 'active' : ''}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-
-          {/* 3. Payment Method Filter */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-slate-500" />
-              <span>Payment Mode</span>
-            </label>
-            <select
-              value={paymentMethodFilter}
-              onChange={(e) => {
-                setPaymentMethodFilter(e.target.value);
-                setBillsPage(1);
-              }}
-              className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
-            >
-              <option value="all">All Payment Modes</option>
-              {availablePaymentMethods.map((m) => (
-                <option key={m} value={m}>
-                  {m.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 4. Bill Status Filter */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-              <Receipt className="w-3.5 h-3.5 text-slate-500" />
-              <span>Invoice Status</span>
-            </label>
-            <select
-              value={billStatusFilter}
-              onChange={(e) => {
-                setBillStatusFilter(e.target.value);
-                setBillsPage(1);
-              }}
-              className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white cursor-pointer"
-            >
-              <option value="all">All Invoice Statuses</option>
-              <option value="paid">Settled / Paid</option>
-              <option value="pending">Pending</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Second Row: Omni-Search, Segment Toggles, and Reset */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-3 border-t border-slate-100">
-          {/* Omni Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by invoice #, salon, customer, phone..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setBillsPage(1);
-              }}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-slate-400 focus:bg-white"
-            />
-          </div>
-
-          {/* Segmented Control Filter */}
-          <div className="segmented-control shrink-0">
-            <button
-              onClick={() => setSegmentFilter('all')}
-              className={`segment ${segmentFilter === 'all' ? 'active' : ''}`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setSegmentFilter('with_staff')}
-              className={`segment ${segmentFilter === 'with_staff' ? 'active' : ''}`}
-            >
-              With Staff
-            </button>
-            <button
-              onClick={() => setSegmentFilter('with_appts')}
-              className={`segment ${segmentFilter === 'with_appts' ? 'active' : ''}`}
-            >
-              With Bookings
-            </button>
-            <button
-              onClick={() => setSegmentFilter('deduplicated')}
-              className={`segment ${segmentFilter === 'deduplicated' ? 'active' : ''}`}
-            >
-              Unique
-            </button>
-          </div>
-
-          {/* Reset Filters */}
-          {hasActiveFilters && (
-            <button
-              onClick={handleResetFilters}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer shrink-0"
-              title="Reset all active filters"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
-            </button>
-          )}
-        </div>
-
-        {/* Active Filter Summary Bar */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-slate-700">Scope:</span>
-            <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
-              {effectiveDateRange.label}
-            </span>
-            {selectedSalonFilter !== 'all' && (
-              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
-                Salon: {shops.find((s) => s.id === selectedSalonFilter)?.name || selectedSalonFilter}
-              </span>
-            )}
-            {paymentMethodFilter !== 'all' && (
-              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
-                Method: {paymentMethodFilter.toUpperCase()}
-              </span>
-            )}
-            {billStatusFilter !== 'all' && (
-              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">
-                Status: {billStatusFilter.toUpperCase()}
-              </span>
-            )}
-          </div>
-
-          <div className="text-[11px] font-medium text-slate-700">
-            {scopedBills.length} Bills matched • Total {formatCurrency(totalBilledMinor)}
-          </div>
-        </div>
-        </>
         )}
       </div>
 
-      {/* NAVIGATION TABS */}
+      {/* Tabs */}
       <div className="flex items-center gap-5 border-b border-slate-200 overflow-x-auto">
         {[
-          { id: 'daily_ledger', label: `Daily Sales Matrix • ${dailyBillingBreakdown.length}`, icon: Calendar },
-          { id: 'all_bills', label: `Sales Invoices • ${scopedBills.length}`, icon: Receipt },
-          { id: 'salon_breakdown', label: `Salon Contribution • ${salonContributions.length}`, icon: Building2 },
-          { id: 'overview', label: 'Charts & Trends', icon: Activity },
-          { id: 'subscription_revenue', label: '100 Quota & Revenue Tracker', icon: CreditCard },
+          { id: 'daily_ledger', label: `Daily (${dailyBillingBreakdown.length})` },
+          { id: 'all_bills', label: `Bills (${scopedBills.length})` },
+          { id: 'salon_breakdown', label: `Salons (${salonContributions.length})` },
+          { id: 'overview', label: 'Charts' },
+          { id: 'subscription_revenue', label: 'Revenue' },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-0.5 pb-2.5 -mb-px border-b-2 text-xs transition-colors cursor-pointer whitespace-nowrap ${
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`px-0.5 pb-2.5 -mb-px border-b-2 text-xs transition-colors cursor-pointer whitespace-nowrap ${
                 isActive
                   ? 'border-[#0F4C5C] text-slate-900 font-semibold'
                   : 'border-transparent text-slate-500 hover:text-slate-900 font-medium'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
+              {tab.label}
             </button>
           );
         })}
@@ -887,15 +820,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="lg:col-span-2 panel space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Daily Sales Volume &amp; Invoicing Cadence
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Aggregated by calendar date from verified sales records in Supabase
-                  </p>
+                  <h3 className="text-sm font-semibold text-slate-900">Daily sales</h3>
                 </div>
                 <span className="text-xs font-mono font-bold text-slate-800">
-                  {dailyChartData.length} Active Days
+                  {dailyChartData.length} days
                 </span>
               </div>
 
@@ -922,7 +850,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </ResponsiveContainer>
                 ) : (
                   <div className="flex items-center justify-center h-full text-xs text-slate-400">
-                    No sales activity recorded for the active filters.
+                    No sales for the current filters.
                   </div>
                 )}
               </div>
@@ -932,15 +860,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="panel space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Account Governance
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Reasons from verified deletion submissions
-                  </p>
+                  <h3 className="text-sm font-semibold text-slate-900">Account deletions</h3>
                 </div>
                 <span className="text-xs font-mono font-medium text-slate-600">
-                  {deletions.length} Requests
+                  {deletions.length} requests
                 </span>
               </div>
 
@@ -979,18 +902,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                   <div className="pt-2 border-t border-slate-100 text-xs space-y-1.5">
                     <div className="flex items-center justify-between text-slate-600">
-                      <span>Total Requests</span>
+                      <span>Total</span>
                       <span className="font-semibold text-slate-900">{deletions.length}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-slate-600">
-                      <span>Audit Logs Preserved</span>
-                      <span className="font-semibold text-slate-900">100%</span>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-48 text-xs text-neutral-400">
-                  No account deletion requests in database.
+                  No account deletion requests.
                 </div>
               )}
             </div>
@@ -1003,16 +922,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="panel space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">
-                Date-by-Date Sales &amp; Invoicing Activity
-              </h3>
-              <p className="text-xs text-slate-500">
-                Shows exact sales volume and revenue submitted by salons on each calendar date. Click any date to view sales invoices.
-              </p>
+              <h3 className="text-sm font-semibold text-slate-900">Daily sales</h3>
             </div>
 
             <div className="text-xs text-slate-500">
-              {dailyBillingBreakdown.length} active dates recorded
+              {dailyBillingBreakdown.length} dates
             </div>
           </div>
 
@@ -1020,20 +934,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-2.5">Calendar Date</th>
-                  <th className="px-4 py-2.5">Sales Put In</th>
-                  <th className="px-4 py-2.5">Total Invoiced INR</th>
-                  <th className="px-4 py-2.5">Average Ticket</th>
-                  <th className="px-4 py-2.5">Paid vs Pending</th>
-                  <th className="px-4 py-2.5">Top Submitting Salon</th>
-                  <th className="px-4 py-2.5 text-right">Action</th>
+                  <th className="px-4 py-2.5">Date</th>
+                  <th className="px-4 py-2.5">Bills</th>
+                  <th className="px-4 py-2.5">Revenue</th>
+                  <th className="px-4 py-2.5">Avg bill</th>
+                  <th className="px-4 py-2.5">Paid / Pending</th>
+                  <th className="px-4 py-2.5">Top salon</th>
+                  <th className="px-4 py-2.5 text-right"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-sans">
                 {dailyBillingBreakdown.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-400">
-                      No daily sales entries match the current filter criteria.
+                      No sales match the current filters.
                     </td>
                   </tr>
                 ) : (
@@ -1049,7 +963,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </td>
 
                       <td className="px-4 py-2.5">
-                        <span className="text-slate-800 font-medium">{row.billsCount} sales</span>
+                        <span className="text-slate-800 font-medium">{row.billsCount}</span>
                       </td>
 
                       <td className="px-4 py-2.5 font-semibold text-slate-900 tabular-nums">
@@ -1071,7 +985,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <td className="px-4 py-2.5">
                         <div className="font-medium text-slate-800">{row.topSalonName}</div>
                         <span className="text-[11px] text-slate-400">
-                          {row.topSalonBills} sales
+                          {row.topSalonBills} bills
                         </span>
                       </td>
 
@@ -1083,7 +997,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           }}
                           className="text-xs font-medium text-[#0F4C5C] hover:text-[#145B6E] hover:underline cursor-pointer"
                         >
-                          View Sales
+                          View
                         </button>
                       </td>
                     </tr>
@@ -1100,12 +1014,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="panel space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">
-                Verified Sales &amp; Invoices Ledger
-              </h3>
-              <p className="text-xs text-slate-500">
-                Real-time records from verified billing invoices with live status and amounts.
-              </p>
+              <h3 className="text-sm font-semibold text-slate-900">Bills</h3>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1130,12 +1039,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-[11px] border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">Invoice Number</th>
-                  <th className="px-4 py-3">Salon Business</th>
+                  <th className="px-4 py-3">Invoice</th>
+                  <th className="px-4 py-3">Salon</th>
                   <th className="px-4 py-3">Customer</th>
-                  <th className="px-4 py-3">Date &amp; Time</th>
-                  <th className="px-4 py-3">Payment Mode</th>
-                  <th className="px-4 py-3">Amount INR</th>
+                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">Payment</th>
+                  <th className="px-4 py-3">Amount</th>
                   <th className="px-4 py-3">Status</th>
                 </tr>
               </thead>
@@ -1143,7 +1052,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {paginatedBills.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-center text-xs text-slate-400">
-                      No sales match the selected filters. Try clearing the exact date or salon search.
+                      No bills match the current filters.
                     </td>
                   </tr>
                 ) : (
@@ -1154,7 +1063,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <tr key={b.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-4 py-3.5">
                           <span className="font-mono font-bold text-slate-900 block">{b.invoice_number}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">ID: {b.id.slice(0, 8)}...</span>
                         </td>
 
                         <td className="px-4 py-3.5">
@@ -1210,7 +1118,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="flex items-center justify-between pt-4 border-t border-slate-200 text-xs">
               <span className="text-slate-500">
                 Showing {(billsPage - 1) * billsPageSize + 1} to{' '}
-                {Math.min(billsPage * billsPageSize, scopedBills.length)} of {scopedBills.length} invoices
+                {Math.min(billsPage * billsPageSize, scopedBills.length)} of {scopedBills.length} bills
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -1241,16 +1149,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="panel space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-black" />
-                <span>Salon Sales Contribution &amp; Activity Ranking</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                Ranked by total invoiced sales volume and number of sales put in during the selected filter window.
-              </p>
+              <h3 className="text-sm font-semibold text-slate-900">Salons by revenue</h3>
             </div>
             <div className="text-xs font-mono text-slate-600">
-              {salonContributions.length} active contributors
+              {salonContributions.length} salons
             </div>
           </div>
 
@@ -1258,20 +1160,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-2.5">Salon Business</th>
+                  <th className="px-4 py-2.5">Salon</th>
                   <th className="px-4 py-2.5">Location</th>
-                  <th className="px-4 py-2.5">Sales Put In</th>
-                  <th className="px-4 py-2.5">Total Invoiced INR</th>
-                  <th className="px-4 py-2.5">Average Ticket</th>
-                  <th className="px-4 py-2.5">Platform Share</th>
-                  <th className="px-4 py-2.5 text-right">Quick Filter</th>
+                  <th className="px-4 py-2.5">Bills</th>
+                  <th className="px-4 py-2.5">Revenue</th>
+                  <th className="px-4 py-2.5">Avg bill</th>
+                  <th className="px-4 py-2.5">Share</th>
+                  <th className="px-4 py-2.5 text-right"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-sans">
                 {salonContributions.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-400">
-                      No salon sales contributions found for this filter criteria.
+                      No salons match the current filters.
                     </td>
                   </tr>
                 ) : (
@@ -1282,7 +1184,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           <span className="text-slate-400 font-medium w-4">{idx + 1}</span>
                           <div>
                             <span className="font-semibold text-slate-900 block">{sc.name}</span>
-                            <span className="text-[10px] text-slate-400 font-mono">ID: {sc.id.slice(0, 8)}...</span>
                           </div>
                         </div>
                       </td>
@@ -1290,7 +1191,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <td className="px-4 py-2.5 text-slate-600">{sc.city}</td>
 
                       <td className="px-4 py-2.5 font-medium text-slate-800">
-                        {sc.billsCount} sales
+                        {sc.billsCount}
                       </td>
 
                       <td className="px-4 py-2.5 font-semibold text-slate-900 tabular-nums">
@@ -1324,7 +1225,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           }}
                           className="px-2.5 py-1 rounded-md border border-slate-200 text-slate-700 text-xs font-medium hover:border-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
                         >
-                          Filter Salon
+                          View bills
                         </button>
                       </td>
                     </tr>
@@ -1342,26 +1243,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Top KPI Cards for Subscription & Revenue */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <KPICard
-              title="Total Settled Revenue"
+              title="Collected"
               value={formatCurrency(totalPaidMinor)}
-              subtitle={`${scopedPayments.length} verified completed transactions`}
+              subtitle={`${scopedPayments.length} payments`}
             />
             <KPICard
-              title="Active SaaS Salons"
+              title="Paid plans"
               value={salonTierLedger.filter((s) => s.tier !== 'Free Trial').length}
-              subtitle="Active on Pro plans ₹1,499, ₹2,799, ₹4,999"
+              subtitle="Salons on Pro or Starter"
             />
             <KPICard
-              title="Free Trials & Onboarding"
+              title="Free trial"
               value={salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
-              subtitle="Salons using 100 free sales quota"
+              subtitle="Salons on the free quota"
             />
             <KPICard
-              title="Average Revenue / Salon"
+              title="Avg per salon"
               value={formatCurrency(
                 salonTierLedger.length > 0 ? Math.round(totalPaidMinor / salonTierLedger.length) : 0
               )}
-              subtitle="Overall platform ARPU"
+              subtitle="Collected / salons"
             />
           </div>
 
@@ -1371,12 +1272,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="lg:col-span-2 panel space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    Monthly Revenue Trajectory &amp; Collections
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Real volume tracked from verified payment records and billing invoices in Supabase
-                  </p>
+                  <h3 className="text-sm font-semibold text-slate-900">Monthly revenue</h3>
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium">
                   <div className="flex items-center gap-1.5 text-slate-700">
@@ -1436,7 +1332,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                    No monthly revenue data available in the active date scope.
+                    No revenue in the selected period.
                   </div>
                 )}
               </div>
@@ -1445,12 +1341,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* Subscription Tier Distribution */}
             <div className="panel space-y-4">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Subscription Tier Distribution
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Salon breakdown by operational scale and usage tier
-                </p>
+                <h3 className="text-sm font-semibold text-slate-900">Plans</h3>
               </div>
 
               <div className="space-y-2.5 pt-1">
@@ -1492,12 +1383,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="panel overflow-hidden space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Salon Subscription Accounts &amp; Financial Contribution
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Live revenue contributions from all {salonTierLedger.length} partner salons
-                </p>
+                <h3 className="text-sm font-semibold text-slate-900">Salon revenue ({salonTierLedger.length})</h3>
               </div>
 
               <ExportButton
@@ -1511,7 +1397,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   lastActive: formatDateTime(s.lastActive),
                 }))}
                 filename="stylefleet_subscription_revenue_report"
-                label="Export Revenue Report"
+                label="Export CSV"
               />
             </div>
 
@@ -1519,13 +1405,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <table className="w-full text-xs text-left">
                 <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-2.5">Salon Business &amp; City</th>
-                    <th className="px-4 py-2.5">Subscription Tier</th>
-                    <th className="px-4 py-2.5">Collected Revenue</th>
-                    <th className="px-4 py-2.5">Invoiced Volume</th>
+                    <th className="px-4 py-2.5">Salon</th>
+                    <th className="px-4 py-2.5">Plan</th>
+                    <th className="px-4 py-2.5">Collected</th>
+                    <th className="px-4 py-2.5">Invoiced</th>
                     <th className="px-4 py-2.5">Transactions</th>
                     <th className="px-4 py-2.5">Last Active</th>
-                    <th className="px-4 py-2.5 text-right">Actions</th>
+                    <th className="px-4 py-2.5 text-right"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-sans">
@@ -1554,7 +1440,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </td>
 
                       <td className="px-4 py-2.5 text-slate-600">
-                        {item.txnCount} settled txns
+                        {item.txnCount}
                       </td>
 
                       <td className="px-4 py-2.5 text-slate-500">
@@ -1585,8 +1471,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* DASHBOARD BOTTOM UTILITY & LEGAL BAR */}
       <div className="pt-4 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
-          <span>StyleFleet Super Admin CRM • Production Platform Connected</span>
+          <span>StyleFleet Admin</span>
         </div>
         <div className="flex items-center gap-3">
           {onOpenPrivacyPolicy && (
