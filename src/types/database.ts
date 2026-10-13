@@ -248,6 +248,7 @@ export interface SupportMessage {
   created_at: string;
   updated_at: string;
   shop?: Shop;
+  shop_name?: string;
   profile?: Profile;
   answers?: SupportMessageAnswer[];
 }

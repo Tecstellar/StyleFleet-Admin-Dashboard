@@ -3,33 +3,72 @@ import { SupportMessage, SupportMessageAnswer } from '../types/database';
 
 export async function fetchSupportMessages(): Promise<{ data: SupportMessage[]; error: string | null }> {
   try {
-    const { data: messages, error } = await supabase
+    let rawMessages: any[] | null = null;
+
+    // 1. First attempt joined query with shops
+    const { data: joinedData, error: joinedErr } = await supabase
       .from('support_messages')
       .select('*, shop:shops(id, name)')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
-    if (!messages) return { data: [], error: null };
+    if (joinedErr) {
+      console.warn('Joined support_messages query failed, trying flat select:', joinedErr);
+      const { data: flatData, error: flatErr } = await supabase
+        .from('support_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    // Fetch existing answers to associate with tickets
-    const { data: answers } = await supabase
-      .from('support_message_answers')
-      .select('*')
-      .order('created_at', { ascending: true });
+      if (flatErr) throw flatErr;
+      rawMessages = flatData || [];
 
-    const answersMap = new Map<string, SupportMessageAnswer[]>();
-    if (answers) {
-      answers.forEach((ans: SupportMessageAnswer) => {
-        if (ans.message_id) {
-          const list = answersMap.get(ans.message_id) || [];
-          list.push(ans);
-          answersMap.set(ans.message_id, list);
-        }
-      });
+      // Manually match shops if possible
+      const shopIds = Array.from(new Set(rawMessages.map((m: any) => m.shop_id).filter(Boolean)));
+      if (shopIds.length > 0) {
+        const { data: shopsData } = await supabase
+          .from('shops')
+          .select('id, name')
+          .in('id', shopIds);
+
+        const shopMap = new Map((shopsData || []).map((s: any) => [s.id, s]));
+        rawMessages = rawMessages.map((m: any) => ({
+          ...m,
+          shop: m.shop_id ? shopMap.get(m.shop_id) || null : null,
+          shop_name: m.shop_id ? shopMap.get(m.shop_id)?.name || '' : '',
+        }));
+      }
+    } else {
+      rawMessages = (joinedData || []).map((m: any) => ({
+        ...m,
+        shop_name: m.shop?.name || '',
+      }));
     }
 
-    const enriched = messages.map((m: any) => ({
+    if (!rawMessages) return { data: [], error: null };
+
+    // 2. Fetch existing answers without breaking the messages if answers query errors
+    const answersMap = new Map<string, SupportMessageAnswer[]>();
+    try {
+      const { data: answers, error: answersErr } = await supabase
+        .from('support_message_answers')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!answersErr && answers) {
+        answers.forEach((ans: SupportMessageAnswer) => {
+          if (ans.message_id) {
+            const list = answersMap.get(ans.message_id) || [];
+            list.push(ans);
+            answersMap.set(ans.message_id, list);
+          }
+        });
+      }
+    } catch (ansErr) {
+      console.warn('Could not load support_message_answers:', ansErr);
+    }
+
+    const enriched: SupportMessage[] = rawMessages.map((m: any) => ({
       ...m,
+      shop_name: m.shop_name || m.shop?.name || '',
       answers: answersMap.get(m.id) || [],
     }));
 

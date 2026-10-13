@@ -13,6 +13,10 @@ import {
   CornerDownRight,
   Store,
   Phone,
+  MessageCircle,
+  RefreshCw,
+  Calendar,
+  Filter,
 } from 'lucide-react';
 import { DataTable, Column } from '../common/DataTable';
 import { StatusBadge } from '../common/StatusBadge';
@@ -36,6 +40,8 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
   const { dateRange } = useDateFilter();
   const [selectedMessage, setSelectedMessage] = useState<SupportMessage | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved' | 'closed'>('all');
+  const [applyDateFilter, setApplyDateFilter] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Answer Form State
   const [answerText, setAnswerText] = useState('');
@@ -46,13 +52,35 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
   const [isRlsBlocked, setIsRlsBlocked] = useState(false);
   const [copiedSql, setCopiedSql] = useState(false);
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await onRefresh?.();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const counts = useMemo(() => {
+    const base = applyDateFilter ? filterByDateRange(messages, 'created_at', dateRange) : messages;
+    return {
+      all: base.length,
+      open: base.filter((m) => m.status === 'open').length,
+      in_progress: base.filter((m) => m.status === 'in_progress').length,
+      resolved: base.filter((m) => m.status === 'resolved').length,
+      closed: base.filter((m) => m.status === 'closed').length,
+      totalAllTime: messages.length,
+      dateFilteredCount: filterByDateRange(messages, 'created_at', dateRange).length,
+    };
+  }, [messages, applyDateFilter, dateRange]);
+
   const filteredMessages = useMemo(() => {
-    let result = filterByDateRange(messages, 'created_at', dateRange);
+    let result = applyDateFilter ? filterByDateRange(messages, 'created_at', dateRange) : [...messages];
     if (statusFilter !== 'all') {
       result = result.filter((m) => m.status === statusFilter);
     }
     return result;
-  }, [messages, dateRange, statusFilter]);
+  }, [messages, applyDateFilter, dateRange, statusFilter]);
 
   const handleOpenModal = (m: SupportMessage) => {
     setSelectedMessage(m);
@@ -129,40 +157,58 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
     {
       key: 'salon',
       header: 'Salon / Sender',
-      render: (m) => (
-        <div>
-          <div className="font-semibold text-neutral-900">
-            {m.shop?.name || 'Direct Mobile App User'}
+      render: (m) => {
+        const phoneDigits = m.contact_info ? m.contact_info.replace(/\D/g, '').slice(-10) : '';
+        return (
+          <div>
+            <div className="font-semibold text-neutral-900 text-xs">
+              {m.shop?.name || m.shop_name || 'Direct Mobile App User'}
+            </div>
+            {m.contact_info && (
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[11px] text-neutral-500 font-mono">{m.contact_info}</span>
+                {phoneDigits && (
+                  <a
+                    href={`https://wa.me/91${phoneDigits}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200 transition-colors"
+                    title="Direct WhatsApp Chat"
+                  >
+                    <MessageCircle className="w-2.5 h-2.5" />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
-          {m.contact_info && (
-            <div className="text-[11px] text-neutral-500 font-mono">{m.contact_info}</div>
-          )}
-        </div>
-      ),
+        );
+      },
     },
     {
       key: 'message',
       header: 'Message Content',
       render: (m) => (
-        <div className="text-neutral-700 truncate max-w-sm">
+        <div className="text-neutral-800 text-xs truncate max-w-sm font-medium">
           {m.message}
         </div>
       ),
     },
     {
       key: 'answers',
-      header: 'Answers',
+      header: 'Replies',
       render: (m) => {
         const count = m.answers?.length || 0;
         return (
           <span
             className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium border ${
               count > 0
-                ? 'bg-neutral-900 text-white border-neutral-900'
+                ? 'bg-blue-50 text-blue-700 border-blue-200'
                 : 'bg-neutral-100 text-neutral-500 border-neutral-200'
             }`}
           >
-            {count} reply{count === 1 ? '' : 'ies'}
+            {count} {count === 1 ? 'reply' : 'replies'}
           </span>
         );
       },
@@ -190,7 +236,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
             e.stopPropagation();
             handleOpenModal(m);
           }}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-800 hover:border-black hover:text-black shadow-xs transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-800 hover:border-black hover:text-black shadow-2xs transition-colors cursor-pointer"
         >
           <Eye className="w-3.5 h-3.5 text-neutral-800" />
           <span>Reply &amp; Manage</span>
@@ -203,39 +249,127 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-neutral-900" />
-            <h1 className="text-xl font-bold tracking-tight text-neutral-900">
-              Support Messages &amp; Help Desk
-            </h1>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold tracking-tight text-neutral-900">
+                  Support Messages &amp; Help Desk
+                </h1>
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 font-mono">
+                  {counts.totalAllTime} Total
+                </span>
+                {counts.open > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 font-mono animate-pulse">
+                    {counts.open} Open
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Realtime salon communications. Replies are recorded into Supabase table <code className="text-neutral-900 font-semibold font-mono">public.support_message_answers</code>.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Realtime salon communications. Replies are recorded into Supabase table <code className="text-neutral-900 font-semibold font-mono">public.support_message_answers</code>.
-          </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100 border border-neutral-200 text-xs">
-          {(['all', 'open', 'in_progress', 'resolved', 'closed'] as const).map((st) => (
+        {/* Action Controls & Date Toggle */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Date Filter Toggle Mode */}
+          <div className="inline-flex items-center p-1 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-medium">
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1 rounded-lg font-medium capitalize transition-colors ${
-                statusFilter === st
-                  ? 'bg-[#111827] text-white font-bold shadow-xs'
+              onClick={() => setApplyDateFilter(false)}
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                !applyDateFilter
+                  ? 'bg-white text-neutral-900 font-bold shadow-2xs'
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              {st.replace('_', ' ')}
+              All Time ({counts.totalAllTime})
             </button>
-          ))}
+            <button
+              onClick={() => setApplyDateFilter(true)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                applyDateFilter
+                  ? 'bg-blue-600 text-white font-bold shadow-2xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
+              }`}
+            >
+              <Calendar className="w-3 h-3" />
+              <span>{dateRange.label} ({counts.dateFilteredCount})</span>
+            </button>
+          </div>
+
+          {/* Refresh Button */}
+          {onRefresh && (
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing || loading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-semibold cursor-pointer shadow-2xs transition-all disabled:opacity-50"
+              title="Refresh support tickets from Supabase"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing || loading ? 'animate-spin text-blue-600' : 'text-neutral-500'}`} />
+              <span>Refresh</span>
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Filter Tabs by Ticket Status */}
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100 border border-neutral-200 text-xs overflow-x-auto">
+        {(
+          [
+            { id: 'all', label: 'All', count: counts.all },
+            { id: 'open', label: 'Open', count: counts.open },
+            { id: 'in_progress', label: 'In Progress', count: counts.in_progress },
+            { id: 'resolved', label: 'Resolved', count: counts.resolved },
+            { id: 'closed', label: 'Closed', count: counts.closed },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setStatusFilter(tab.id as any)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              statusFilter === tab.id
+                ? 'bg-[#111827] text-white shadow-2xs'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-white/60'
+            }`}
+          >
+            <span>{tab.label}</span>
+            <span
+              className={`px-1.5 py-0.2 rounded-full font-mono text-[10px] ${
+                statusFilter === tab.id ? 'bg-white/20 text-white' : 'bg-neutral-200/80 text-neutral-700'
+              }`}
+            >
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Date Filter Notice when active period has 0 matches */}
+      {applyDateFilter && filteredMessages.length === 0 && messages.length > 0 && (
+        <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/80 text-amber-900 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>
+              0 tickets submitted within the active date range ({dateRange.label}). There are {messages.length} tickets recorded across all time.
+            </span>
+          </div>
+          <button
+            onClick={() => setApplyDateFilter(false)}
+            className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors shrink-0 cursor-pointer shadow-2xs"
+          >
+            View All Time ({messages.length})
+          </button>
+        </div>
+      )}
+
       {/* Supabase RLS Notice Banner */}
-      {messages.length === 0 && (
+      {messages.length === 0 && !loading && (
         <div className="p-4 rounded-2xl border border-neutral-200 border-l-4 border-l-black bg-neutral-50 text-xs text-neutral-800 space-y-3 shadow-xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2 font-bold text-neutral-900">
@@ -287,10 +421,10 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
         emptyDescription={
           messages.length === 0
             ? 'The support inbox is currently clear with 0 pending tickets.'
-            : 'No support messages match the selected status filter or date range.'
+            : 'No support messages match the selected status filter.'
         }
-        searchPlaceholder="Search message content, sender, ticket ID..."
-        searchFields={['message', 'contact_info', 'id']}
+        searchPlaceholder="Search message content, salon, phone, ticket ID..."
+        searchFields={['message', 'contact_info', 'id', 'shop_name']}
         defaultSortField="created_at"
         defaultSortOrder="desc"
         onRowClick={(m) => handleOpenModal(m)}
