@@ -636,7 +636,9 @@ export const App: React.FC = () => {
           {currentView === 'incomplete_signups' && (
             <IncompleteSignupsView
               shops={shops}
+              profiles={profiles}
               loading={loading}
+              onRefresh={handleManualRefresh}
               onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
@@ -722,6 +724,7 @@ export const App: React.FC = () => {
           {currentView === 'account_deletions' && (
             <AccountDeletionsView
               deletions={deletions}
+              shops={shops}
               loading={loading}
               onRefresh={handleManualRefresh}
               onOpenDeleteAccountInstructions={openDeleteAccountPage}
