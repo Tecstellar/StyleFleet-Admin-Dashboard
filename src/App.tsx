@@ -19,7 +19,7 @@ import { SubscriptionPlansView } from './components/views/SubscriptionPlansView'
 import { OverviewView } from './components/views/OverviewView';
 import { ProductAnalyticsView } from './components/views/ProductAnalyticsView';
 import { DailyUserMetricsView } from './components/views/DailyUserMetricsView';
-import { CrmAddedUsersView } from './components/views/CrmAddedUsersView';
+import { UserDetailsView } from './components/views/UserDetailsView';
 import { LoginView } from './components/auth/LoginView';
 import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
 import { DeleteAccountView } from './components/views/DeleteAccountView';
@@ -511,6 +511,7 @@ export const App: React.FC = () => {
               appointments={appointments}
               staff={staff}
               customers={customers}
+              payments={payments}
               telemetryRecords={telemetryRecords}
               loading={loading}
               onNavigate={(v) => setCurrentView(v)}
@@ -550,6 +551,7 @@ export const App: React.FC = () => {
               payments={payments}
               bills={bills}
               shops={shops}
+              subscriptions={subscriptions}
               loading={loading}
               onSelectSalon={handleSelectSalonDrilldown}
             />
@@ -586,7 +588,7 @@ export const App: React.FC = () => {
           )}
 
           {/* 2. Salons & 360 Ecosystem */}
-          {(currentView === 'salons_360' || currentView === 'user_details') && (
+          {currentView === 'salons_360' && (
             <SalonsCombinedView
               shops={shops}
               profiles={profiles}
@@ -601,8 +603,21 @@ export const App: React.FC = () => {
               selectedShop={selectedShopForModal}
               onClearSelectedShop={() => setSelectedShopForModal(null)}
               onRefresh={handleManualRefresh}
-              initialTab={currentView === 'user_details' ? 'ecosystem_360' : salonsTab}
+              initialTab={salonsTab}
               initialModalTab={salonModalInitialTab}
+            />
+          )}
+
+          {/* 2a. User Details (Reference Column View with Real Data) */}
+          {currentView === 'user_details' && (
+            <UserDetailsView
+              shops={shops}
+              bills={bills}
+              subscriptions={subscriptions}
+              telemetryRecords={telemetryRecords}
+              loading={loading}
+              onRefresh={handleManualRefresh}
+              onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
 
@@ -637,12 +652,14 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 4. Payment History (Purchases & Transactions) */}
+          {/* 4. Payment History (Subscription Amounts & Purchases) */}
           {currentView === 'purchases' && (
             <PurchasesView
               payments={payments}
               shops={shops}
+              subscriptions={subscriptions}
               loading={loading}
+              onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
 
@@ -707,17 +724,6 @@ export const App: React.FC = () => {
               deletions={deletions}
               loading={loading}
               onOpenDeleteAccountInstructions={openDeleteAccountPage}
-            />
-          )}
-
-          {/* 11. CRM Added Users */}
-          {currentView === 'crm_added_users' && (
-            <CrmAddedUsersView
-              customers={customers}
-              shops={shops}
-              bills={bills}
-              loading={loading}
-              onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
         </main>

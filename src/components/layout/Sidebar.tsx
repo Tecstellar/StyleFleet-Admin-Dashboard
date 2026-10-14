@@ -6,7 +6,6 @@ import {
   LayoutGrid,
   Users,
   Activity,
-  UserPlus,
   Headphones,
   Smartphone,
   Bug,
@@ -299,9 +298,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
           </div>
-
-          {/* CRM added users */}
-          {renderNavButton('crm_added_users', 'CRM added users', UserPlus)}
         </div>
 
         {/* SECTION: ENGAGEMENT */}

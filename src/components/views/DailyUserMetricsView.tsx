@@ -8,11 +8,17 @@ import {
   ChevronRight,
   UserCheck,
   TrendingUp,
+  Store,
+  Phone,
+  MapPin,
+  Receipt,
+  Crown,
+  CheckCircle2,
+  Clock,
 } from 'lucide-react';
 import { formatNumber } from '../../utils/formatters';
-import { formatDate } from '../../utils/dateUtils';
 import { KPICard } from '../common/KPICard';
-import { Shop, Profile, Staff, Customer, Bill, Appointment } from '../../types/database';
+import { Shop, Profile, Staff, Customer, Bill, Appointment, Payment } from '../../types/database';
 
 interface DailyUserMetricsViewProps {
   shops: Shop[];
@@ -22,9 +28,21 @@ interface DailyUserMetricsViewProps {
   bills: Bill[];
   appointments: Appointment[];
   subscriptions?: any[];
-  payments?: any[];
+  payments?: Payment[];
   loading?: boolean;
   onSelectSalon?: (shop: Shop) => void;
+}
+
+interface SalonOwnerActivityItem {
+  id: string;
+  name: string;
+  phone: string;
+  salonName: string;
+  salonCity?: string;
+  shop?: Shop | null;
+  registrationDate: string;
+  isSubscriber: boolean;
+  activitiesOnDate: string[];
 }
 
 interface DailyRow {
@@ -36,7 +54,10 @@ interface DailyRow {
   premiumConversions: number;
   premiumChurned: number;
   totalUsers: number;
-  newUsersList: any[];
+  newUsersList: SalonOwnerActivityItem[];
+  activeUsersList: SalonOwnerActivityItem[];
+  conversionUsersList: SalonOwnerActivityItem[];
+  cumulativeUsersList: SalonOwnerActivityItem[];
 }
 
 export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
@@ -54,240 +75,414 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [drilldownData, setDrilldownData] = useState<{
     title: string;
+    subtitle: string;
     date: string;
-    users: any[];
+    type: 'new_users' | 'active_users' | 'conversions' | 'total_users' | 'subscribers';
+    users: SalonOwnerActivityItem[];
   } | null>(null);
 
-  // Live timestamp for "Updated 06 Oct, 07:41 pm"
+  // Live timestamp for "Updated <DD> <Month>, <hh:mm am/pm>"
   const formattedUpdatedTime = useMemo(() => {
     const now = new Date();
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = now.toLocaleString('en-US', { month: 'short' });
-    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
-    return `Updated ${day} ${month}, ${time}`;
+    return now.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).replace(',', ' at') + ' (IST)';
   }, []);
 
-  // Compute 100% real daily metrics strictly from Supabase database tables
-  const { dailyRows, monthTabs, totalUsersCount, newSubscribersCount, totalSubscribersCount } =
-    useMemo(() => {
-      const getCleanPhone = (p?: string | null) => {
-        if (!p) return null;
-        const cleaned = p.replace(/\D/g, '');
-        if (cleaned.length >= 10) return cleaned.slice(-10);
-        return cleaned || null;
-      };
+  // Normalize phone number to last 10 digits
+  const getCleanPhone = (p?: string | null): string | null => {
+    if (!p) return null;
+    const cleaned = p.replace(/\D/g, '');
+    if (cleaned.length >= 10) return cleaned.slice(-10);
+    return cleaned || null;
+  };
 
-      // 1. Map Salon Owner Users strictly from profiles and shops (NO CRM customer records)
-      interface SalonOwnerUser {
-        key: string;
-        id: string;
-        name: string;
-        phone: string;
-        salonName: string;
-        salonCity?: string;
-        role: string;
-        type: string;
-        first_created_at: string;
-        shopIds: Set<string>;
-        allIds: Set<string>;
+  // Convert UTC timestamp to Indian Standard Time (YYYY-MM-DD) date key
+  const toISTDateKey = (dateStr: string): string => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    } catch {
+      return (dateStr || '').split('T')[0];
+    }
+  };
+
+  // Compute 100% REAL daily metrics strictly from live Supabase database tables
+  const {
+    dailyRows,
+    monthTabs,
+    totalUsersCount,
+    newSubscribersCount,
+    totalSubscribersCount,
+    allSubscribersList,
+    allOwnersList,
+  } = useMemo(() => {
+    // 1. Filter out internal/test salons
+    const internalNames = ['test salon', 'demo salon', 'antigravity test'];
+    const realShops = shops.filter((s) => {
+      const name = (s.name || '').toLowerCase();
+      return !internalNames.some((t) => name.includes(t));
+    });
+
+    // 2. Identify real subscribers strictly from payments, subscriptions, or overrides
+    const shopPaymentsMap = new Map<string, Payment[]>();
+    payments.forEach((p) => {
+      if (!shopPaymentsMap.has(p.shop_id)) shopPaymentsMap.set(p.shop_id, []);
+      shopPaymentsMap.get(p.shop_id)!.push(p);
+    });
+
+    const isShopSubscribed = (shopId: string, shop?: Shop | null): boolean => {
+      const sPayments = shopPaymentsMap.get(shopId) || [];
+      const hasPaidPlan = sPayments.some(
+        (p) =>
+          (p.status === 'completed' || (p as any).status === 'success') &&
+          ((p as any).amount_minor >= 49900 || (p.reference && p.reference.toLowerCase().includes('sub')))
+      );
+      const hasSubscriptionTableRecord = subscriptions.some(
+        (sub) => sub.shop_id === shopId && (sub.status === 'active' || sub.status === 'paid')
+      );
+      const hasSalesLimitOverride = (shop?.free_sales_limit || 0) > 100;
+      return hasPaidPlan || hasSubscriptionTableRecord || hasSalesLimitOverride;
+    };
+
+    // 3. Map Salon Owner Users strictly from real shops and profiles (NO CRM customer records)
+    interface BaseOwner {
+      key: string;
+      id: string;
+      name: string;
+      phone: string;
+      salonName: string;
+      salonCity?: string;
+      shop: Shop | null;
+      registrationDate: string;
+      isSubscriber: boolean;
+      allShopIds: Set<string>;
+    }
+
+    const ownersMap = new Map<string, BaseOwner>();
+    const shopIdToOwnerKey = new Map<string, string>();
+
+    // Map by owner_profile_id and by phone
+    const profilesMap = new Map<string, Profile>();
+    profiles.forEach((p) => profilesMap.set(p.id, p));
+
+    realShops.forEach((s) => {
+      const cp = getCleanPhone(s.phone);
+      const ownerProf = s.owner_profile_id ? profilesMap.get(s.owner_profile_id) : null;
+      const key = cp ? `phone:${cp}` : `shop:${s.id}`;
+
+      if (!ownersMap.has(key)) {
+        const ownerName = ownerProf?.full_name?.trim() || `${s.name} Owner`;
+        const phone = s.phone || ownerProf?.phone || 'No phone';
+        const isSub = isShopSubscribed(s.id, s);
+
+        ownersMap.set(key, {
+          key,
+          id: s.id,
+          name: ownerName,
+          phone,
+          salonName: s.name,
+          salonCity: s.city || undefined,
+          shop: s,
+          registrationDate: s.created_at || new Date().toISOString(),
+          isSubscriber: isSub,
+          allShopIds: new Set([s.id]),
+        });
+      } else {
+        const existing = ownersMap.get(key)!;
+        existing.allShopIds.add(s.id);
+        if (!existing.shop) existing.shop = s;
+        if (s.name && !existing.salonName) existing.salonName = s.name;
+        if (s.city && !existing.salonCity) existing.salonCity = s.city;
+        if (isShopSubscribed(s.id, s)) existing.isSubscriber = true;
       }
 
-      const uniqueOwnersMap = new Map<string, SalonOwnerUser>();
-      const shopIdToOwnerKey = new Map<string, string>();
+      shopIdToOwnerKey.set(s.id, key);
+      if (s.duplicate_ids) {
+        s.duplicate_ids.forEach((dupId) => shopIdToOwnerKey.set(dupId, key));
+      }
+    });
 
-      // Index shops by owner_profile_id and by phone
-      const shopByOwnerProfId = new Map<string, Shop>();
-      const shopByPhone = new Map<string, Shop>();
-      shops.forEach((s) => {
-        if (s.owner_profile_id) shopByOwnerProfId.set(s.owner_profile_id, s);
-        const cp = getCleanPhone(s.phone);
-        if (cp) shopByPhone.set(cp, s);
-      });
+    const allOwners = Array.from(ownersMap.values());
 
-      // Register all owner profiles
-      profiles.forEach((p) => {
-        const cp = getCleanPhone(p.phone);
-        const key = cp ? `phone:${cp}` : `prof:${p.id}`;
-        const shop = shopByOwnerProfId.get(p.id) || (cp ? shopByPhone.get(cp) : null);
+    // 4. Map date-by-date activity strictly for salon owner users
+    interface DateRecord {
+      newOwners: Set<string>;
+      activeOwnerActivities: Map<string, string[]>;
+      conversionOwners: Set<string>;
+      churnedOwners: Set<string>;
+    }
 
-        const owner: SalonOwnerUser = {
-          key,
-          id: p.id,
-          name: p.full_name?.trim() || (shop ? `${shop.name} Owner` : 'Salon Owner'),
-          phone: p.phone || shop?.phone || 'No phone',
-          salonName: shop?.name || 'Unassigned',
-          salonCity: shop?.city || '',
-          role: 'Salon Owner',
-          type: 'Salon Owner',
-          first_created_at: p.created_at || new Date().toISOString(),
-          shopIds: new Set(shop ? [shop.id] : []),
-          allIds: new Set([p.id]),
-        };
-        uniqueOwnersMap.set(key, owner);
-        if (shop) {
-          shopIdToOwnerKey.set(shop.id, key);
-          if (shop.duplicate_ids) {
-            shop.duplicate_ids.forEach((dId) => shopIdToOwnerKey.set(dId, key));
+    const dateMap = new Map<string, DateRecord>();
+
+    const getOrCreateDate = (key: string): DateRecord => {
+      if (!dateMap.has(key)) {
+        dateMap.set(key, {
+          newOwners: new Set<string>(),
+          activeOwnerActivities: new Map<string, string[]>(),
+          conversionOwners: new Set<string>(),
+          churnedOwners: new Set<string>(),
+        });
+      }
+      return dateMap.get(key)!;
+    };
+
+    // A. Record new salon owner signups
+    allOwners.forEach((u) => {
+      if (!u.registrationDate) return;
+      const dateKey = toISTDateKey(u.registrationDate);
+      if (!dateKey) return;
+
+      const record = getOrCreateDate(dateKey);
+      record.newOwners.add(u.key);
+
+      // New signup is also considered active on registration day
+      if (!record.activeOwnerActivities.has(u.key)) {
+        record.activeOwnerActivities.set(u.key, []);
+      }
+      record.activeOwnerActivities.get(u.key)!.push('New Salon Registration');
+    });
+
+    // B. Track active salon owners from bills (sales finalized on that date)
+    bills.forEach((b) => {
+      if (!b.created_at && !b.issued_at) return;
+      if (!b.shop_id) return;
+
+      const ownerKey = shopIdToOwnerKey.get(b.shop_id);
+      if (!ownerKey) return;
+
+      const dateKey = toISTDateKey(b.issued_at || b.created_at);
+      if (!dateKey) return;
+
+      const record = getOrCreateDate(dateKey);
+      if (!record.activeOwnerActivities.has(ownerKey)) {
+        record.activeOwnerActivities.set(ownerKey, []);
+      }
+
+      const invText = b.invoice_number ? `Bill #${b.invoice_number}` : 'POS Sale';
+      const amtText = b.total_minor ? ` (₹${Math.round(b.total_minor / 100)})` : '';
+      const actStr = `Generated ${invText}${amtText}`;
+
+      // Avoid adding duplicate bill strings to activities list
+      const acts = record.activeOwnerActivities.get(ownerKey)!;
+      if (acts.filter((a) => a.startsWith('Generated')).length < 3) {
+        acts.push(actStr);
+      }
+    });
+
+    // C. Track active salon owners from appointments
+    appointments.forEach((a) => {
+      if (!a.created_at || !a.shop_id) return;
+      const ownerKey = shopIdToOwnerKey.get(a.shop_id);
+      if (!ownerKey) return;
+
+      const dateKey = toISTDateKey(a.created_at);
+      if (!dateKey) return;
+
+      const record = getOrCreateDate(dateKey);
+      if (!record.activeOwnerActivities.has(ownerKey)) {
+        record.activeOwnerActivities.set(ownerKey, []);
+      }
+      const acts = record.activeOwnerActivities.get(ownerKey)!;
+      if (!acts.includes('Booked Client Appointment')) {
+        acts.push('Booked Client Appointment');
+      }
+    });
+
+    // D. Track real subscription conversions from payments & subscriptions
+    payments.forEach((p) => {
+      if (!p.created_at || !p.shop_id) return;
+      const ownerKey = shopIdToOwnerKey.get(p.shop_id);
+      if (!ownerKey) return;
+
+      const isSubPayment =
+        (p.status === 'completed' || (p as any).status === 'success') &&
+        ((p as any).amount_minor >= 49900 || (p.reference && p.reference.toLowerCase().includes('sub')));
+
+      if (isSubPayment) {
+        const dateKey = toISTDateKey(p.created_at);
+        if (dateKey) {
+          const record = getOrCreateDate(dateKey);
+          record.conversionOwners.add(ownerKey);
+          if (!record.activeOwnerActivities.has(ownerKey)) {
+            record.activeOwnerActivities.set(ownerKey, []);
           }
+          record.activeOwnerActivities.get(ownerKey)!.push('Subscribed to Paid Plan');
         }
+      }
+    });
+
+    subscriptions.forEach((sub) => {
+      if (!sub.created_at || !sub.shop_id) return;
+      const ownerKey = shopIdToOwnerKey.get(sub.shop_id);
+      if (!ownerKey) return;
+
+      const dateKey = toISTDateKey(sub.created_at);
+      if (!dateKey) return;
+
+      const record = getOrCreateDate(dateKey);
+      if (sub.status === 'active' || sub.status === 'paid') {
+        record.conversionOwners.add(ownerKey);
+      } else if (sub.status === 'cancelled' || sub.status === 'expired') {
+        record.churnedOwners.add(ownerKey);
+      }
+    });
+
+    // 5. Chronological sorting for cumulative totals
+    const sortedAscDates = Array.from(dateMap.keys()).sort();
+    let runningCumulativeOwners: SalonOwnerActivityItem[] = [];
+    const dateToCumulativeUsers = new Map<string, SalonOwnerActivityItem[]>();
+
+    sortedAscDates.forEach((key) => {
+      const record = dateMap.get(key)!;
+      const newItems: SalonOwnerActivityItem[] = Array.from(record.newOwners).map((oKey) => {
+        const owner = ownersMap.get(oKey)!;
+        return {
+          id: owner.id,
+          name: owner.name,
+          phone: owner.phone,
+          salonName: owner.salonName,
+          salonCity: owner.salonCity,
+          shop: owner.shop,
+          registrationDate: owner.registrationDate,
+          isSubscriber: owner.isSubscriber,
+          activitiesOnDate: ['Registered Salon Profile'],
+        };
       });
 
-      // Also register canonical shops if owner account is directly attached to shop record
-      shops.forEach((s) => {
-        const cp = getCleanPhone(s.phone);
-        const key = cp ? `phone:${cp}` : `shop:${s.id}`;
-        if (!uniqueOwnersMap.has(key)) {
-          const owner: SalonOwnerUser = {
-            key,
-            id: s.id,
-            name: s.name ? `${s.name} Owner` : 'Salon Owner',
-            phone: s.phone || 'No phone',
-            salonName: s.name,
-            salonCity: s.city || '',
-            role: 'Salon Owner',
-            type: 'Salon Owner',
-            first_created_at: s.created_at || new Date().toISOString(),
-            shopIds: new Set([s.id]),
-            allIds: new Set([s.id]),
-          };
-          uniqueOwnersMap.set(key, owner);
-          shopIdToOwnerKey.set(s.id, key);
-        } else {
-          const existing = uniqueOwnersMap.get(key)!;
-          existing.shopIds.add(s.id);
-          shopIdToOwnerKey.set(s.id, key);
-          if (s.name && existing.salonName === 'Unassigned') existing.salonName = s.name;
-          if (s.city && !existing.salonCity) existing.salonCity = s.city;
-        }
-        if (s.duplicate_ids) {
-          s.duplicate_ids.forEach((dId) => shopIdToOwnerKey.set(dId, key));
-        }
+      runningCumulativeOwners = [...runningCumulativeOwners, ...newItems];
+      dateToCumulativeUsers.set(key, runningCumulativeOwners);
+    });
+
+    // 6. Build descending daily rows (latest first)
+    const sortedDatesDesc = [...sortedAscDates].reverse();
+    const rows: DailyRow[] = [];
+    const monthsSet = new Set<string>();
+
+    sortedDatesDesc.forEach((key) => {
+      const record = dateMap.get(key)!;
+      const d = new Date(key + 'T12:00:00Z');
+      const formattedDate = d.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+      const monthKey = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      monthsSet.add(monthKey);
+
+      // New users item list for this day
+      const newUsersList: SalonOwnerActivityItem[] = Array.from(record.newOwners).map((oKey) => {
+        const owner = ownersMap.get(oKey)!;
+        return {
+          id: owner.id,
+          name: owner.name,
+          phone: owner.phone,
+          salonName: owner.salonName,
+          salonCity: owner.salonCity,
+          shop: owner.shop,
+          registrationDate: owner.registrationDate,
+          isSubscriber: owner.isSubscriber,
+          activitiesOnDate: record.activeOwnerActivities.get(oKey) || ['Newly Registered'],
+        };
       });
 
-      const allUniqueOwners = Array.from(uniqueOwnersMap.values());
-
-      // 2. Map date-by-date activity strictly for salon owner users
-      const dateMap = new Map<
-        string,
-        {
-          newUsers: SalonOwnerUser[];
-          activeUserKeys: Set<string>;
-          conversions: number;
-          churned: number;
-        }
-      >();
-
-      const getOrCreateDate = (key: string) => {
-        if (!dateMap.has(key)) {
-          dateMap.set(key, {
-            newUsers: [],
-            activeUserKeys: new Set<string>(),
-            conversions: 0,
-            churned: 0,
-          });
-        }
-        return dateMap.get(key)!;
-      };
-
-      // Group genuine new salon owner registrations on their first signup date
-      allUniqueOwners.forEach((u) => {
-        if (!u.first_created_at) return;
-        const key = u.first_created_at.split('T')[0];
-        const entry = getOrCreateDate(key);
-        entry.newUsers.push(u);
-        entry.activeUserKeys.add(u.key);
+      // Active users item list for this day
+      const activeUsersList: SalonOwnerActivityItem[] = Array.from(
+        record.activeOwnerActivities.entries()
+      ).map(([oKey, acts]) => {
+        const owner = ownersMap.get(oKey)!;
+        return {
+          id: owner.id,
+          name: owner.name,
+          phone: owner.phone,
+          salonName: owner.salonName,
+          salonCity: owner.salonCity,
+          shop: owner.shop,
+          registrationDate: owner.registrationDate,
+          isSubscriber: owner.isSubscriber,
+          activitiesOnDate: acts.length > 0 ? acts : ['Active Session'],
+        };
       });
 
-      // Track active salon owners from bills (sales submitted by their salon)
-      bills.forEach((b) => {
-        if (!b.created_at || !b.shop_id) return;
-        const key = b.created_at.split('T')[0];
-        const ownerKey = shopIdToOwnerKey.get(b.shop_id);
-        if (ownerKey) {
-          const entry = getOrCreateDate(key);
-          entry.activeUserKeys.add(ownerKey);
-        }
+      // Conversion users list for this day
+      const conversionUsersList: SalonOwnerActivityItem[] = Array.from(
+        record.conversionOwners
+      ).map((oKey) => {
+        const owner = ownersMap.get(oKey)!;
+        return {
+          id: owner.id,
+          name: owner.name,
+          phone: owner.phone,
+          salonName: owner.salonName,
+          salonCity: owner.salonCity,
+          shop: owner.shop,
+          registrationDate: owner.registrationDate,
+          isSubscriber: true,
+          activitiesOnDate: ['Subscribed to Paid Plan'],
+        };
       });
 
-      // Track active salon owners from appointments
-      appointments.forEach((a) => {
-        if (!a.created_at || !a.shop_id) return;
-        const key = a.created_at.split('T')[0];
-        const ownerKey = shopIdToOwnerKey.get(a.shop_id);
-        if (ownerKey) {
-          const entry = getOrCreateDate(key);
-          entry.activeUserKeys.add(ownerKey);
-        }
+      const cumulativeList = dateToCumulativeUsers.get(key) || [];
+
+      rows.push({
+        dateKey: key,
+        formattedDate,
+        monthKey,
+        newUsers: newUsersList.length,
+        activeUsers: activeUsersList.length,
+        premiumConversions: conversionUsersList.length,
+        premiumChurned: record.churnedOwners.size,
+        totalUsers: cumulativeList.length,
+        newUsersList,
+        activeUsersList,
+        conversionUsersList,
+        cumulativeUsersList: cumulativeList,
       });
+    });
 
-      // Track real premium subscriptions (strictly from the subscriptions table)
-      subscriptions.forEach((s) => {
-        if (!s.created_at) return;
-        const key = s.created_at.split('T')[0];
-        const entry = getOrCreateDate(key);
-        if (s.status === 'active' || s.status === 'paid') {
-          entry.conversions += 1;
-        } else if (s.status === 'cancelled' || s.status === 'expired') {
-          entry.churned += 1;
-        }
-      });
+    // 7. Full subscribers and owners list for KPI card drilldown
+    const allSubscribersList: SalonOwnerActivityItem[] = allOwners
+      .filter((o) => o.isSubscriber)
+      .map((o) => ({
+        id: o.id,
+        name: o.name,
+        phone: o.phone,
+        salonName: o.salonName,
+        salonCity: o.salonCity,
+        shop: o.shop,
+        registrationDate: o.registrationDate,
+        isSubscriber: true,
+        activitiesOnDate: ['Active Paid Subscriber'],
+      }));
 
-      // 3. Chronological sorting to compute exact cumulative total users
-      const sortedAscDates = Array.from(dateMap.keys()).sort();
-      let runningCumulative = 0;
-      const dateToCumulativeTotal = new Map<string, number>();
+    const allOwnersList: SalonOwnerActivityItem[] = allOwners.map((o) => ({
+      id: o.id,
+      name: o.name,
+      phone: o.phone,
+      salonName: o.salonName,
+      salonCity: o.salonCity,
+      shop: o.shop,
+      registrationDate: o.registrationDate,
+      isSubscriber: o.isSubscriber,
+      activitiesOnDate: [o.isSubscriber ? 'Paid Subscriber' : 'Standard Salon Owner'],
+    }));
 
-      sortedAscDates.forEach((key) => {
-        const entry = dateMap.get(key)!;
-        runningCumulative += entry.newUsers.length;
-        dateToCumulativeTotal.set(key, runningCumulative);
-      });
-
-      // 4. Build descending daily rows (latest first)
-      const sortedDatesDesc = [...sortedAscDates].reverse();
-      const rows: DailyRow[] = [];
-      const monthsSet = new Set<string>();
-
-      sortedDatesDesc.forEach((key) => {
-        const entry = dateMap.get(key)!;
-        const d = new Date(key + 'T00:00:00');
-        const formattedDate = d.toLocaleDateString('en-GB', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        });
-        const monthKey = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        monthsSet.add(monthKey);
-
-        rows.push({
-          dateKey: key,
-          formattedDate,
-          monthKey,
-          newUsers: entry.newUsers.length,
-          activeUsers: entry.activeUserKeys.size,
-          premiumConversions: entry.conversions,
-          premiumChurned: entry.churned,
-          totalUsers: dateToCumulativeTotal.get(key) || 0,
-          newUsersList: entry.newUsers,
-        });
-      });
-
-      // 5. Subscriptions totals (100% true data from database)
-      const newSubs = subscriptions.filter(
-        (s) => s.status === 'active' || s.status === 'paid'
-      ).length;
-      const totalSubs = subscriptions.filter(
-        (s) => s.status === 'active'
-      ).length;
-
-      return {
-        dailyRows: rows,
-        monthTabs: Array.from(monthsSet),
-        totalUsersCount: allUniqueOwners.length,
-        newSubscribersCount: newSubs,
-        totalSubscribersCount: totalSubs,
-      };
-    }, [profiles, shops, bills, appointments, subscriptions]);
+    return {
+      dailyRows: rows,
+      monthTabs: Array.from(monthsSet),
+      totalUsersCount: allOwners.length,
+      newSubscribersCount: allSubscribersList.length,
+      totalSubscribersCount: allSubscribersList.length,
+      allSubscribersList,
+      allOwnersList,
+    };
+  }, [shops, profiles, bills, appointments, subscriptions, payments]);
 
   // Filter rows by selected month
   const filteredRows = useMemo(() => {
@@ -295,20 +490,27 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
     return dailyRows.filter((r) => r.monthKey.toLowerCase() === selectedMonth.toLowerCase());
   }, [dailyRows, selectedMonth]);
 
-  // True growth calculation over loaded dates
+  // Real user growth calculation over the filtered date range
   const growthPercentage = useMemo(() => {
     if (filteredRows.length <= 1) return '+0.0%';
-    const latest = filteredRows[0].totalUsers;
-    const oldest = filteredRows[filteredRows.length - 1].totalUsers;
-    if (oldest <= 0) return `+${((latest) * 100).toFixed(1)}%`;
+    const latest = filteredRows[0]?.totalUsers || 0;
+    const oldest = filteredRows[filteredRows.length - 1]?.totalUsers || 0;
+    if (oldest <= 0) return `+${latest * 100}%`;
     const growth = (((latest - oldest) / oldest) * 100).toFixed(1);
     return `+${growth}%`;
   }, [filteredRows]);
 
-  const latestDateString = dailyRows.length > 0 ? dailyRows[0].formattedDate : '6 October 2026';
+  const latestDateString = dailyRows.length > 0 ? dailyRows[0].formattedDate : 'Today';
+
+  const handleOpenSalon = (shop: Shop | null | undefined) => {
+    if (shop && onSelectSalon) {
+      setDrilldownData(null);
+      onSelectSalon(shop);
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       {/* Title & Top Refresh Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -319,7 +521,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
             Daily salon owner signups, active salon owners, premium conversions, churn, and totals.
           </p>
           <div className="text-xs text-neutral-400 mt-2 font-medium">
-            {formattedUpdatedTime}
+            Updated {formattedUpdatedTime}
           </div>
         </div>
 
@@ -332,29 +534,74 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         </button>
       </div>
 
-      {/* 4 Metric KPI Cards - Clean White & Emerald/Teal Modern Style */}
+      {/* 4 Metric KPI Cards - Clickable to open full drilldowns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <KPICard
-          title="Total Salon Owners"
-          value={formatNumber(totalUsersCount)}
-          subtitle={`As of ${latestDateString} • all dates`}
-          icon={Users}
-          tone="revenue"
-        />
-        <KPICard
-          title="New Subscribers"
-          value={newSubscribersCount}
-          subtitle="First completed payments"
-          icon={UserCheck}
-          tone="conversion"
-        />
-        <KPICard
-          title="Total Subscribers"
-          value={totalSubscribersCount}
-          subtitle={`Active as of ${latestDateString}`}
-          icon={Users}
-          tone="signup"
-        />
+        <div
+          onClick={() =>
+            setDrilldownData({
+              title: 'Total Salon Owners Directory',
+              subtitle: 'All registered salon owner accounts',
+              date: `As of ${latestDateString}`,
+              type: 'total_users',
+              users: allOwnersList,
+            })
+          }
+          className="cursor-pointer transition-transform hover:-translate-y-0.5"
+          title="Click to view all registered salon owners"
+        >
+          <KPICard
+            title="Total Salon Owners"
+            value={formatNumber(totalUsersCount)}
+            subtitle={`As of ${latestDateString} • Click to view`}
+            icon={Users}
+            tone="revenue"
+          />
+        </div>
+
+        <div
+          onClick={() =>
+            setDrilldownData({
+              title: 'New Subscribers',
+              subtitle: 'Salon owners who converted to paid subscription',
+              date: `Active • ${newSubscribersCount} salons`,
+              type: 'subscribers',
+              users: allSubscribersList,
+            })
+          }
+          className="cursor-pointer transition-transform hover:-translate-y-0.5"
+          title="Click to view subscriber salons"
+        >
+          <KPICard
+            title="New Subscribers"
+            value={newSubscribersCount}
+            subtitle="First completed payments • Click to view"
+            icon={UserCheck}
+            tone="conversion"
+          />
+        </div>
+
+        <div
+          onClick={() =>
+            setDrilldownData({
+              title: 'Total Active Subscribers',
+              subtitle: 'All salons with active paid subscriptions',
+              date: `Active as of ${latestDateString}`,
+              type: 'subscribers',
+              users: allSubscribersList,
+            })
+          }
+          className="cursor-pointer transition-transform hover:-translate-y-0.5"
+          title="Click to view active subscribers"
+        >
+          <KPICard
+            title="Total Subscribers"
+            value={totalSubscribersCount}
+            subtitle={`Active as of ${latestDateString} • Click to view`}
+            icon={Crown}
+            tone="signup"
+          />
+        </div>
+
         <KPICard
           title="User Growth"
           value={growthPercentage}
@@ -366,12 +613,22 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
 
       {/* Main Table Panel: Select Daily User Metrics to change */}
       <div className="bg-white rounded-xl border border-neutral-200/90 shadow-2xs p-5 sm:p-6">
-        <h3 className="text-base font-bold text-[#1c1f26] tracking-tight">
-          Select Daily User Metrics to change
-        </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 className="text-base font-bold text-[#1c1f26] tracking-tight">
+              Select Daily User Metrics to change
+            </h3>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Touch any number below to inspect the exact salons and users behind it.
+            </p>
+          </div>
+          <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 self-start sm:self-auto">
+            Interactive Touch Active
+          </span>
+        </div>
 
         {/* Month Filter Tabs strictly derived from real activity dates */}
-        <div className="flex items-center gap-4 text-xs font-semibold overflow-x-auto mt-3 pb-3 border-b border-neutral-100">
+        <div className="flex items-center gap-4 text-xs font-semibold overflow-x-auto mt-4 pb-3 border-b border-neutral-100">
           <button
             onClick={() => setSelectedMonth('all')}
             className={`pb-1 transition-all cursor-pointer whitespace-nowrap ${
@@ -380,7 +637,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
                 : 'text-neutral-500 hover:text-[#1c1f26] border-b-2 border-transparent'
             }`}
           >
-            All dates
+            All dates ({dailyRows.length})
           </button>
           {monthTabs.map((m) => (
             <button
@@ -411,116 +668,234 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 text-neutral-800">
-              {filteredRows.map((row) => (
-                <tr key={row.dateKey} className="hover:bg-neutral-50/70 transition-colors">
-                  {/* DATE */}
-                  <td className="py-3.5 px-2 font-medium text-neutral-900 whitespace-nowrap">
-                    {row.formattedDate}
+              {filteredRows.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-xs text-neutral-400">
+                    No activity recorded for this period.
                   </td>
+                </tr>
+              ) : (
+                filteredRows.map((row) => (
+                  <tr key={row.dateKey} className="hover:bg-neutral-50/80 transition-colors">
+                    {/* DATE */}
+                    <td className="py-3.5 px-2 font-medium text-neutral-900 whitespace-nowrap">
+                      {row.formattedDate}
+                    </td>
 
-                  {/* NEW USERS (black clickable link) */}
-                  <td className="py-3.5 px-2 text-center">
-                    {row.newUsers > 0 ? (
+                    {/* NEW USERS (Interactive Touch button) */}
+                    <td className="py-3.5 px-2 text-center">
+                      {row.newUsers > 0 ? (
+                        <button
+                          onClick={() =>
+                            setDrilldownData({
+                              title: 'New Salon Owners Registered',
+                              subtitle: 'Salons that completed initial registration on this date',
+                              date: row.formattedDate,
+                              type: 'new_users',
+                              users: row.newUsersList,
+                            })
+                          }
+                          className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-md bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition-colors cursor-pointer"
+                          title="Touch to view newly registered salons"
+                        >
+                          {row.newUsers}
+                        </button>
+                      ) : (
+                        <span className="text-neutral-400 font-mono">0</span>
+                      )}
+                    </td>
+
+                    {/* ACTIVE USERS (Interactive Touch button) */}
+                    <td className="py-3.5 px-2 text-center">
+                      {row.activeUsers > 0 ? (
+                        <button
+                          onClick={() =>
+                            setDrilldownData({
+                              title: 'Active Salon Owners',
+                              subtitle: 'Salons that generated sales, appointments, or registered on this date',
+                              date: row.formattedDate,
+                              type: 'active_users',
+                              users: row.activeUsersList,
+                            })
+                          }
+                          className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-md bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition-colors cursor-pointer"
+                          title="Touch to see which salons were active on this date"
+                        >
+                          {row.activeUsers}
+                        </button>
+                      ) : (
+                        <span className="text-neutral-400 font-mono">0</span>
+                      )}
+                    </td>
+
+                    {/* PREMIUM CONVERSIONS (Interactive Touch button) */}
+                    <td className="py-3.5 px-2 text-center">
+                      {row.premiumConversions > 0 ? (
+                        <button
+                          onClick={() =>
+                            setDrilldownData({
+                              title: 'Premium Subscriber Conversions',
+                              subtitle: 'Salons that subscribed to a paid tier on this date',
+                              date: row.formattedDate,
+                              type: 'conversions',
+                              users: row.conversionUsersList,
+                            })
+                          }
+                          className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-md bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer"
+                          title="Touch to view converted subscribers"
+                        >
+                          {row.premiumConversions}
+                        </button>
+                      ) : (
+                        <span className="text-neutral-400 font-mono">0</span>
+                      )}
+                    </td>
+
+                    {/* PREMIUM CHURNED */}
+                    <td className="py-3.5 px-2 text-center text-neutral-400 font-mono">
+                      {row.premiumChurned}
+                    </td>
+
+                    {/* TOTAL USERS (Interactive Touch button) */}
+                    <td className="py-3.5 px-2 text-right">
                       <button
                         onClick={() =>
                           setDrilldownData({
-                            title: 'Registered Salon Owners on this date',
-                            date: row.formattedDate,
-                            users: row.newUsersList,
+                            title: 'Cumulative Salons',
+                            subtitle: 'All salons registered up to this date',
+                            date: `As of ${row.formattedDate}`,
+                            type: 'total_users',
+                            users: row.cumulativeUsersList,
                           })
                         }
-                        className="text-[#1c1f26] font-bold hover:underline cursor-pointer"
+                        className="text-[#1c1f26] font-bold font-mono hover:underline cursor-pointer"
+                        title="Touch to view cumulative salon list"
                       >
-                        {row.newUsers}
+                        {formatNumber(row.totalUsers)}
                       </button>
-                    ) : (
-                      <span className="text-neutral-400 font-mono">0</span>
-                    )}
-                  </td>
-
-                  {/* ACTIVE USERS */}
-                  <td className="py-3.5 px-2 text-center">
-                    {row.activeUsers > 0 ? (
-                      <span className="text-[#1c1f26] font-bold">
-                        {row.activeUsers}
-                      </span>
-                    ) : (
-                      <span className="text-neutral-400 font-mono">0</span>
-                    )}
-                  </td>
-
-                  {/* PREMIUM CONVERSIONS */}
-                  <td className="py-3.5 px-2 text-center">
-                    {row.premiumConversions > 0 ? (
-                      <span className="text-[#1c1f26] font-bold">
-                        {row.premiumConversions}
-                      </span>
-                    ) : (
-                      <span className="text-neutral-400 font-mono">0</span>
-                    )}
-                  </td>
-
-                  {/* PREMIUM CHURNED */}
-                  <td className="py-3.5 px-2 text-center text-neutral-400 font-mono">
-                    {row.premiumChurned}
-                  </td>
-
-                  {/* TOTAL USERS */}
-                  <td className="py-3.5 px-2 text-right">
-                    <span className="text-[#1c1f26] font-bold font-mono">
-                      {formatNumber(row.totalUsers)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Drilldown Modal if a day's new users are clicked */}
+      {/* Interactive Drilldown Modal when touching ANY user metric */}
       {drilldownData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-neutral-200">
-            <div className="flex items-center justify-between mb-4 border-b border-neutral-100 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-neutral-200 max-h-[85vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-neutral-100">
               <div>
-                <h3 className="text-sm font-bold text-neutral-900">{drilldownData.title}</h3>
-                <p className="text-xs text-neutral-500">{drilldownData.date} • {drilldownData.users.length} salon owners</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-neutral-900">
+                    {drilldownData.title}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-200">
+                    {drilldownData.users.length} {drilldownData.users.length === 1 ? 'Salon' : 'Salons'}
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  {drilldownData.subtitle}
+                </p>
+                <div className="text-[11px] font-mono text-neutral-400 mt-1 flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3 text-neutral-400" />
+                  <span>{drilldownData.date}</span>
+                </div>
               </div>
+
               <button
                 onClick={() => setDrilldownData(null)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer shrink-0"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100">
+            {/* Modal List of Salons */}
+            <div className="flex-1 overflow-y-auto divide-y divide-neutral-100 py-2 pr-1">
               {drilldownData.users.length === 0 ? (
-                <div className="py-6 text-center text-xs text-neutral-400">
-                  No salon owners registered on this date.
+                <div className="py-8 text-center text-xs text-neutral-400">
+                  No salon owners recorded for this metric.
                 </div>
               ) : (
-                drilldownData.users.map((u, i) => (
-                  <div key={i} className="py-2.5 flex items-center justify-between text-xs">
-                    <div>
-                      <div className="font-semibold text-neutral-900">{u.name}</div>
-                      <div className="text-[11px] text-neutral-500">
-                        {u.phone} • {u.salonName}{u.salonCity ? ` (${u.salonCity})` : ''}
+                drilldownData.users.map((item, idx) => (
+                  <div
+                    key={`${item.id}-${idx}`}
+                    className="py-3 px-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-neutral-50/70 rounded-lg transition-colors"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-neutral-900 text-sm">
+                          {item.salonName}
+                        </span>
+                        {item.salonCity && (
+                          <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-neutral-600 bg-neutral-100 px-1.5 py-0.5 rounded">
+                            <MapPin className="w-2.5 h-2.5 text-neutral-400" />
+                            {item.salonCity}
+                          </span>
+                        )}
+                        {item.isSubscriber && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
+                            <Crown className="w-2.5 h-2.5 text-amber-600" />
+                            Subscribed
+                          </span>
+                        )}
                       </div>
+
+                      <div className="text-xs text-neutral-600 flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-neutral-800">
+                          {item.name}
+                        </span>
+                        {item.phone && item.phone !== 'No phone' && (
+                          <a
+                            href={`tel:${item.phone}`}
+                            className="inline-flex items-center gap-1 text-neutral-500 hover:text-neutral-900 font-mono text-[11px]"
+                          >
+                            <Phone className="w-3 h-3 text-neutral-400" />
+                            {item.phone}
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Real Activity on this date */}
+                      {item.activitiesOnDate && item.activitiesOnDate.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                          {item.activitiesOnDate.map((act, actIdx) => (
+                            <span
+                              key={actIdx}
+                              className="text-[10px] font-medium text-emerald-800 bg-emerald-50/80 border border-emerald-100 px-2 py-0.5 rounded"
+                            >
+                              • {act}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-700">
-                      Salon Owner
-                    </span>
+
+                    {/* View Salon 360 Action */}
+                    {item.shop && onSelectSalon && (
+                      <button
+                        onClick={() => handleOpenSalon(item.shop)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer self-start sm:self-center shrink-0"
+                      >
+                        <span>View Salon</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 ))
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-neutral-100 flex justify-end">
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+              <span>Touch any salon above to inspect complete 360 profile.</span>
               <button
                 onClick={() => setDrilldownData(null)}
-                className="px-4 py-1.5 bg-[#1c1f26] text-white rounded-lg text-xs font-semibold hover:bg-[#282d37] transition-colors cursor-pointer"
+                className="px-4 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 Close
               </button>

@@ -80,7 +80,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
   const [billSearch, setBillSearch] = useState<string>('');
   const [billStatus, setBillStatus] = useState<string>('all');
   const [billPaymentMethod, setBillPaymentMethod] = useState<string>('all');
-  const [billPresetRange, setBillPresetRange] = useState<'all' | 'today' | 'yesterday' | 'last_7_days' | 'this_month'>('today');
+  const [billPresetRange, setBillPresetRange] = useState<'all' | 'today' | 'yesterday' | 'last_7_days' | 'this_month'>('all');
 
   useEffect(() => {
     if (initialTab && isOpen) {

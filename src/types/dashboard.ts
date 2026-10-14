@@ -33,7 +33,6 @@ export type NavView =
   | 'purchases'
   | 'system_health'
   | 'reports_bi'
-  | 'crm_added_users'
   | 'support_messages'
   | 'subscription_plans'
   | 'salons_360'

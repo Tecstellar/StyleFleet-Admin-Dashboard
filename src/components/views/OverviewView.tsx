@@ -322,40 +322,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
         {/* Top Action Controls */}
         <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto">
-          {/* Live Sync Badge */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Live Sync</span>
-          </div>
-
-          {/* Date Range Selector Pill */}
-          <div className="relative">
-            <select
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value as DateFilterOption)}
-              className="appearance-none pl-7 pr-7 py-1 text-xs font-semibold rounded-full border border-slate-200 bg-white text-slate-700 hover:border-slate-300 focus:outline-none focus:border-slate-400 cursor-pointer shadow-2xs"
-            >
-              <option value="all_time">All Time</option>
-              <option value="today">Today</option>
-              <option value="yesterday">Yesterday</option>
-              <option value="last_7_days">Last 7 Days</option>
-              <option value="last_30_days">Last 30 Days</option>
-            </select>
-            <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-
-          {/* Top Quick Search Bar */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search shops, bills, staff..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1 text-xs rounded-full border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 w-48 sm:w-56 shadow-2xs"
-            />
-          </div>
 
           {/* Top Export Button */}
           <ExportButton

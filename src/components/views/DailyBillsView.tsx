@@ -49,10 +49,10 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
   loading = false,
   onSelectSalon,
 }) => {
-  // Multi-Attribute Filter States (defaults to today)
+  // Multi-Attribute Filter States (defaults to all time)
   const [salonFilter, setSalonFilter] = useState<string>('all');
-  const [exactDate, setExactDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
-  const [datePreset, setDatePreset] = useState<'all' | 'today' | 'yesterday' | '7d' | '30d'>('today');
+  const [exactDate, setExactDate] = useState<string>('');
+  const [datePreset, setDatePreset] = useState<'all' | 'today' | 'yesterday' | '7d' | '30d'>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeSubTab, setActiveSubTab] = useState<'matrix' | 'invoices'>('matrix');

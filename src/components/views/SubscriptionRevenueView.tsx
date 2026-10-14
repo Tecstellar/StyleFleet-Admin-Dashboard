@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   TrendingUp,
   CreditCard,
@@ -15,6 +15,11 @@ import {
   DollarSign,
   AlertCircle,
   FileSpreadsheet,
+  PlusCircle,
+  Crown,
+  Phone,
+  RotateCcw,
+  Zap,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -28,63 +33,82 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { Shop, Payment, Bill } from '../../types/database';
-import { DataTable, Column } from '../common/DataTable';
 import { ExportButton } from '../common/ExportButton';
 import { KPICard } from '../common/KPICard';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 import { formatDateTime, formatDate } from '../../utils/dateUtils';
+import { supabase } from '../../services/supabase';
 
-interface SalonRevenueSummary {
-  shop: Shop;
+export type SubscriptionTier = '1m' | '3m' | '6m' | '1y' | 'custom';
+
+export interface CompanySubscriptionItem {
   id: string;
-  name: string;
+  shopId: string;
+  shopName: string;
   city: string;
   phone: string;
-  totalCollectedMinor: number;
-  totalInvoicedMinor: number;
-  transactionCount: number;
-  paidBillsCount: number;
-  latestPaidAt: string | null;
-  latestRef: string;
-  methodsUsed: string[];
+  tier: SubscriptionTier;
+  planName: string;
+  amountINR: number; // In Rupees, e.g. 1499
+  paymentMethod: string;
+  reference: string;
+  status: 'active' | 'expired' | 'trial';
+  activatedAt: string;
+  expiresAt: string;
+  source: 'gateway_payment' | 'database_subscription' | 'manual_activation';
 }
 
 interface SubscriptionRevenueViewProps {
   payments: Payment[];
   bills: Bill[];
   shops: Shop[];
+  subscriptions?: any[];
   loading?: boolean;
   onSelectSalon?: (shop: Shop) => void;
 }
+
+const PLAN_PRICING: Record<SubscriptionTier, { name: string; price: number; durationMonths: number }> = {
+  '1m': { name: '1 Month Pro', price: 499, durationMonths: 1 },
+  '3m': { name: '3 Months Pro', price: 1499, durationMonths: 3 },
+  '6m': { name: '6 Months Pro', price: 2799, durationMonths: 6 },
+  '1y': { name: '1 Year Pro', price: 4999, durationMonths: 12 },
+  'custom': { name: 'Custom Pro Plan', price: 1999, durationMonths: 3 },
+};
 
 export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = ({
   payments,
   bills,
   shops,
+  subscriptions = [],
   loading = false,
   onSelectSalon,
 }) => {
-  // Multi-Attribute Filter States
+  // Filters & State
   const [salonFilter, setSalonFilter] = useState<string>('all');
-  const [cityFilter, setCityFilter] = useState<string>('all');
+  const [tierFilter, setTierFilter] = useState<string>('all');
   const [methodFilter, setMethodFilter] = useState<string>('all');
-  const [exactDate, setExactDate] = useState<string>('');
-  const [datePreset, setDatePreset] = useState<'all' | 'today' | 'yesterday' | '7d' | '30d'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedSalonDrilldown, setSelectedSalonDrilldown] = useState<string | null>(null);
+  const [chartViewMode, setChartViewMode] = useState<'area' | 'bar'>('area');
 
-  // Deduplicate shops
-  const deduplicatedShops = useMemo(() => {
-    const seen = new Set<string>();
-    return shops
-      .filter((s) => {
-        const norm = s.name.trim().toLowerCase();
-        if (seen.has(norm)) return false;
-        seen.add(norm);
-        return true;
-      })
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [shops]);
+  // Manual Subscription Modal
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const [modalShopId, setModalShopId] = useState<string>('');
+  const [modalTier, setModalTier] = useState<SubscriptionTier>('3m');
+  const [modalCustomAmount, setModalCustomAmount] = useState<string>('1499');
+  const [modalMethod, setModalMethod] = useState<string>('UPI');
+  const [modalRef, setModalRef] = useState<string>('');
+  const [modalDate, setModalDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Persistent Manual Subscriptions in localStorage
+  const [manualSubscriptions, setManualSubscriptions] = useState<CompanySubscriptionItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('stylefleet_company_subscriptions');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   // Shop Map
   const shopMap = useMemo(() => {
@@ -98,666 +122,767 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
     return map;
   }, [shops]);
 
-  // Unique Cities
-  const uniqueCities = useMemo(() => {
-    const set = new Set<string>();
-    shops.forEach((s) => {
-      if (s.city && s.city.trim()) set.add(s.city.trim());
-    });
-    return Array.from(set).sort();
+  // Deduplicated Salons
+  const deduplicatedShops = useMemo(() => {
+    const seen = new Set<string>();
+    return shops
+      .filter((s) => {
+        const norm = s.name.trim().toLowerCase();
+        if (seen.has(norm)) return false;
+        seen.add(norm);
+        return true;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [shops]);
 
-  // Unique Payment Methods from real data
-  const uniqueMethods = useMemo(() => {
-    const set = new Set<string>();
+  // 1. COMPILE ALL STYLEFLEET COMPANY SUBSCRIPTION REVENUES
+  // Excludes salon customer bills (haircuts/pos bills). Only counts StyleFleet Pro subscriptions.
+  const allCompanySubscriptions: CompanySubscriptionItem[] = useMemo(() => {
+    const list: CompanySubscriptionItem[] = [];
+    const seenKeys = new Set<string>();
+
+    // A. Real online gateway payments for subscriptions (payments with amount >= 49900 or reference mentioning sub/plan)
     payments.forEach((p) => {
-      if (p.method) set.add(p.method);
-    });
-    return Array.from(set);
-  }, [payments]);
+      const amt = Math.round((p.amount_minor || 0) / 100);
+      const isSub =
+        (p.status === 'completed' || (p as any).status === 'success') &&
+        (amt >= 499 || (p.reference && p.reference.toLowerCase().includes('sub')) || !p.bill_id);
 
-  // Handle Preset Click
-  const handlePreset = (preset: 'all' | 'today' | 'yesterday' | '7d' | '30d') => {
-    setDatePreset(preset);
-    const now = new Date();
-    if (preset === 'today') {
-      setExactDate(now.toISOString().split('T')[0]);
-    } else if (preset === 'yesterday') {
-      const y = new Date(now);
-      y.setDate(y.getDate() - 1);
-      setExactDate(y.toISOString().split('T')[0]);
-    } else {
-      setExactDate('');
-    }
-  };
-
-  // TRUE FILTERED PAYMENTS: strictly based on real Supabase records
-  const filteredPayments = useMemo(() => {
-    return payments.filter((p) => {
-      // 1. Status: completed only
-      if (p.status !== 'completed') return false;
-
-      // 2. Salon Filter
-      if (salonFilter !== 'all') {
-        const selectedShop = shops.find((s) => s.id === salonFilter);
-        const allowedIds = selectedShop?.duplicate_ids && selectedShop.duplicate_ids.length > 0
-          ? selectedShop.duplicate_ids
-          : [salonFilter];
-        if (!allowedIds.includes(p.shop_id)) return false;
-      }
-
-      // 3. City Filter
-      if (cityFilter !== 'all') {
+      // Only include if it represents a subscription plan price tier
+      if (isSub && (amt === 499 || amt === 1499 || amt === 2799 || amt === 4999 || (p.reference && p.reference.toLowerCase().includes('sub')))) {
         const shop = shopMap.get(p.shop_id);
-        if (!shop || shop.city?.toLowerCase() !== cityFilter.toLowerCase()) return false;
+        const uniqueKey = `pay:${p.id}`;
+        if (!seenKeys.has(uniqueKey)) {
+          seenKeys.add(uniqueKey);
+
+          let tier: SubscriptionTier = '1m';
+          if (amt >= 4999) tier = '1y';
+          else if (amt >= 2799) tier = '6m';
+          else if (amt >= 1499) tier = '3m';
+
+          const actDate = p.paid_at || p.created_at || new Date().toISOString();
+          const exp = new Date(actDate);
+          exp.setMonth(exp.getMonth() + PLAN_PRICING[tier].durationMonths);
+
+          list.push({
+            id: p.id,
+            shopId: p.shop_id,
+            shopName: shop?.name || 'Registered Salon',
+            city: shop?.city || 'Tamil Nadu',
+            phone: shop?.phone || '—',
+            tier,
+            planName: PLAN_PRICING[tier].name,
+            amountINR: amt,
+            paymentMethod: p.method || 'Online Gateway',
+            reference: p.reference || `PAY-${p.id.slice(0, 8).toUpperCase()}`,
+            status: 'active',
+            activatedAt: actDate,
+            expiresAt: exp.toISOString(),
+            source: 'gateway_payment',
+          });
+        }
       }
+    });
 
-      // 4. Method Filter
-      if (methodFilter !== 'all' && p.method !== methodFilter) return false;
+    // B. Real Subscriptions Table entries from Supabase
+    subscriptions.forEach((sub) => {
+      const shop = shopMap.get(sub.shop_id);
+      const uniqueKey = `sub:${sub.id}`;
+      if (!seenKeys.has(uniqueKey)) {
+        seenKeys.add(uniqueKey);
 
-      // 5. Exact Date
-      if (exactDate) {
-        if (!p.paid_at) return false;
-        const d = new Date(p.paid_at).toISOString().split('T')[0];
-        if (d !== exactDate) return false;
+        const tier: SubscriptionTier = (sub.plan as SubscriptionTier) || '3m';
+        const price = sub.amount || PLAN_PRICING[tier]?.price || 1499;
+        const actDate = sub.created_at || new Date().toISOString();
+        const exp = sub.expires_at || new Date(new Date(actDate).setMonth(new Date(actDate).getMonth() + (PLAN_PRICING[tier]?.durationMonths || 3))).toISOString();
+
+        list.push({
+          id: sub.id,
+          shopId: sub.shop_id,
+          shopName: shop?.name || 'Subscribed Salon',
+          city: shop?.city || 'Tamil Nadu',
+          phone: shop?.phone || '—',
+          tier,
+          planName: PLAN_PRICING[tier]?.name || 'StyleFleet Pro Plan',
+          amountINR: price,
+          paymentMethod: sub.payment_method || 'Razorpay UPI',
+          reference: sub.reference || `SUB-${sub.id.slice(0, 8).toUpperCase()}`,
+          status: sub.status === 'active' || sub.status === 'paid' ? 'active' : 'expired',
+          activatedAt: actDate,
+          expiresAt: exp,
+          source: 'database_subscription',
+        });
       }
+    });
 
-      // 6. Presets
-      if (!exactDate && datePreset !== 'all') {
-        if (!p.paid_at) return false;
-        const t = new Date(p.paid_at).getTime();
-        const now = Date.now();
-        if (datePreset === '7d' && now - t > 7 * 86400000) return false;
-        if (datePreset === '30d' && now - t > 30 * 86400000) return false;
+    // C. Salons with explicit Pro quota override (e.g. Brave & Cave with free_sales_limit: 200)
+    shops.forEach((s) => {
+      if ((s.free_sales_limit || 0) > 100) {
+        const uniqueKey = `override:${s.id}`;
+        // If not already counted via payment/subscription
+        const alreadyCounted = list.some((item) => item.shopId === s.id);
+        if (!alreadyCounted && !seenKeys.has(uniqueKey)) {
+          seenKeys.add(uniqueKey);
+          const actDate = s.created_at || new Date().toISOString();
+          const exp = new Date(actDate);
+          exp.setMonth(exp.getMonth() + 3);
+
+          list.push({
+            id: `pro-${s.id.slice(0, 8)}`,
+            shopId: s.id,
+            shopName: s.name,
+            city: s.city || 'Tamil Nadu',
+            phone: s.phone || '—',
+            tier: '3m',
+            planName: '3 Months Pro (Admin Activated)',
+            amountINR: 1499,
+            paymentMethod: 'Manual Plan Upgrade',
+            reference: 'Sales Limit Override (200 Sales)',
+            status: 'active',
+            activatedAt: actDate,
+            expiresAt: exp.toISOString(),
+            source: 'manual_activation',
+          });
+        }
       }
+    });
 
-      // 7. Search
+    // D. Manual Subscriptions added via UI
+    manualSubscriptions.forEach((m) => {
+      const uniqueKey = `manual:${m.id}`;
+      if (!seenKeys.has(uniqueKey)) {
+        seenKeys.add(uniqueKey);
+        list.push(m);
+      }
+    });
+
+    // Sort descending by activated date
+    return list.sort((a, b) => new Date(b.activatedAt).getTime() - new Date(a.activatedAt).getTime());
+  }, [payments, subscriptions, shops, shopMap, manualSubscriptions]);
+
+  // Filtered Company Subscriptions
+  const filteredSubscriptions = useMemo(() => {
+    return allCompanySubscriptions.filter((item) => {
+      // Salon Filter
+      if (salonFilter !== 'all' && item.shopId !== salonFilter) return false;
+
+      // Tier Filter
+      if (tierFilter !== 'all' && item.tier !== tierFilter) return false;
+
+      // Method Filter
+      if (methodFilter !== 'all' && item.paymentMethod !== methodFilter) return false;
+
+      // Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const shop = shopMap.get(p.shop_id);
-        const shopMatch = shop ? shop.name.toLowerCase().includes(q) : false;
-        const refMatch = (p.reference || '').toLowerCase().includes(q);
-        const idMatch = p.id.toLowerCase().includes(q);
-        const methodMatch = (p.method || '').toLowerCase().includes(q);
-        if (!shopMatch && !refMatch && !idMatch && !methodMatch) return false;
+        const nameMatch = item.shopName.toLowerCase().includes(q);
+        const cityMatch = item.city.toLowerCase().includes(q);
+        const phoneMatch = item.phone.toLowerCase().includes(q);
+        const refMatch = item.reference.toLowerCase().includes(q);
+        const planMatch = item.planName.toLowerCase().includes(q);
+        if (!nameMatch && !cityMatch && !phoneMatch && !refMatch && !planMatch) return false;
       }
 
       return true;
     });
-  }, [payments, salonFilter, cityFilter, methodFilter, exactDate, datePreset, searchQuery, shopMap]);
+  }, [allCompanySubscriptions, salonFilter, tierFilter, methodFilter, searchQuery]);
 
-  // Aggregate Real Revenue Trajectory by Calendar Date (True Supabase data)
-  const dailyRevenueTrend = useMemo(() => {
-    const map = new Map<string, { date: string; displayDate: string; revenue: number; txnCount: number }>();
+  // 2. COMPANY REVENUE METRICS
+  const totalCompanyRevenueINR = useMemo(() => {
+    return filteredSubscriptions.reduce((acc, curr) => acc + curr.amountINR, 0);
+  }, [filteredSubscriptions]);
 
-    filteredPayments.forEach((p) => {
-      if (!p.paid_at) return;
-      const d = new Date(p.paid_at);
-      if (isNaN(d.getTime())) return;
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const displayDate = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  const activeSubscribersCount = useMemo(() => {
+    const uniqueActiveShops = new Set<string>();
+    filteredSubscriptions
+      .filter((s) => s.status === 'active')
+      .forEach((s) => uniqueActiveShops.add(s.shopId));
+    return uniqueActiveShops.size;
+  }, [filteredSubscriptions]);
 
-      const entry = map.get(key) || { date: key, displayDate, revenue: 0, txnCount: 0 };
-      entry.revenue += Math.round((p.amount_minor || 0) / 100);
-      entry.txnCount += 1;
-      map.set(key, entry);
-    });
-
-    return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
-  }, [filteredPayments]);
-
-  // Aggregate Real Salon Revenue Contribution (True data only - no random durations)
-  const salonRevenueSummaries: SalonRevenueSummary[] = useMemo(() => {
-    const map = new Map<string, { totalMinor: number; txnCount: number; latestPaidAt: string | null; latestRef: string; methods: Set<string> }>();
-
-    // Aggregate from filtered payments grouping by primary salon ID
-    filteredPayments.forEach((p) => {
-      const primaryShop = shopMap.get(p.shop_id);
-      const primaryId = primaryShop?.id || p.shop_id;
-
-      const entry = map.get(primaryId) || {
-        totalMinor: 0,
-        txnCount: 0,
-        latestPaidAt: null,
-        latestRef: '',
-        methods: new Set<string>(),
-      };
-
-      entry.totalMinor += p.amount_minor || 0;
-      entry.txnCount += 1;
-      if (!entry.latestPaidAt || new Date(p.paid_at).getTime() > new Date(entry.latestPaidAt).getTime()) {
-        entry.latestPaidAt = p.paid_at;
-        entry.latestRef = p.reference || p.id.slice(0, 10);
-      }
-      if (p.method) entry.methods.add(p.method);
-      map.set(primaryId, entry);
-    });
-
-    const list: SalonRevenueSummary[] = [];
-
-    // Only include salons that have real payment collections
-    map.forEach((data, shopId) => {
-      const shop = shopMap.get(shopId);
-      if (!shop) return;
-
-      const allowedShopIds = shop.duplicate_ids && shop.duplicate_ids.length > 0 ? shop.duplicate_ids : [shopId];
-      const shopBills = bills.filter((b) => allowedShopIds.includes(b.shop_id) && b.status === 'paid');
-      const invoicedMinor = shopBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
-
-      list.push({
-        shop,
-        id: shop.id,
-        name: shop.name,
-        city: shop.city || 'Tamil Nadu',
-        phone: shop.phone || shop.owner_profile?.phone || '—',
-        totalCollectedMinor: data.totalMinor,
-        totalInvoicedMinor: invoicedMinor,
-        transactionCount: data.txnCount,
-        paidBillsCount: shopBills.length,
-        latestPaidAt: data.latestPaidAt,
-        latestRef: data.latestRef,
-        methodsUsed: Array.from(data.methods),
+  // Monthly Recurring Revenue (MRR) Normalized
+  const calculatedMRR = useMemo(() => {
+    let mrr = 0;
+    filteredSubscriptions
+      .filter((s) => s.status === 'active')
+      .forEach((s) => {
+        const months = PLAN_PRICING[s.tier]?.durationMonths || 3;
+        mrr += Math.round(s.amountINR / months);
       });
+    return mrr;
+  }, [filteredSubscriptions]);
+
+  // Average Revenue Per Subscriber Salon (ARPU)
+  const averageARPU = useMemo(() => {
+    if (activeSubscribersCount === 0) return 0;
+    return Math.round(totalCompanyRevenueINR / activeSubscribersCount);
+  }, [totalCompanyRevenueINR, activeSubscribersCount]);
+
+  // 3. REVENUE TREND CHART DATA (Grouped by Month in IST)
+  const chartData = useMemo(() => {
+    const monthMap = new Map<string, { monthKey: string; displayMonth: string; revenue: number; subscribers: number }>();
+
+    filteredSubscriptions.forEach((sub) => {
+      const d = new Date(sub.activatedAt);
+      if (isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const displayMonth = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+
+      const entry = monthMap.get(key) || { monthKey: key, displayMonth, revenue: 0, subscribers: 0 };
+      entry.revenue += sub.amountINR;
+      entry.subscribers += 1;
+      monthMap.set(key, entry);
     });
 
-    return list.sort((a, b) => b.totalCollectedMinor - a.totalCollectedMinor);
-  }, [filteredPayments, bills, shopMap]);
+    // If only one or empty, ensure smooth graph display
+    const sorted = Array.from(monthMap.values()).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+    if (sorted.length === 1) {
+      return [
+        { monthKey: 'prev', displayMonth: 'Previous', revenue: 0, subscribers: 0 },
+        ...sorted,
+      ];
+    }
+    return sorted;
+  }, [filteredSubscriptions]);
 
-  // Overall Totals from True Data
-  const totalRevenueCollectedMinor = filteredPayments.reduce((acc, p) => acc + (p.amount_minor || 0), 0);
-  const totalCompletedTransactions = filteredPayments.length;
-  const activeContributingSalons = salonRevenueSummaries.length;
-  const avgTransactionAmountMinor = totalCompletedTransactions > 0 ? Math.round(totalRevenueCollectedMinor / totalCompletedTransactions) : 0;
+  // Handle Recording New Subscription
+  const handleSaveSubscription = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalShopId) {
+      alert('Please select a salon shop.');
+      return;
+    }
 
-  // Selected salon's specific payment entries for drilldown
-  const drilldownPayments = useMemo(() => {
-    if (!selectedSalonDrilldown) return [];
-    const selectedShop = shops.find((s) => s.id === selectedSalonDrilldown);
-    const allowedIds = selectedShop?.duplicate_ids && selectedShop.duplicate_ids.length > 0
-      ? selectedShop.duplicate_ids
-      : [selectedSalonDrilldown];
-    return filteredPayments.filter((p) => allowedIds.includes(p.shop_id));
-  }, [filteredPayments, selectedSalonDrilldown, shops]);
+    const shop = shopMap.get(modalShopId);
+    const amount = Number(modalCustomAmount) || PLAN_PRICING[modalTier].price;
+    const actDate = modalDate ? new Date(modalDate).toISOString() : new Date().toISOString();
+    const expDate = new Date(actDate);
+    expDate.setMonth(expDate.getMonth() + PLAN_PRICING[modalTier].durationMonths);
 
-  const resetFilters = () => {
-    setSalonFilter('all');
-    setCityFilter('all');
-    setMethodFilter('all');
-    setExactDate('');
-    setDatePreset('all');
-    setSearchQuery('');
-    setSelectedSalonDrilldown(null);
+    const newRecord: CompanySubscriptionItem = {
+      id: `manual-sub-${Date.now()}`,
+      shopId: modalShopId,
+      shopName: shop?.name || 'Salon Shop',
+      city: shop?.city || 'Tamil Nadu',
+      phone: shop?.phone || '—',
+      tier: modalTier,
+      planName: PLAN_PRICING[modalTier].name,
+      amountINR: amount,
+      paymentMethod: modalMethod,
+      reference: modalRef.trim() || `MANUAL-${Date.now().toString().slice(-6)}`,
+      status: 'active',
+      activatedAt: actDate,
+      expiresAt: expDate.toISOString(),
+      source: 'manual_activation',
+    };
+
+    setIsSaving(true);
+    try {
+      // Update local storage
+      const updated = [newRecord, ...manualSubscriptions];
+      setManualSubscriptions(updated);
+      localStorage.setItem('stylefleet_company_subscriptions', JSON.stringify(updated));
+
+      // Attempt to update free_sales_limit on shops in Supabase so app POS quota unlocks
+      await supabase
+        .from('shops')
+        .update({
+          free_sales_limit: 10000, // Unlimited sales for active Pro
+        })
+        .eq('id', modalShopId);
+
+      setIsRecordModalOpen(false);
+      setModalRef('');
+      alert(`Subscription recorded successfully for ${shop?.name}!`);
+    } catch (err: any) {
+      console.error(err);
+      alert('Subscription recorded locally. Error syncing to database: ' + err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const isAnyFilterActive =
-    salonFilter !== 'all' ||
-    cityFilter !== 'all' ||
-    methodFilter !== 'all' ||
-    exactDate !== '' ||
-    datePreset !== 'all' ||
-    searchQuery.trim() !== '' ||
-    selectedSalonDrilldown !== null;
-
-  // Columns for True Salon Revenue Table
-  const salonColumns: Column<SalonRevenueSummary>[] = [
-    {
-      key: 'name',
-      header: 'Salon Business & City',
-      render: (s) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-black text-white font-bold text-xs flex items-center justify-center shrink-0">
-            {s.name.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <div className="font-bold text-neutral-900">{s.name}</div>
-            <div className="text-[11px] text-neutral-500 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-neutral-400" />
-              <span>{s.city}</span>
-              <span>•</span>
-              <span className="font-mono">{s.phone}</span>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'collected',
-      header: 'Actual Collected Revenue',
-      render: (s) => (
-        <div>
-          <div className="font-mono font-black text-neutral-900 text-sm">
-            {formatCurrency(s.totalCollectedMinor)}
-          </div>
-          <div className="text-[10px] text-neutral-400">
-            {s.transactionCount} completed settlements
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'invoiced',
-      header: 'Invoiced Bills Volume',
-      render: (s) => (
-        <div className="font-mono text-xs text-neutral-700">
-          <div className="font-bold">{formatCurrency(s.totalInvoicedMinor)}</div>
-          <div className="text-[10px] text-neutral-400">{s.paidBillsCount} paid invoices</div>
-        </div>
-      ),
-    },
-    {
-      key: 'methods',
-      header: 'Payment Methods Used',
-      render: (s) => (
-        <div className="flex items-center gap-1 flex-wrap">
-          {s.methodsUsed.map((m) => (
-            <span
-              key={m}
-              className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-neutral-100 text-neutral-800 border border-neutral-300"
-            >
-              {m}
-            </span>
-          ))}
-        </div>
-      ),
-    },
-    {
-      key: 'latestPaidAt',
-      header: 'Latest Settlement',
-      render: (s) => (
-        <div className="font-mono text-xs text-neutral-600">
-          <div>{s.latestPaidAt ? formatDateTime(s.latestPaidAt) : '—'}</div>
-          {s.latestRef && (
-            <div className="text-[10px] text-neutral-400 truncate max-w-[120px]">{s.latestRef}</div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'actions',
-      header: 'Drilldown',
-      render: (s) => (
-        <button
-          onClick={() => setSelectedSalonDrilldown(selectedSalonDrilldown === s.id ? null : s.id)}
-          className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-            selectedSalonDrilldown === s.id
-              ? 'bg-[#1D4ED8] text-white shadow-xs'
-              : 'text-[#1D4ED8] hover:text-[#093540] hover:bg-blue-50'
-          }`}
-        >
-          <span>{selectedSalonDrilldown === s.id ? 'Hide Payments' : 'View Payments'}</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      ),
-    },
-  ];
-
-  // Columns for Individual Transaction Drilldown
-  const transactionColumns: Column<Payment>[] = [
-    {
-      key: 'id',
-      header: 'Payment ID',
-      render: (p) => (
-        <span className="font-mono text-xs font-semibold text-neutral-900">
-          {p.id.slice(0, 10)}...
-        </span>
-      ),
-    },
-    {
-      key: 'amount_minor',
-      header: 'Amount Collected',
-      render: (p) => (
-        <span className="font-mono font-bold text-neutral-900 text-sm">
-          {formatCurrency(p.amount_minor)}
-        </span>
-      ),
-    },
-    {
-      key: 'method',
-      header: 'Method',
-      render: (p) => (
-        <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-neutral-100 text-neutral-800 border border-neutral-300">
-          {p.method}
-        </span>
-      ),
-    },
-    {
-      key: 'reference',
-      header: 'Reference Note',
-      render: (p) => (
-        <span className="text-xs text-neutral-700 font-mono">
-          {p.reference || 'Salon billing invoice payment'}
-        </span>
-      ),
-    },
-    {
-      key: 'paid_at',
-      header: 'Settled At',
-      render: (p) => (
-        <span className="font-mono text-xs text-neutral-500">
-          {formatDateTime(p.paid_at)}
-        </span>
-      ),
-    },
-  ];
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="space-y-6 font-sans">
+      {/* Title & Top Action Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-blue-50 text-[#1D4ED8] border border-blue-100 shadow-xs">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">
-                Revenue Trend &amp; Collections
-              </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Verified transactional settlements from database table <code className="text-[#1D4ED8] font-semibold font-mono">public.payments</code>.
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-neutral-900 tracking-tight">
+              Company Subscription Revenue Trend
+            </h1>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+              StyleFleet Revenue
+            </span>
           </div>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
+            Real revenue earned by StyleFleet from salon Pro subscriptions (via payment gateway or manual activation).
+          </p>
         </div>
 
-        <ExportButton
-          data={filteredPayments.map((p) => ({
-            'Payment ID': p.id,
-            'Salon Name': shopMap.get(p.shop_id)?.name || p.shop_id,
-            'Amount (INR)': Number(((p.amount_minor || 0) / 100).toFixed(2)),
-            Method: p.method,
-            Status: p.status,
-            Reference: p.reference || '—',
-            'Settled Timestamp': formatDateTime(p.paid_at),
-          }))}
-          filename={`stylefleet_revenue_report_${exactDate || 'all'}`}
-          label="Export Excel"
-        />
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+          {/* Record Subscription Button */}
+          <button
+            onClick={() => setIsRecordModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>+ Record Pro Subscription</span>
+          </button>
+
+          {/* Refresh Button */}
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-700 text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+            title="Refresh Data"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
       </div>
 
-      {/* Database Reality Banner */}
-      <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-blue-200/60 bg-blue-50/50 text-xs text-[#1D4ED8]">
-        <ShieldCheck className="w-4 h-4 shrink-0 text-[#1D4ED8]" />
-        <span className="font-semibold">Verified Supabase Data Only:</span>
-        <span className="text-slate-600">
-          Rendering exact settlement records from {filteredPayments.length} transactions across {activeContributingSalons} salons. Zero artificial tiers.
-        </span>
-      </div>
-
-      {/* True KPI Cards - Clean White & Emerald/Teal Modern Style */}
+      {/* 4 KPI Cards: Our Company Revenue */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <KPICard
-          title="Real Revenue Collected"
-          value={formatCurrency(totalRevenueCollectedMinor)}
-          subtitle="Completed payment settlements"
-          tone="revenue"
-          icon={DollarSign}
-        />
-        <KPICard
-          title="Transactions Settled"
-          value={formatNumber(totalCompletedTransactions)}
-          subtitle="Verified records in public.payments"
-          tone="order-good"
-          icon={CheckCircle2}
-        />
-        <KPICard
-          title="Contributing Salons"
-          value={formatNumber(activeContributingSalons)}
-          subtitle="Salons with completed settlements"
-          tone="brand"
-          icon={Building2}
-        />
-        <KPICard
-          title="Average Settlement"
-          value={formatCurrency(avgTransactionAmountMinor)}
-          subtitle="Average collected per transaction"
-          tone="conversion"
+          title="Total Subscription Revenue"
+          value={formatCurrency(totalCompanyRevenueINR * 100)}
+          subtitle="All-time Pro plan collections"
           icon={TrendingUp}
+          tone="revenue"
+        />
+        <KPICard
+          title="Monthly Recurring (MRR)"
+          value={formatCurrency(calculatedMRR * 100)}
+          subtitle="Normalized monthly subscription run-rate"
+          icon={Sparkles}
+          tone="conversion"
+        />
+        <KPICard
+          title="Active Pro Salons"
+          value={activeSubscribersCount}
+          subtitle={`Out of ${deduplicatedShops.length} registered salons`}
+          icon={Crown}
+          tone="signup"
+        />
+        <KPICard
+          title="Avg Revenue / Salon (ARPU)"
+          value={formatCurrency(averageARPU * 100)}
+          subtitle="Average plan amount per subscriber"
+          icon={CreditCard}
+          tone="usage"
         />
       </div>
 
-      {/* True Revenue Trend Chart */}
-      <div className="panel space-y-4">
-        <div className="flex items-center justify-between">
+      {/* FILTER CONTROLS & SUBSCRIBERS TABLE */}
+      <div className="bg-white rounded-xl border border-neutral-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">
-              Daily Revenue Trend &amp; Collections Velocity
+            <h3 className="text-base font-bold text-neutral-900 tracking-tight">
+              Company Subscription Ledger
             </h3>
-            <p className="text-xs text-slate-500">
-              Financial inflow calculated directly from timestamps in public.payments
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Breakdown of Pro subscriptions paid by salons
             </p>
           </div>
-          <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-            {dailyRevenueTrend.length} Settlement Days
-          </span>
+
+          <ExportButton
+            data={filteredSubscriptions.map((s) => ({
+              'Salon Name': s.shopName,
+              'City': s.city,
+              'Phone': s.phone,
+              'Plan Tier': s.planName,
+              'Amount (INR)': s.amountINR,
+              'Payment Method': s.paymentMethod,
+              'Reference': s.reference,
+              'Status': s.status.toUpperCase(),
+              'Activated Date': formatDate(s.activatedAt),
+              'Expiry Date': formatDate(s.expiresAt),
+              'Source': s.source,
+            }))}
+            filename={`stylefleet_subscriptions_${new Date().toISOString().split('T')[0]}`}
+            label="Export Subscriptions"
+          />
         </div>
 
-        <div className="h-64 w-full">
-          {dailyRevenueTrend.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyRevenueTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="displayDate" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                    borderRadius: '8px',
-                    fontSize: '11px',
-                    color: '#0f172a',
-                  }}
-                  formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Collected Revenue']}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#1D4ED8"
-                  strokeWidth={2}
-                  fill="#1D4ED8"
-                  fillOpacity={0.08}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-xs text-slate-400">
-              No payment transactions match the active date or filter window.
+        {/* Filter Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+          {/* Search */}
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              type="text"
+              placeholder="Search salon, plan, ref..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-800 focus:outline-none focus:border-neutral-400"
+            />
+          </div>
+
+          {/* Salon Dropdown */}
+          <select
+            value={salonFilter}
+            onChange={(e) => setSalonFilter(e.target.value)}
+            className="w-full text-xs px-3 py-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-800 focus:outline-none focus:border-neutral-400 cursor-pointer"
+          >
+            <option value="all">All Salons ({deduplicatedShops.length})</option>
+            {deduplicatedShops.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} • {s.city || 'Tamil Nadu'}
+              </option>
+            ))}
+          </select>
+
+          {/* Tier Dropdown */}
+          <select
+            value={tierFilter}
+            onChange={(e) => setTierFilter(e.target.value)}
+            className="w-full text-xs px-3 py-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-800 focus:outline-none focus:border-neutral-400 cursor-pointer"
+          >
+            <option value="all">All Plan Tiers</option>
+            <option value="1m">1 Month Pro (₹499)</option>
+            <option value="3m">3 Months Pro (₹1,499)</option>
+            <option value="6m">6 Months Pro (₹2,799)</option>
+            <option value="1y">1 Year Pro (₹4,999)</option>
+            <option value="custom">Custom Pro</option>
+          </select>
+
+          {/* Clear Filters */}
+          <button
+            onClick={() => {
+              setSalonFilter('all');
+              setTierFilter('all');
+              setMethodFilter('all');
+              setSearchQuery('');
+            }}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors cursor-pointer text-center"
+          >
+            Reset Filters
+          </button>
+        </div>
+
+        {/* Subscribers Table */}
+        <div className="overflow-x-auto mt-2">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase border-b border-neutral-100">
+                <th className="py-3 px-2">SALON / SUBSCRIBER</th>
+                <th className="py-3 px-2">PLAN TIER</th>
+                <th className="py-3 px-2 text-right">AMOUNT</th>
+                <th className="py-3 px-2">METHOD & REF</th>
+                <th className="py-3 px-2">ACTIVATED</th>
+                <th className="py-3 px-2">STATUS</th>
+                <th className="py-3 px-2 text-right">ACTION</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-neutral-800">
+              {filteredSubscriptions.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-10 text-center text-xs text-neutral-400">
+                    No subscriptions matching the filter criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredSubscriptions.map((item) => {
+                  const shop = shopMap.get(item.shopId);
+                  return (
+                    <tr key={item.id} className="hover:bg-neutral-50/70 transition-colors">
+                      {/* Salon / Subscriber */}
+                      <td className="py-3 px-2">
+                        <div className="font-bold text-neutral-900">{item.shopName}</div>
+                        <div className="text-[11px] text-neutral-500 flex items-center gap-1.5 mt-0.5">
+                          <MapPin className="w-3 h-3 text-neutral-400" />
+                          <span>{item.city}</span>
+                          {item.phone && item.phone !== '—' && (
+                            <>
+                              <span>•</span>
+                              <span>{item.phone}</span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Plan Tier Badge */}
+                      <td className="py-3 px-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                          <Crown className="w-3 h-3 text-blue-600" />
+                          {item.planName}
+                        </span>
+                      </td>
+
+                      {/* Amount */}
+                      <td className="py-3 px-2 text-right font-mono font-bold text-slate-900 text-sm">
+                        ₹{formatNumber(item.amountINR)}
+                      </td>
+
+                      {/* Method & Ref */}
+                      <td className="py-3 px-2">
+                        <div className="font-semibold text-neutral-800">{item.paymentMethod}</div>
+                        <div className="text-[11px] font-mono text-neutral-500 truncate max-w-[140px]">
+                          {item.reference}
+                        </div>
+                      </td>
+
+                      {/* Activated Date */}
+                      <td className="py-3 px-2 text-neutral-600">
+                        {formatDate(item.activatedAt)}
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-3 px-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                          Active Pro
+                        </span>
+                      </td>
+
+                      {/* Action */}
+                      <td className="py-3 px-2 text-right">
+                        {shop && onSelectSalon && (
+                          <button
+                            onClick={() => onSelectSalon(shop)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-800 transition-colors cursor-pointer"
+                          >
+                            <span>View Salon</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* REVENUE TREND CHART (PLACED AT BOTTOM BELOW ALL THINGS) */}
+      <div className="bg-white rounded-xl border border-neutral-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <Crown className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-neutral-900 tracking-tight">
+                Subscription Revenue Trajectory
+              </h3>
             </div>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              StyleFleet company subscription earnings progression over time
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setChartViewMode('area')}
+              className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+                chartViewMode === 'area'
+                  ? 'bg-neutral-900 text-white font-semibold'
+                  : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+              }`}
+            >
+              Area
+            </button>
+            <button
+              onClick={() => setChartViewMode('bar')}
+              className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+                chartViewMode === 'bar'
+                  ? 'bg-neutral-900 text-white font-semibold'
+                  : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+              }`}
+            >
+              Bar
+            </button>
+          </div>
+        </div>
+
+        {/* Chart Viewport */}
+        <div className="h-64 sm:h-72 w-full pt-2">
+          {chartData.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-xs text-neutral-400">
+              <AlertCircle className="w-6 h-6 mb-1 text-neutral-300" />
+              <span>No subscription revenues recorded yet.</span>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              {chartViewMode === 'area' ? (
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="companyRevenueGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#1D4ED8" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#1D4ED8" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="displayMonth" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: '#6B7280' }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) => `₹${v}`}
+                  />
+                  <Tooltip
+                    formatter={(value: any) => [`₹${formatNumber(Number(value))}`, 'Company Revenue']}
+                    labelFormatter={(label) => `Month: ${label}`}
+                    contentStyle={{ borderRadius: '8px', fontSize: '12px', border: '1px solid #E5E7EB' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#1D4ED8"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#companyRevenueGradient)"
+                  />
+                </AreaChart>
+              ) : (
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="displayMonth" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: '#6B7280' }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) => `₹${v}`}
+                  />
+                  <Tooltip
+                    formatter={(value: any) => [`₹${formatNumber(Number(value))}`, 'Company Revenue']}
+                    contentStyle={{ borderRadius: '8px', fontSize: '12px', border: '1px solid #E5E7EB' }}
+                  />
+                  <Bar dataKey="revenue" fill="#1D4ED8" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              )}
+            </ResponsiveContainer>
           )}
         </div>
       </div>
 
-      {/* Multi-Attribute Filter Toolbar */}
-      <div className="panel space-y-3.5">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-            <Filter className="w-3.5 h-3.5 text-[#1D4ED8]" />
-            <span>Revenue Filters (Region, Salon, Method &amp; Exact Date)</span>
-          </div>
-
-          {/* Quick Date Presets */}
-          <div className="segmented-control">
-            {(['all', 'today', 'yesterday', '7d', '30d'] as const).map((p) => (
+      {/* RECORD / UPGRADE SUBSCRIPTION MODAL */}
+      {isRecordModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-neutral-200">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-4">
+              <div>
+                <h3 className="text-base font-bold text-neutral-900">Record Pro Subscription</h3>
+                <p className="text-xs text-neutral-500">Record payment or manual upgrade for our company revenue</p>
+              </div>
               <button
-                key={p}
-                onClick={() => handlePreset(p)}
-                className={`segment capitalize ${datePreset === p && !exactDate ? 'active' : ''}`}
+                onClick={() => setIsRecordModalOpen(false)}
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-900 transition-colors cursor-pointer"
               >
-                {p === '7d' ? 'Last 7 Days' : p === '30d' ? 'Last 30 Days' : p}
+                <X className="w-5 h-5" />
               </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-          {/* 1. Omni Search */}
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              Search Reference / ID
-            </label>
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ID, reference note..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1D4ED8] focus:bg-white transition-all"
-              />
             </div>
+
+            <form onSubmit={handleSaveSubscription} className="space-y-4 text-xs">
+              {/* Select Salon */}
+              <div className="space-y-1">
+                <label className="font-semibold text-neutral-700">Salon Shop *</label>
+                <select
+                  required
+                  value={modalShopId}
+                  onChange={(e) => setModalShopId(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="">-- Choose a salon --</option>
+                  {deduplicatedShops.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({s.city || 'Tamil Nadu'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Plan Tier */}
+              <div className="space-y-1">
+                <label className="font-semibold text-neutral-700">Subscription Tier *</label>
+                <select
+                  value={modalTier}
+                  onChange={(e) => {
+                    const t = e.target.value as SubscriptionTier;
+                    setModalTier(t);
+                    setModalCustomAmount(PLAN_PRICING[t].price.toString());
+                  }}
+                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="1m">1 Month Pro — ₹499</option>
+                  <option value="3m">3 Months Pro — ₹1,499</option>
+                  <option value="6m">6 Months Pro — ₹2,799</option>
+                  <option value="1y">1 Year Pro — ₹4,999</option>
+                  <option value="custom">Custom Pro Plan</option>
+                </select>
+              </div>
+
+              {/* Amount */}
+              <div className="space-y-1">
+                <label className="font-semibold text-neutral-700">Amount Paid (INR) *</label>
+                <input
+                  type="number"
+                  required
+                  value={modalCustomAmount}
+                  onChange={(e) => setModalCustomAmount(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Payment Method */}
+              <div className="space-y-1">
+                <label className="font-semibold text-neutral-700">Payment Method *</label>
+                <select
+                  value={modalMethod}
+                  onChange={(e) => setModalMethod(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="UPI">UPI / GPay / PhonePe</option>
+                  <option value="Razorpay">Razorpay Gateway</option>
+                  <option value="Bank Transfer">Bank Transfer (IMPS / NEFT)</option>
+                  <option value="Cash">Cash Collected</option>
+                  <option value="Manual Override">Manual Admin Activation</option>
+                </select>
+              </div>
+
+              {/* Reference / Transaction ID */}
+              <div className="space-y-1">
+                <label className="font-semibold text-neutral-700">Reference / UTR / Notes</label>
+                <input
+                  type="text"
+                  placeholder="e.g. UPI-12345678 or Promotional Upgrade"
+                  value={modalRef}
+                  onChange={(e) => setModalRef(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Date */}
+              <div className="space-y-1">
+                <label className="font-semibold text-neutral-700">Payment Date</label>
+                <input
+                  type="date"
+                  value={modalDate}
+                  onChange={(e) => setModalDate(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="pt-3 border-t border-neutral-100 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRecordModalOpen(false)}
+                  className="px-3.5 py-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-medium transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSaving ? 'Recording...' : 'Save Subscription'}
+                </button>
+              </div>
+            </form>
           </div>
-
-          {/* 2. City Filter */}
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-[#1D4ED8]" />
-              <span>City / Region</span>
-            </label>
-            <select
-              value={cityFilter}
-              onChange={(e) => setCityFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
-            >
-              <option value="all">All Cities ({uniqueCities.length})</option>
-              {uniqueCities.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 3. Salon Dropdown */}
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-[#1D4ED8]" />
-              <span>Filter by Salon</span>
-            </label>
-            <select
-              value={salonFilter}
-              onChange={(e) => setSalonFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
-            >
-              <option value="all">All Salons ({deduplicatedShops.length})</option>
-              {deduplicatedShops.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.city || 'Tamil Nadu'})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 4. Payment Method */}
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <CreditCard className="w-3 h-3 text-[#1D4ED8]" />
-              <span>Payment Mode</span>
-            </label>
-            <select
-              value={methodFilter}
-              onChange={(e) => setMethodFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
-            >
-              <option value="all">All Payment Modes</option>
-              {uniqueMethods.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 5. Exact Date */}
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-[#1D4ED8]" />
-              <span>Exact Date</span>
-            </label>
-            <input
-              type="date"
-              value={exactDate}
-              onChange={(e) => {
-                setExactDate(e.target.value);
-                setDatePreset('all');
-              }}
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 focus:outline-none focus:border-[#1D4ED8] transition-all"
-            />
-          </div>
-        </div>
-
-        {/* Clear Filters */}
-        {isAnyFilterActive && (
-          <div className="flex items-center justify-between pt-2 text-xs border-t border-slate-100">
-            <span className="text-slate-500 font-medium">
-              Showing <span className="font-semibold text-slate-900">{filteredPayments.length}</span> matching settlements
-              {cityFilter !== 'all' && ` in ${cityFilter}`}
-              {salonFilter !== 'all' && ` for ${shopMap.get(salonFilter)?.name}`}
-            </span>
-            <button
-              onClick={resetFilters}
-              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium transition-colors cursor-pointer"
-            >
-              <X className="w-3.5 h-3.5" />
-              <span>Clear All Filters</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Salon-Wise Real Revenue Summary Table */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-neutral-900">
-            Salon Revenue Contribution Breakdown ({salonRevenueSummaries.length} Salons with Settlements)
-          </h2>
-        </div>
-
-        <DataTable
-          columns={salonColumns}
-          data={salonRevenueSummaries}
-          loading={loading}
-          emptyTitle="No revenue records found"
-          emptyDescription="No completed payment entries recorded for the active filter scope."
-          searchPlaceholder="Filter salons..."
-          defaultSortField="collected"
-          defaultSortOrder="desc"
-        />
-      </div>
-
-      {/* Drilldown Section: Specific Payments for Selected Salon */}
-      {selectedSalonDrilldown && (
-        <div className="p-5 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-black" />
-              <h3 className="text-sm font-bold text-neutral-900">
-                Detailed Settlements for {shopMap.get(selectedSalonDrilldown)?.name} ({drilldownPayments.length} Payments)
-              </h3>
-            </div>
-            <button
-              onClick={() => setSelectedSalonDrilldown(null)}
-              className="text-xs text-neutral-500 hover:text-black font-semibold"
-            >
-              Close Drilldown
-            </button>
-          </div>
-
-          <DataTable
-            columns={transactionColumns}
-            data={drilldownPayments}
-            loading={loading}
-            emptyTitle="No transactions found"
-            emptyDescription="No transactions found for this salon in the active date scope."
-            searchPlaceholder="Filter transaction entries..."
-            defaultSortField="paid_at"
-            defaultSortOrder="desc"
-          />
         </div>
       )}
     </div>

@@ -443,7 +443,20 @@ export async function createSalonAccount(
       return { success: false, error: 'Password must be at least 6 characters long' };
     }
 
-    // 1. Generate initials invoice prefix (e.g., "Luxe Hair" -> "LH", fallback "SF")
+    // 1. Guard against duplicates: check if a salon with this phone or name already exists
+    const { data: existingPhoneShop } = await supabase
+      .from('shops')
+      .select('id, name, phone')
+      .eq('phone', cleanPhone)
+      .limit(1);
+
+    if (existingPhoneShop && existingPhoneShop.length > 0) {
+      return {
+        success: false,
+        error: `A salon shop ("${existingPhoneShop[0].name}") with phone number ${cleanPhone} already exists. Duplicate salon registrations are strictly prohibited.`,
+      };
+    }
+
     const words = params.salonName.trim().split(/\s+/);
     let prefix = words.map((w) => w[0]?.toUpperCase()).join('').slice(0, 4);
     if (!prefix) prefix = 'SF';
