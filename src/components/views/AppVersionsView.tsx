@@ -18,10 +18,10 @@ export const AppVersionsView: React.FC = () => {
       </div>
 
       <UnavailableBanner
-        title="Data unavailable — required source field/table not found."
-        sourceTable="public.app_versions"
-        message="App version tracking table (public.app_versions) is not currently configured in the Supabase schema."
-        details="Table 'public.app_versions' returned HTTP 404 from Supabase REST API."
+        title="App Version Fleet Data Unavailable"
+        sourceTable="App Versions"
+        message="App version fleet telemetry is not currently connected to live tracking."
+        details="Version telemetry activates when client applications send version heartbeats."
       />
 
       {/* Discovered Client Build Specification */}

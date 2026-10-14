@@ -268,7 +268,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
               Customer Tracking &amp; CRM Directory
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Live customer records stored across all partner salons in <code className="text-[#1D4ED8] font-semibold font-mono">public.customers</code>.
+              Live customer records stored across all partner salons.
             </p>
           </div>
         </div>
@@ -440,7 +440,7 @@ export const CustomerTrackingView: React.FC<CustomerTrackingViewProps> = ({
         loading={loading}
         searchPlaceholder="Filter listed clients..."
         emptyTitle="No Client Records Found"
-        emptyDescription="No customer records in public.customers match the selected date, salon, or filter criteria."
+        emptyDescription="No customer records match the selected date, salon, or filter criteria."
       />
     </div>
   );

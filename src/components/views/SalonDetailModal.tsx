@@ -747,7 +747,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                 </div>
               ) : (
                 <div className="p-6 text-center text-xs text-neutral-500 border border-dashed border-[#E5E7EB] rounded-xl bg-white">
-                  No staff members registered for this salon in <code className="text-neutral-900 font-semibold">public.staff</code>.
+                  No staff members registered for this salon yet.
                 </div>
               )}
             </div>
@@ -1206,7 +1206,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                 </div>
               ) : (
                 <div className="p-6 text-center text-xs text-neutral-500 border border-dashed border-[#E5E7EB] rounded-xl bg-white">
-                  No automated settings row configured in <code className="text-neutral-900 font-semibold">public.shop_settings</code>.
+                  No automated settings configured for this salon.
                 </div>
               )}
             </div>
@@ -1217,9 +1217,9 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
             <div className="space-y-4">
               <UnavailableBanner
                 title="Device & App Telemetry Unavailable"
-                sourceTable="public.telemetry"
-                message="Client device telemetry and app installation tracking are not recorded in the connected Supabase database for this salon."
-                details="To see device models, OS versions, and app builds, the mobile application must insert events into public.telemetry."
+                sourceTable="Device Telemetry"
+                message="Client device telemetry and app installation tracking are not recorded in the connected database for this salon."
+                details="To see device models, OS versions, and app builds, the mobile application must send device telemetry events."
               />
               <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs text-xs space-y-2 text-neutral-700">
                 <div className="font-semibold text-neutral-900">Expected Telemetry Fields:</div>

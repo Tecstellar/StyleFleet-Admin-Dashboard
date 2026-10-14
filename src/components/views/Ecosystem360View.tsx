@@ -115,7 +115,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
               {linkedProfile ? (
                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-mono">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  public.profiles (ID: {linkedProfile.id.slice(0, 8)}...)
+                  Owner Profile (ID: {linkedProfile.id.slice(0, 8)}...)
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 text-[11px] text-neutral-500 font-mono">
@@ -142,7 +142,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
               </div>
             ) : (
               <p className="text-xs text-neutral-700 bg-neutral-100 p-2.5 rounded-lg border border-neutral-200">
-                This salon does not have a linked user profile row in <code className="font-mono">public.profiles</code>.
+                This salon does not have a linked user profile row.
               </p>
             )}
           </div>
@@ -164,7 +164,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
               </div>
               <span className="inline-flex items-center gap-1 text-[11px] text-neutral-900 font-mono font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#1c1f26]" />
-                public.shops (ID: {activeShop.id.slice(0, 8)}...)
+                Salon Entity (ID: {activeShop.id.slice(0, 8)}...)
               </span>
             </div>
 
@@ -300,7 +300,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
               <p className="text-xs text-neutral-500">
                 {linkedSupport.length === 0
                   ? 'No support messages opened by this salon.'
-                  : `${linkedSupport.length} conversation(s) recorded in public.support_messages.`}
+                  : `${linkedSupport.length} support conversation(s) recorded.`}
               </p>
             </div>
 
@@ -323,7 +323,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
               </div>
               <p className="text-xs text-neutral-500">
                 {linkedDeletions.length > 0
-                  ? `Deletion record found in public.account_deletions. Reason: "${linkedDeletions[0].reason}".`
+                  ? `Deletion record found. Reason: "${linkedDeletions[0].reason}".`
                   : 'No account deletion request has been submitted for this salon.'}
               </p>
             </div>

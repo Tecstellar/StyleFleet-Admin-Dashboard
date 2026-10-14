@@ -313,7 +313,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
             Salons Management
           </h1>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Verified salon businesses connected to Supabase table <code className="text-neutral-900 font-mono font-bold">public.shops</code>
+            Verified salon businesses registered on the platform
           </p>
         </div>
 

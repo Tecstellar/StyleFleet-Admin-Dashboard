@@ -18,10 +18,10 @@ export const TrialsView: React.FC = () => {
       </div>
 
       <UnavailableBanner
-        title="Data unavailable — required source field/table not found."
-        sourceTable="public.trials / public.subscriptions"
-        message="Trial subscription tracking is not configured in the connected Supabase database. Per Rule 1, no mock trial periods or synthetic conversion rates will be fabricated."
-        details="Table 'public.trials' returned 404 (PGRST205) from Supabase REST API."
+        title="Trial Lifecycle Tracking Unavailable"
+        sourceTable="Trial & Subscription Quotas"
+        message="Trial subscription tracking is managed via active subscription quotas in the shop settings."
+        details="Trial statuses activate when salon accounts are enrolled in promotional quotas."
       />
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-6 space-y-3 shadow-xs">

@@ -755,7 +755,7 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({
             data={healthRecords}
             loading={loading}
             emptyTitle="No component records found"
-            emptyDescription="Component health records in public.system_health_records are operational."
+            emptyDescription="All system component health checks are operational."
             searchPlaceholder="Search component or node..."
             searchFields={['component', 'status']}
           />

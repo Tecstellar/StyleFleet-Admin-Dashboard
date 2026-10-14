@@ -18,10 +18,10 @@ export const TelemetryView: React.FC = () => {
       </div>
 
       <UnavailableBanner
-        title="Data unavailable — required source field/table not found."
-        sourceTable="public.telemetry"
-        message="The connected Supabase database currently contains no 'telemetry' table. In accordance with Rule 1, no mock devices or synthetic ping telemetry will be displayed."
-        details="Table 'public.telemetry' returned status 404 (PGRST205: Could not find the table 'public.telemetry' in schema cache)."
+        title="Device Telemetry Stream Unavailable"
+        sourceTable="Device Telemetry Stream"
+        message="Client hardware telemetry is not currently connected to live tracking."
+        details="Telemetry activates automatically when client mobile devices emit telemetry heartbeats."
       />
 
       {/* Engineering Blueprint Card */}

@@ -270,7 +270,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                 )}
               </div>
               <p className="text-xs text-neutral-500 mt-0.5">
-                Realtime salon communications. Replies are recorded into Supabase table <code className="text-neutral-900 font-semibold font-mono">public.support_message_answers</code>.
+                Realtime salon communications and client support inquiries.
               </p>
             </div>
           </div>
@@ -506,7 +506,7 @@ CREATE POLICY "allow_support_message_answers_all" ON public.support_message_answ
                 ))
               ) : (
                 <div className="p-3.5 rounded-xl border border-dashed border-neutral-200 text-center text-xs text-neutral-500 bg-white">
-                  No replies recorded in <code className="text-neutral-900 font-semibold font-mono">public.support_message_answers</code> yet.
+                  No replies recorded yet.
                 </div>
               )}
             </div>

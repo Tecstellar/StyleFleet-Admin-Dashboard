@@ -18,10 +18,10 @@ export const PlatformView: React.FC = () => {
       </div>
 
       <UnavailableBanner
-        title="Data unavailable — required source field/table not found."
-        sourceTable="public.devices / public.telemetry"
-        message="Device installation metrics and platform telemetry are not currently stored in the Supabase schema."
-        details="Tables 'public.devices' and 'public.telemetry' were not found in the public database schema."
+        title="Platform & Device Telemetry Unavailable"
+        sourceTable="Device Platforms"
+        message="Device installation metrics and platform telemetry are not currently stored in the active database."
+        details="Platform metrics activate when mobile applications connect to the telemetry sink."
       />
 
       {/* Target Platforms from verified codebase */}

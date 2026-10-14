@@ -638,7 +638,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
       {reportType === 'unavailable' && (
         <UnavailableBanner
           title="SaaS Subscriptions & Mobile Crash BI Not Yet Formatted"
-          sourceTable="public.app_versions / public.telemetry_records"
+          sourceTable="App Versions & Device Telemetry"
           message="StyleFleet app crash dumps and direct Google Play subscription receipts are not aggregated in a separate report table. Live billing and transaction logs are available in the financial report."
         />
       )}

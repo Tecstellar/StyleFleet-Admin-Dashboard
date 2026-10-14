@@ -222,11 +222,11 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
               App Version &amp; Hardware Telemetry
             </h1>
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-300">
-              Supabase public.telemetry
+              Telemetry Stream
             </span>
           </div>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Realtime mobile fleet telemetry events, client installations, and version adoption from live Postgres table.
+            Realtime mobile fleet telemetry events, client installations, and version adoption.
           </p>
         </div>
 
@@ -248,7 +248,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
         <KPICard
           title="Telemetry Events"
           value={records.length.toString()}
-          subtitle="Total rows in public.telemetry"
+          subtitle="Total recorded telemetry events"
           icon={Activity}
         />
         <KPICard
@@ -339,7 +339,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
           emptyTitle="No telemetry records found"
           emptyDescription={
             records.length === 0
-              ? 'The public.telemetry table in Supabase currently has 0 rows. When mobile apps send hardware heartbeats, they will automatically appear here via Supabase Realtime.'
+              ? 'Currently 0 device telemetry records received. When mobile apps send hardware heartbeats, they will automatically appear here via Realtime.'
               : 'No telemetry records match the current platform or date filter.'
           }
           searchPlaceholder="Search device ID, name, OS, salon..."
@@ -385,7 +385,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
               <GitBranch className="w-8 h-8 text-neutral-400 mx-auto" />
               <div className="text-sm font-semibold text-neutral-900">No version telemetry recorded yet</div>
               <p className="text-xs text-neutral-500 max-w-md mx-auto">
-                Once mobile apps upload telemetry to <code className="text-neutral-900 font-semibold font-mono">public.telemetry</code>, version adoption percentages will calculate dynamically.
+                Once mobile apps upload device telemetry, version adoption percentages will calculate dynamically.
               </p>
             </div>
           )}
@@ -405,8 +405,8 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             <div className="space-y-1.5 text-xs text-neutral-600">
               <div>Framework: <span className="font-mono text-neutral-900">React Native 0.76 / Expo SDK 52</span></div>
               <div>Client Type: <span className="font-mono text-neutral-900 font-semibold">StyleFleet Mobile Client</span></div>
-              <div>Telemetry Target: <span className="font-mono text-emerald-700">public.telemetry</span></div>
-              <div>Status: <span className="text-emerald-700 font-semibold">Active Supabase Sink</span></div>
+              <div>Telemetry Target: <span className="font-mono text-emerald-700">Device Telemetry Sink</span></div>
+              <div>Status: <span className="text-emerald-700 font-semibold">Active Realtime Sink</span></div>
             </div>
           </div>
 
@@ -420,7 +420,7 @@ export const AppTelemetryCombinedView: React.FC<AppTelemetryCombinedViewProps> =
             <div className="space-y-1.5 text-xs text-neutral-600">
               <div>Framework: <span className="font-mono text-neutral-900">Xcode 16 / React Native</span></div>
               <div>Bundle ID: <span className="font-mono text-neutral-900 font-semibold">com.stylefleet.ios</span></div>
-              <div>Telemetry Target: <span className="font-mono text-neutral-900 font-semibold">public.telemetry</span></div>
+              <div>Telemetry Target: <span className="font-mono text-neutral-900 font-semibold">Device Telemetry Sink</span></div>
               <div>Status: <span className="text-neutral-900 font-semibold">Ready in Workspace</span></div>
             </div>
           </div>
