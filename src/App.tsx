@@ -682,6 +682,8 @@ export const App: React.FC = () => {
           {currentView === 'support_messages' && (
             <SupportMessagesView
               messages={supportMessages}
+              shops={shops}
+              profiles={profiles}
               loading={loading}
               onRefresh={handleManualRefresh}
             />
