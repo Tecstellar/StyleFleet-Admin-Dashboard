@@ -723,6 +723,7 @@ export const App: React.FC = () => {
             <AccountDeletionsView
               deletions={deletions}
               loading={loading}
+              onRefresh={handleManualRefresh}
               onOpenDeleteAccountInstructions={openDeleteAccountPage}
             />
           )}
