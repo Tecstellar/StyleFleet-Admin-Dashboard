@@ -151,9 +151,6 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                 <h1 className="text-xl font-bold tracking-tight text-slate-900">
                   Product Analytics
                 </h1>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-700 border border-blue-200">
-                  IronDrobe Engine
-                </span>
                 {data.isCached && (
                   <span className="text-[10px] text-slate-400 font-mono">
                     (Cached 5m)

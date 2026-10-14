@@ -217,7 +217,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
       <div className="panel overflow-hidden">
         <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
           <h3 className="text-sm font-bold text-neutral-900">Broadcast Campaigns History</h3>
-          <span className="text-xs text-neutral-500 font-medium">IronDrobe Engagement</span>
+          <span className="text-xs text-neutral-500 font-medium">StyleFleet Engagement</span>
         </div>
 
         <div className="divide-y divide-neutral-100">

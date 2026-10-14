@@ -1,6 +1,6 @@
 /**
  * Product Analytics Service Layer
- * Replicates the IronDrobe Operations Console Product Analytics backend engine.
+ * StyleFleet Operations Console Product Analytics backend engine.
  * 100% REAL APPLICATION DATA ONLY:
  * Uses live data from `shops`, `bills`, `customers`, `staff`, `appointments`, and `payments`.
  * Zero synthetic, mock, or hardcoded dummy numbers.
