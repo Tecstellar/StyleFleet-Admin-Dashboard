@@ -540,7 +540,9 @@ export const App: React.FC = () => {
               bills={bills}
               shops={shops}
               payments={payments}
+              customers={customers}
               loading={loading}
+              onRefresh={handleManualRefresh}
               onSelectSalon={handleSelectSalonDrilldown}
             />
           )}
