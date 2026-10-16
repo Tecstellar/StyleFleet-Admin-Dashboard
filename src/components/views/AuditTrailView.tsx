@@ -357,7 +357,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-neutral-900">
-              Platform Audit Trail &amp; Dossiers
+              Activity Logs
             </h1>
             <p className="text-xs text-neutral-500 mt-0.5">
               Verified chronological log of transactional mutations, registrations, payments, and account deletions.

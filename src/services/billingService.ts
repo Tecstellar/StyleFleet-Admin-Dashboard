@@ -63,3 +63,21 @@ export async function fetchSubscriptions(): Promise<{ data: any[]; error: string
   }
 }
 
+export function subscribeToSubscriptions(callback: () => void) {
+  const channel = supabase
+    .channel('subscriptions_changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'subscriptions' },
+      () => {
+        callback();
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
+

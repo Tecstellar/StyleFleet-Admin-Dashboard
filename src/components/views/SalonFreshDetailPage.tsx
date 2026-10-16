@@ -273,14 +273,22 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const freeOrdersRemaining = Math.max(0, freeSalesLimit - freeOrdersUsed);
   const freeOrdersPercent = Math.min(100, Math.round((freeOrdersUsed / freeSalesLimit) * 100));
 
-  // Strict Subscriber Status (strictly from database subscriptions or verified subscription payments)
-  const { isSubscriber, planExpiry, paymentStatus, planLabel } = useMemo(() => {
+  const {
+    isSubscriber,
+    planExpiry,
+    paymentStatus,
+    planLabel,
+    subscribedDateText,
+    subscriptionAmountText,
+  } = useMemo(() => {
     // 1. Check subscriptions table for active pro record
     const subRecord = subscriptions.find(
       (s: any) =>
         s.shop_id === shop.id &&
-        (s.status === 'active' || s.tier === 'pro') &&
+        (s.status === 'active' || s.status === 'paid' || s.tier === 'pro' || !s.status) &&
         (!s.subscription_end_date || new Date(s.subscription_end_date).getTime() > Date.now())
+    ) || subscriptions.find(
+      (s: any) => s.shop_id === shop.id && (s.status === 'active' || s.status === 'paid' || !s.status)
     );
 
     // 2. Check completed payments that indicate paid pro plan
@@ -296,7 +304,13 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     const isSub = Boolean(subRecord || proPayment || isBraveAndCave);
 
     let expiryText = 'N/A (Quota Based)';
-    if (subRecord?.expires_at) {
+    if (subRecord?.subscription_end_date) {
+      expiryText = new Date(subRecord.subscription_end_date).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } else if (subRecord?.expires_at) {
       expiryText = new Date(subRecord.expires_at).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
@@ -320,14 +334,56 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       expiryText = 'Active (Auto-Renews)';
     }
 
+    // Subscribed Date (specifically when they subscribed from subscriptions table)
+    let subDateText = 'Not Subscribed';
+    if (subRecord?.subscription_start_date || subRecord?.created_at) {
+      subDateText = new Date(subRecord.subscription_start_date || subRecord.created_at).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } else if (proPayment?.paid_at) {
+      subDateText = new Date(proPayment.paid_at).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } else if (isBraveAndCave) {
+      subDateText = new Date(shop.created_at || Date.now()).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    }
+
+    // Amount (amount stored in subscriptions table)
+    let amtText = '₹0';
+    if (subRecord) {
+      const raw = typeof subRecord.amount_minor === 'number' && subRecord.amount_minor > 0
+        ? (subRecord.amount_minor >= 100 ? Math.round(subRecord.amount_minor / 100) : subRecord.amount_minor)
+        : (typeof subRecord.amount === 'number' && subRecord.amount > 0 ? subRecord.amount : (subRecord.plan_id === '3_months' ? 2199 : 0));
+      amtText = `₹${raw.toLocaleString('en-IN')}`;
+    } else if (isBraveAndCave) {
+      amtText = '₹2,199';
+    } else if (proPayment?.amount_minor) {
+      amtText = `₹${Math.round(proPayment.amount_minor / 100).toLocaleString('en-IN')}`;
+    }
+
     const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
     const pLabel = isBraveAndCave
       ? 'Pro Plan (3 Months - ₹2,199)'
       : isSub
-      ? 'Pro Plan (Subscriber)'
+      ? (subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan (Subscriber)')
       : 'Free Plan (100 Quota)';
 
-    return { isSubscriber: isSub, planExpiry: expiryText, paymentStatus: payStatus, planLabel: pLabel };
+    return {
+      isSubscriber: isSub,
+      planExpiry: expiryText,
+      paymentStatus: payStatus,
+      planLabel: pLabel,
+      subscribedDateText: subDateText,
+      subscriptionAmountText: amtText,
+    };
   }, [shop, subscriptions, payments]);
 
   // Last Login / Activity Time
@@ -672,13 +728,20 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
             <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Current Plan</div>
             <div className="text-sm font-black text-black mt-1 font-mono">
-              {isSubscriber ? 'Pro Plan' : 'Free Trial'}
+              {isSubscriber ? planLabel : 'Free Trial'}
             </div>
+            {isSubscriber && subscriptionAmountText !== '₹0' && (
+              <div className="text-[11px] text-emerald-800 font-bold font-mono mt-0.5">
+                Amount: {subscriptionAmountText}
+              </div>
+            )}
           </div>
 
           {/* 4. Plan Expiry */}
           <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
-            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Plan Expiry</div>
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">
+              {isSubscriber ? `Plan Expiry (Subscribed: ${subscribedDateText})` : 'Plan Expiry'}
+            </div>
             <div className="text-sm font-black text-black mt-1 font-mono">{planExpiry}</div>
           </div>
 

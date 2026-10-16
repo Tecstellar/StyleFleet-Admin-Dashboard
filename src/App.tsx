@@ -29,7 +29,7 @@ import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
 import { fetchProfiles, fetchStaff, fetchCustomers } from './services/usersService';
-import { fetchBills, fetchPayments, fetchSubscriptions } from './services/billingService';
+import { fetchBills, fetchPayments, fetchSubscriptions, subscribeToSubscriptions } from './services/billingService';
 import { fetchAppointments } from './services/appointmentsService';
 import { supabase } from './services/supabase';
 
@@ -324,10 +324,17 @@ export const App: React.FC = () => {
       });
     });
 
+    const unsubSubscriptions = subscribeToSubscriptions(() => {
+      fetchSubscriptions().then((res) => {
+        if (res.data) setSubscriptions(res.data);
+      });
+    });
+
     return () => {
       unsubSupport();
       unsubDeletions();
       unsubTelemetryHealth();
+      unsubSubscriptions();
     };
   }, [isAuthenticated]);
 
