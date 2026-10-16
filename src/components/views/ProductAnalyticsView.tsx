@@ -140,24 +140,24 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
   return (
     <div className="space-y-6 font-sans select-none">
       {/* PAGE HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1 border-b border-slate-200/80">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1 border-b border-[#014BAA]/15">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-slate-900 text-white shadow-2xs">
+            <div className="p-2 rounded-xl bg-[#014BAA] text-white shadow-2xs">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                <h1 className="text-xl font-bold tracking-tight text-black">
                   Product Analytics
                 </h1>
                 {data.isCached && (
-                  <span className="text-[10px] text-slate-400 font-mono">
+                  <span className="text-[10px] text-black/50 font-mono">
                     (Cached 5m)
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-0.5 max-w-3xl leading-relaxed">
+              <p className="text-xs text-black/60 mt-0.5 max-w-3xl leading-relaxed">
                 Complete product analytics engine: user journeys, funnels, engagement scores, screen analytics, interaction heat intelligence, founder insights, and Customer Success opportunities.
               </p>
             </div>
@@ -165,16 +165,16 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0 self-start md:self-center">
-          <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200/60">
+          <span className="text-xs font-mono text-[#014BAA] bg-[#014BAA]/10 px-2.5 py-1.5 rounded-lg border border-[#014BAA]/20">
             Updated {data.updatedAt}
           </span>
           <button
             onClick={() => loadAnalytics(true)}
             disabled={isRefreshing}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F8F3F0] border border-[#014BAA]/20 text-black hover:bg-[#014BAA]/10 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
             title="Bypass cache and refetch fresh metrics from database"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-blue-600' : 'text-slate-600'}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#014BAA]' : 'text-black/70'}`} />
             <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
         </div>
@@ -183,141 +183,141 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       {/* 1. SUMMARY CARDS (6 CARDS) */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Card 1: Time to first order */}
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-[#F8F3F0] p-3.5 rounded-xl border border-[#014BAA]/20 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-black/60">
             <span className="text-[11px] font-medium truncate">Time to First {PRODUCT_ANALYTICS_CONFIG.app.coreActionSingular}</span>
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <Clock className="w-3.5 h-3.5 text-[#014BAA]" />
           </div>
-          <div className="text-xl font-bold font-mono text-slate-900">
-            {data.summary.timeToFirstOrderDays} <span className="text-xs font-sans font-medium text-slate-500">days</span>
+          <div className="text-xl font-bold font-mono text-black">
+            {data.summary.timeToFirstOrderDays} <span className="text-xs font-sans font-medium text-black/60">days</span>
           </div>
-          <p className="text-[10px] text-slate-400 truncate">Registration to first sale</p>
+          <p className="text-[10px] text-black/50 truncate">Registration to first sale</p>
         </div>
 
         {/* Card 2: Time to subscription */}
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-[#F8F3F0] p-3.5 rounded-xl border border-[#014BAA]/20 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-black/60">
             <span className="text-[11px] font-medium truncate">Time to Subscribe</span>
-            <Crown className="w-3.5 h-3.5 text-amber-500" />
+            <Crown className="w-3.5 h-3.5 text-[#014BAA]" />
           </div>
-          <div className="text-xl font-bold font-mono text-slate-900">
-            {data.summary.timeToSubscriptionDays} <span className="text-xs font-sans font-medium text-slate-500">days</span>
+          <div className="text-xl font-bold font-mono text-black">
+            {data.summary.timeToSubscriptionDays} <span className="text-xs font-sans font-medium text-black/60">days</span>
           </div>
-          <p className="text-[10px] text-slate-400 truncate">Registration to paid plan</p>
+          <p className="text-[10px] text-black/50 truncate">Registration to paid plan</p>
         </div>
 
         {/* Card 3: Subscription conversion % */}
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-[#F8F3F0] p-3.5 rounded-xl border border-[#014BAA]/20 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-black/60">
             <span className="text-[11px] font-medium truncate">Sub Conversion</span>
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+            <TrendingUp className="w-3.5 h-3.5 text-[#014BAA]" />
           </div>
-          <div className="text-xl font-bold font-mono text-emerald-700">
+          <div className="text-xl font-bold font-mono text-[#014BAA]">
             {data.summary.subscriptionConversionRate}%
           </div>
-          <p className="text-[10px] text-slate-400 truncate">Subscribers / pricing viewers</p>
+          <p className="text-[10px] text-black/50 truncate">Subscribers / pricing viewers</p>
         </div>
 
         {/* Card 4: Most used feature */}
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-[#F8F3F0] p-3.5 rounded-xl border border-[#014BAA]/20 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-black/60">
             <span className="text-[11px] font-medium truncate">Most Used Feature</span>
-            <Flame className="w-3.5 h-3.5 text-rose-500" />
+            <Flame className="w-3.5 h-3.5 text-[#014BAA]" />
           </div>
-          <div className="text-sm font-bold text-slate-900 truncate" title={data.summary.mostUsedFeature.name}>
+          <div className="text-sm font-bold text-black truncate" title={data.summary.mostUsedFeature.name}>
             {data.summary.mostUsedFeature.name.split('>')[1]?.trim() || data.summary.mostUsedFeature.name}
           </div>
-          <p className="text-[10px] text-slate-500 font-mono">
+          <p className="text-[10px] text-black/60 font-mono">
             {data.summary.mostUsedFeature.count} interactions
           </p>
         </div>
 
         {/* Card 5: Highest drop-off */}
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-[#F8F3F0] p-3.5 rounded-xl border border-[#014BAA]/20 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-black/60">
             <span className="text-[11px] font-medium truncate">Highest Drop-off</span>
-            <ArrowDownRight className="w-3.5 h-3.5 text-rose-500" />
+            <ArrowDownRight className="w-3.5 h-3.5 text-black/80" />
           </div>
-          <div className="text-xl font-bold font-mono text-rose-600">
+          <div className="text-xl font-bold font-mono text-black">
             {data.summary.highestDropOff.dropOffPercent}%
           </div>
-          <p className="text-[10px] text-slate-400 truncate" title={data.summary.highestDropOff.step}>
+          <p className="text-[10px] text-black/50 truncate" title={data.summary.highestDropOff.step}>
             {data.summary.highestDropOff.step}
           </p>
         </div>
 
         {/* Card 6: CS opportunities */}
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-[#F8F3F0] p-3.5 rounded-xl border border-[#014BAA]/20 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-black/60">
             <span className="text-[11px] font-medium truncate">CS Opportunities</span>
-            <Users className="w-3.5 h-3.5 text-blue-600" />
+            <Users className="w-3.5 h-3.5 text-[#014BAA]" />
           </div>
-          <div className="text-xl font-bold font-mono text-blue-700">
+          <div className="text-xl font-bold font-mono text-[#014BAA]">
             {data.summary.csOpportunitiesCount}
           </div>
-          <p className="text-[10px] text-slate-400 truncate">Auto-detected outreach</p>
+          <p className="text-[10px] text-black/50 truncate">Auto-detected outreach</p>
         </div>
       </div>
 
-      {/* 2. ALERTS PANEL (RULE-BASED, COLOR-CODED) */}
-      <div className="p-4 rounded-xl border border-amber-200/90 bg-amber-50/60 space-y-3">
+      {/* 2. ALERTS PANEL */}
+      <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900">
+            <AlertTriangle className="w-4 h-4 text-[#014BAA] shrink-0" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-black">
               Rule-Based Operational Alerts
             </h3>
           </div>
-          <span className="text-[10px] font-mono text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-mono text-[#014BAA] bg-[#014BAA]/10 px-2 py-0.5 rounded border border-[#014BAA]/20 font-semibold">
             Threshold: Exit &gt;= {(PRODUCT_ANALYTICS_CONFIG.alerts.highDropOffExitRateThreshold * 100)}%
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           {/* Alert Item 1: High Drop-Off Screens */}
-          <div className="p-3 bg-white rounded-lg border border-amber-200/70 shadow-2xs">
-            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+          <div className="p-3 bg-[#F8F3F0] rounded-lg border border-[#014BAA]/20 shadow-2xs">
+            <div className="text-[10px] font-semibold text-black/60 uppercase tracking-wider">
               High Drop-off Screens
             </div>
             {data.alerts.highDropOffScreens.length > 0 ? (
               data.alerts.highDropOffScreens.map((s, idx) => (
                 <div key={idx} className="mt-1 flex items-center justify-between">
-                  <span className="font-mono font-medium text-slate-800 text-[11px]">{s.screen}</span>
-                  <span className="font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200 text-[11px]">
+                  <span className="font-mono font-medium text-black text-[11px]">{s.screen}</span>
+                  <span className="font-mono font-bold text-black bg-[#014BAA]/10 px-1.5 py-0.2 rounded border border-[#014BAA]/20 text-[11px]">
                     {s.exitRatePercent}% exit
                   </span>
                 </div>
               ))
             ) : (
-              <p className="text-[11px] text-slate-600 mt-1">All screens below 50% exit threshold.</p>
+              <p className="text-[11px] text-black/60 mt-1">All screens below 50% exit threshold.</p>
             )}
           </div>
 
           {/* Alert Item 2: Users Likely to Subscribe */}
-          <div className="p-3 bg-white rounded-lg border border-amber-200/70 shadow-2xs">
-            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+          <div className="p-3 bg-[#F8F3F0] rounded-lg border border-[#014BAA]/20 shadow-2xs">
+            <div className="text-[10px] font-semibold text-black/60 uppercase tracking-wider">
               Users Likely to Subscribe
             </div>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-lg font-bold font-mono text-slate-900">
+              <span className="text-lg font-bold font-mono text-black">
                 {data.alerts.likelyToSubscribeCount}
               </span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-black/60">
                 {PRODUCT_ANALYTICS_CONFIG.app.entityPlural.toLowerCase()} viewed pricing without paying
               </span>
             </div>
           </div>
 
           {/* Alert Item 3: Users Likely to Churn */}
-          <div className="p-3 bg-white rounded-lg border border-amber-200/70 shadow-2xs">
-            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+          <div className="p-3 bg-[#F8F3F0] rounded-lg border border-[#014BAA]/20 shadow-2xs">
+            <div className="text-[10px] font-semibold text-black/60 uppercase tracking-wider">
               At-Risk / Inactive Users
             </div>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-lg font-bold font-mono text-rose-600">
+              <span className="text-lg font-bold font-mono text-black">
                 {data.alerts.likelyToChurnCount}
               </span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-black/60">
                 {PRODUCT_ANALYTICS_CONFIG.app.entityPlural.toLowerCase()} dormant &gt; 7 days or score &lt; 35
               </span>
             </div>
@@ -328,20 +328,20 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       {/* FUNNELS SECTION (TWO-COLUMN RESPONSIVE GRID) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 3. USER JOURNEY FUNNEL */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4 text-blue-600" />
-              <h3 className="text-sm font-bold text-slate-900">User Journey Funnel</h3>
+              <Compass className="w-4 h-4 text-[#014BAA]" />
+              <h3 className="text-sm font-bold text-black">User Journey Funnel</h3>
             </div>
-            <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+            <span className="text-[10px] text-black/50 uppercase font-mono tracking-wider">
               Lifecycle Conversion
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                 <tr>
                   <th className="py-2 px-2.5">Step</th>
                   <th className="py-2 px-2.5 text-right">Users</th>
@@ -350,33 +350,33 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   <th className="py-2 px-2.5 text-right">Drop-off</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#014BAA]/10 text-black">
                 {data.funnels.userJourney.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-2.5 px-2.5 font-medium text-slate-900">
+                  <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <td className="py-2.5 px-2.5 font-medium text-black">
                       <div className="flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] flex items-center justify-center shrink-0">
+                        <span className="w-4 h-4 rounded-full bg-[#014BAA]/10 text-[#014BAA] font-mono text-[10px] flex items-center justify-center shrink-0 font-bold">
                           {idx + 1}
                         </span>
                         <span>{row.step}</span>
                       </div>
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono font-semibold text-slate-800">
+                    <td className="py-2.5 px-2.5 text-right font-mono font-semibold text-black">
                       {row.users}
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black/70">
                       {row.fromPrevPercent}%
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black/70">
                       {row.fromStartPercent}%
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-rose-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black font-semibold">
                       {row.dropOffPercent > 0 ? (
                         <span>
-                          {row.dropOffPercent}% <span className="text-[10px] text-slate-400">(-{row.dropOffCount})</span>
+                          {row.dropOffPercent}% <span className="text-[10px] text-black/40">(-{row.dropOffCount})</span>
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-black/40">—</span>
                       )}
                     </td>
                   </tr>
@@ -387,20 +387,20 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         </div>
 
         {/* 4. SUBSCRIPTION FUNNEL */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Crown className="w-4 h-4 text-amber-500" />
-              <h3 className="text-sm font-bold text-slate-900">Subscription Funnel</h3>
+              <Crown className="w-4 h-4 text-[#014BAA]" />
+              <h3 className="text-sm font-bold text-black">Subscription Funnel</h3>
             </div>
-            <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+            <span className="text-[10px] text-black/50 uppercase font-mono tracking-wider">
               Pricing to Paid
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                 <tr>
                   <th className="py-2 px-2.5">Step</th>
                   <th className="py-2 px-2.5 text-right">Users</th>
@@ -409,33 +409,33 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   <th className="py-2 px-2.5 text-right">Drop-off</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#014BAA]/10 text-black">
                 {data.funnels.subscription.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-2.5 px-2.5 font-medium text-slate-900">
+                  <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <td className="py-2.5 px-2.5 font-medium text-black">
                       <div className="flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] flex items-center justify-center shrink-0">
+                        <span className="w-4 h-4 rounded-full bg-[#014BAA]/10 text-[#014BAA] font-mono text-[10px] flex items-center justify-center shrink-0 font-bold">
                           {idx + 1}
                         </span>
                         <span>{row.step}</span>
                       </div>
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono font-semibold text-slate-800">
+                    <td className="py-2.5 px-2.5 text-right font-mono font-semibold text-black">
                       {row.users}
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black/70">
                       {row.fromPrevPercent}%
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black/70">
                       {row.fromStartPercent}%
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-rose-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black font-semibold">
                       {row.dropOffPercent > 0 ? (
                         <span>
-                          {row.dropOffPercent}% <span className="text-[10px] text-slate-400">(-{row.dropOffCount})</span>
+                          {row.dropOffPercent}% <span className="text-[10px] text-black/40">(-{row.dropOffCount})</span>
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-black/40">—</span>
                       )}
                     </td>
                   </tr>
@@ -449,22 +449,22 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       {/* 5. CORE ACTION FUNNEL & 7. ENGAGEMENT DISTRIBUTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Core Action Funnel */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-emerald-600" />
-              <h3 className="text-sm font-bold text-slate-900">
+              <Sliders className="w-4 h-4 text-[#014BAA]" />
+              <h3 className="text-sm font-bold text-black">
                 Core Action Funnel ({PRODUCT_ANALYTICS_CONFIG.app.coreActionSingular} Generation)
               </h3>
             </div>
-            <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+            <span className="text-[10px] text-black/50 uppercase font-mono tracking-wider">
               Terminal POS Flow
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                 <tr>
                   <th className="py-2 px-2.5">Step</th>
                   <th className="py-2 px-2.5 text-right">Volume</th>
@@ -473,31 +473,31 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   <th className="py-2 px-2.5 text-right">Drop-off</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#014BAA]/10 text-black">
                 {data.funnels.coreAction.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-2.5 px-2.5 font-medium text-slate-900">
+                  <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <td className="py-2.5 px-2.5 font-medium text-black">
                       <div className="flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] flex items-center justify-center shrink-0">
+                        <span className="w-4 h-4 rounded-full bg-[#014BAA]/10 text-[#014BAA] font-mono text-[10px] flex items-center justify-center shrink-0 font-bold">
                           {idx + 1}
                         </span>
                         <span>{row.step}</span>
                       </div>
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono font-semibold text-slate-800">
+                    <td className="py-2.5 px-2.5 text-right font-mono font-semibold text-black">
                       {row.users}
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black/70">
                       {row.fromPrevPercent}%
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-slate-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black/70">
                       {row.fromStartPercent}%
                     </td>
-                    <td className="py-2.5 px-2.5 text-right font-mono text-rose-600">
+                    <td className="py-2.5 px-2.5 text-right font-mono text-black font-semibold">
                       {row.dropOffPercent > 0 ? (
                         <span>{row.dropOffPercent}%</span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-black/40">—</span>
                       )}
                     </td>
                   </tr>
@@ -508,18 +508,18 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         </div>
 
         {/* 7. ENGAGEMENT DISTRIBUTION */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-4 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-purple-600" />
-              <h3 className="text-sm font-bold text-slate-900">Engagement Distribution</h3>
+              <Layers className="w-4 h-4 text-[#014BAA]" />
+              <h3 className="text-sm font-bold text-black">Engagement Distribution</h3>
             </div>
-            <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+            <span className="text-[10px] text-black/50 uppercase font-mono tracking-wider">
               30-Day Activity Score
             </span>
           </div>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-black/60">
             Scored (0-100) per {PRODUCT_ANALYTICS_CONFIG.app.entitySingular.toLowerCase()} across recency of last action, sales frequency, staff size, and customer volume.
           </p>
 
@@ -527,17 +527,17 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
             {/* Highly engaged */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-emerald-700 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="font-semibold text-black flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#014BAA]" />
                   Highly Engaged (Score &gt;= 70)
                 </span>
-                <span className="font-mono text-slate-800 font-semibold">
+                <span className="font-mono text-black font-semibold">
                   {data.engagement.distribution.highlyEngaged.count} {PRODUCT_ANALYTICS_CONFIG.app.entityPlural.toLowerCase()} ({data.engagement.distribution.highlyEngaged.percent}%)
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div className="w-full h-2 rounded-full bg-[#014BAA]/10 overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[#014BAA] rounded-full transition-all duration-500"
                   style={{ width: `${data.engagement.distribution.highlyEngaged.percent}%` }}
                 />
               </div>
@@ -546,17 +546,17 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
             {/* Moderately engaged */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-blue-700 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="font-semibold text-black/80 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#014BAA]/70" />
                   Moderately Engaged (Score 40 - 69)
                 </span>
-                <span className="font-mono text-slate-800 font-semibold">
+                <span className="font-mono text-black font-semibold">
                   {data.engagement.distribution.moderatelyEngaged.count} {PRODUCT_ANALYTICS_CONFIG.app.entityPlural.toLowerCase()} ({data.engagement.distribution.moderatelyEngaged.percent}%)
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div className="w-full h-2 rounded-full bg-[#014BAA]/10 overflow-hidden">
                 <div
-                  className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[#014BAA]/70 rounded-full transition-all duration-500"
                   style={{ width: `${data.engagement.distribution.moderatelyEngaged.percent}%` }}
                 />
               </div>
@@ -565,17 +565,17 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
             {/* At risk */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-amber-700 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="font-semibold text-black/80 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#014BAA]/40" />
                   At Risk (Score 20 - 39)
                 </span>
-                <span className="font-mono text-slate-800 font-semibold">
+                <span className="font-mono text-black font-semibold">
                   {data.engagement.distribution.atRisk.count} {PRODUCT_ANALYTICS_CONFIG.app.entityPlural.toLowerCase()} ({data.engagement.distribution.atRisk.percent}%)
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div className="w-full h-2 rounded-full bg-[#014BAA]/10 overflow-hidden">
                 <div
-                  className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[#014BAA]/40 rounded-full transition-all duration-500"
                   style={{ width: `${data.engagement.distribution.atRisk.percent}%` }}
                 />
               </div>
@@ -584,17 +584,17 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
             {/* Inactive */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-slate-500 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-slate-400" />
+                <span className="font-semibold text-black/60 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-black/30" />
                   Inactive (Score &lt; 20)
                 </span>
-                <span className="font-mono text-slate-800 font-semibold">
+                <span className="font-mono text-black font-semibold">
                   {data.engagement.distribution.inactive.count} {PRODUCT_ANALYTICS_CONFIG.app.entityPlural.toLowerCase()} ({data.engagement.distribution.inactive.percent}%)
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div className="w-full h-2 rounded-full bg-[#014BAA]/10 overflow-hidden">
                 <div
-                  className="h-full bg-slate-400 rounded-full transition-all duration-500"
+                  className="h-full bg-black/30 rounded-full transition-all duration-500"
                   style={{ width: `${data.engagement.distribution.inactive.percent}%` }}
                 />
               </div>
@@ -606,20 +606,20 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       {/* 6. TOP 20 INTERACTIONS & 8. SCREEN ANALYTICS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top 20 Interactions */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-rose-500" />
-              <h3 className="text-sm font-bold text-slate-900">Top 20 User Interactions</h3>
+              <Flame className="w-4 h-4 text-[#014BAA]" />
+              <h3 className="text-sm font-bold text-black">Top 20 User Interactions</h3>
             </div>
-            <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+            <span className="text-[10px] text-black/50 uppercase font-mono tracking-wider">
               Heat Intelligence
             </span>
           </div>
 
           <div className="overflow-y-auto max-h-80">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold sticky top-0 border-b border-slate-200">
+              <thead className="bg-[#014BAA]/5 text-black/70 font-semibold sticky top-0 border-b border-[#014BAA]/20">
                 <tr>
                   <th className="py-2 px-2">#</th>
                   <th className="py-2 px-2">Interaction Name</th>
@@ -627,29 +627,19 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   <th className="py-2 px-2 text-right">Count</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#014BAA]/10 text-black">
                 {data.interactions.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-2 px-2 text-slate-400 font-mono text-[10px]">{idx + 1}</td>
-                    <td className="py-2 px-2 font-medium text-slate-800 truncate max-w-[220px]">
+                  <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <td className="py-2 px-2 text-black/50 font-mono text-[10px]">{idx + 1}</td>
+                    <td className="py-2 px-2 font-medium text-black truncate max-w-[220px]">
                       {item.interaction}
                     </td>
                     <td className="py-2 px-2">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
-                          item.type === 'repeat'
-                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                            : item.type === 'button'
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : item.type === 'action'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-700 border border-slate-200'
-                        }`}
-                      >
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#014BAA]/10 text-[#014BAA] border border-[#014BAA]/20">
                         {item.type}
                       </span>
                     </td>
-                    <td className="py-2 px-2 text-right font-mono font-bold text-slate-900">
+                    <td className="py-2 px-2 text-right font-mono font-bold text-black">
                       {item.count}
                     </td>
                   </tr>
@@ -662,20 +652,20 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         {/* 8. Screen Analytics & 9. Scroll Depth */}
         <div className="space-y-6">
           {/* Screen Analytics */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+          <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-blue-600" />
-                <h3 className="text-sm font-bold text-slate-900">Screen Analytics</h3>
+                <Activity className="w-4 h-4 text-[#014BAA]" />
+                <h3 className="text-sm font-bold text-black">Screen Analytics</h3>
               </div>
-              <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+              <span className="text-[10px] text-black/50 uppercase font-mono tracking-wider">
                 View &amp; Exit Rates
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                   <tr>
                     <th className="py-2 px-2">Screen</th>
                     <th className="py-2 px-2 text-right">Visits</th>
@@ -684,18 +674,18 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                     <th className="py-2 px-2">Top Clicks</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#014BAA]/10 text-black">
                   {data.screens.map((row, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="py-2 px-2 font-mono text-slate-800 text-[11px] font-medium">{row.screen}</td>
-                      <td className="py-2 px-2 text-right font-mono text-slate-600">{row.visits}</td>
-                      <td className="py-2 px-2 text-right font-mono text-slate-600">{row.users}</td>
+                    <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                      <td className="py-2 px-2 font-mono text-black text-[11px] font-medium">{row.screen}</td>
+                      <td className="py-2 px-2 text-right font-mono text-black/70">{row.visits}</td>
+                      <td className="py-2 px-2 text-right font-mono text-black/70">{row.users}</td>
                       <td className="py-2 px-2 text-right font-mono font-semibold">
-                        <span className={row.exitPercent >= 50 ? 'text-rose-600' : 'text-slate-800'}>
+                        <span className="text-black">
                           {row.exitPercent}%
                         </span>
                       </td>
-                      <td className="py-2 px-2 text-[11px] text-slate-500 truncate max-w-[140px]">{row.topClicks}</td>
+                      <td className="py-2 px-2 text-[11px] text-black/60 truncate max-w-[140px]">{row.topClicks}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -704,16 +694,16 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
           </div>
 
           {/* 9. Scroll Depth */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+          <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900">Scroll Depth Progression</h3>
-              <span className="text-[10px] text-slate-400 font-mono uppercase">App Telemetry</span>
+              <h3 className="text-sm font-bold text-black">Scroll Depth Progression</h3>
+              <span className="text-[10px] text-black/50 font-mono uppercase">App Telemetry</span>
             </div>
 
             {data.scroll.depths.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                  <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                     <tr>
                       <th className="py-2 px-2">Screen</th>
                       <th className="py-2 px-2 text-center">25%</th>
@@ -722,22 +712,22 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                       <th className="py-2 px-2 text-center">100%</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-[#014BAA]/10 text-black">
                     {data.scroll.depths.map((row, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                        <td className="py-2 px-2 font-mono text-slate-800 text-[11px]">{row.screen}</td>
-                        <td className="py-2 px-2 text-center font-mono text-slate-600">{row.d25}%</td>
-                        <td className="py-2 px-2 text-center font-mono text-slate-600">{row.d50}%</td>
-                        <td className="py-2 px-2 text-center font-mono text-slate-600">{row.d75}%</td>
-                        <td className="py-2 px-2 text-center font-mono text-slate-600">{row.d100}%</td>
+                      <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                        <td className="py-2 px-2 font-mono text-black text-[11px]">{row.screen}</td>
+                        <td className="py-2 px-2 text-center font-mono text-black/70">{row.d25}%</td>
+                        <td className="py-2 px-2 text-center font-mono text-black/70">{row.d50}%</td>
+                        <td className="py-2 px-2 text-center font-mono text-black/70">{row.d75}%</td>
+                        <td className="py-2 px-2 text-center font-mono text-black/70">{row.d100}%</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <div className="p-4 rounded-lg bg-blue-50/70 border border-blue-200 text-blue-900 text-xs flex items-center gap-2.5">
-                <Info className="w-4 h-4 text-blue-600 shrink-0" />
+              <div className="p-4 rounded-lg bg-[#014BAA]/10 border border-[#014BAA]/20 text-black text-xs flex items-center gap-2.5">
+                <Info className="w-4 h-4 text-[#014BAA] shrink-0" />
                 <span>Scroll tracking activates on app screens with scroll analytics enabled.</span>
               </div>
             )}
@@ -748,42 +738,42 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       {/* 10. FOUNDER INSIGHTS (TWO CARDS) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Card 1: Why users subscribe */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <h3 className="text-sm font-bold text-slate-900">Why Users Subscribe</h3>
+            <CheckCircle2 className="w-4 h-4 text-[#014BAA]" />
+            <h3 className="text-sm font-bold text-black">Why Users Subscribe</h3>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100 text-xs">
+          <div className="grid grid-cols-3 gap-2 bg-[#014BAA]/5 p-3 rounded-lg border border-[#014BAA]/15 text-xs">
             <div>
-              <span className="text-[10px] text-emerald-800 font-medium block">Setup Prior to Sub</span>
-              <span className="text-base font-bold font-mono text-emerald-900">
+              <span className="text-[10px] text-black/70 font-medium block">Setup Prior to Sub</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersSubscribe.hasCoreDataBeforePayingPercent}%
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-emerald-800 font-medium block">Pricing Viewed</span>
-              <span className="text-base font-bold font-mono text-emerald-900">
+              <span className="text-[10px] text-black/70 font-medium block">Pricing Viewed</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersSubscribe.viewedPricingBeforePayingPercent}%
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-emerald-800 font-medium block">Avg Core Actions</span>
-              <span className="text-base font-bold font-mono text-emerald-900">
+              <span className="text-[10px] text-black/70 font-medium block">Avg Core Actions</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersSubscribe.avgCoreActionsBeforeSubscribing}
               </span>
             </div>
           </div>
 
           <div className="space-y-1.5 pt-1">
-            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+            <div className="text-[11px] font-bold text-black uppercase tracking-wider">
               Top Conversion Drivers
             </div>
             <div className="space-y-1 text-xs">
               {data.insights.whyUsersSubscribe.conversionDrivers.map((cd, idx) => (
-                <div key={idx} className="flex justify-between items-center p-2 rounded bg-slate-50 border border-slate-100">
-                  <span className="font-medium text-slate-800">{cd.event}</span>
-                  <span className="font-mono text-emerald-700 font-semibold">{cd.percent}% ({cd.count})</span>
+                <div key={idx} className="flex justify-between items-center p-2 rounded bg-[#F8F3F0] border border-[#014BAA]/15">
+                  <span className="font-medium text-black">{cd.event}</span>
+                  <span className="font-mono text-[#014BAA] font-semibold">{cd.percent}% ({cd.count})</span>
                 </div>
               ))}
             </div>
@@ -791,48 +781,48 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         </div>
 
         {/* Card 2: Why users do not subscribe */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-rose-600" />
-            <h3 className="text-sm font-bold text-slate-900">Why Users Do Not Subscribe</h3>
+            <ShieldAlert className="w-4 h-4 text-[#014BAA]" />
+            <h3 className="text-sm font-bold text-black">Why Users Do Not Subscribe</h3>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-rose-50/50 p-3 rounded-lg border border-rose-100 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[#014BAA]/5 p-3 rounded-lg border border-[#014BAA]/15 text-xs">
             <div>
-              <span className="text-[10px] text-rose-800 font-medium block">No Setup Data</span>
-              <span className="text-base font-bold font-mono text-rose-900">
+              <span className="text-[10px] text-black/70 font-medium block">No Setup Data</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersDoNotSubscribe.noSetupDataCount}
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-rose-800 font-medium block">Zero Sales</span>
-              <span className="text-base font-bold font-mono text-rose-900">
+              <span className="text-[10px] text-black/70 font-medium block">Zero Sales</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersDoNotSubscribe.zeroCoreActionsCount}
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-rose-800 font-medium block">Pricing Drop-off</span>
-              <span className="text-base font-bold font-mono text-rose-900">
+              <span className="text-[10px] text-black/70 font-medium block">Pricing Drop-off</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersDoNotSubscribe.viewedPricingDidNotPayCount}
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-rose-800 font-medium block">Inactive &gt; 7d</span>
-              <span className="text-base font-bold font-mono text-rose-900">
+              <span className="text-[10px] text-black/70 font-medium block">Inactive &gt; 7d</span>
+              <span className="text-base font-bold font-mono text-black">
                 {data.insights.whyUsersDoNotSubscribe.inactive7DaysPlusCount}
               </span>
             </div>
           </div>
 
           <div className="space-y-1.5 pt-1">
-            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+            <div className="text-[11px] font-bold text-black uppercase tracking-wider">
               Early Churn Signals
             </div>
             <div className="space-y-1 text-xs">
               {data.insights.whyUsersDoNotSubscribe.churnSignals.map((cs, idx) => (
-                <div key={idx} className="flex justify-between items-center p-2 rounded bg-slate-50 border border-slate-100">
-                  <span className="font-medium text-slate-800">{cs.signal}</span>
-                  <span className="font-mono text-rose-600 font-semibold">{cs.percent}% ({cs.count})</span>
+                <div key={idx} className="flex justify-between items-center p-2 rounded bg-[#F8F3F0] border border-[#014BAA]/15">
+                  <span className="font-medium text-black">{cs.signal}</span>
+                  <span className="font-mono text-black/80 font-semibold">{cs.percent}% ({cs.count})</span>
                 </div>
               ))}
             </div>
@@ -843,11 +833,11 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       {/* 11. TOP CITIES AND TOP STATES BY ENGAGEMENT */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Cities */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
-          <h3 className="text-sm font-bold text-slate-900">Top Cities by Engagement</h3>
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
+          <h3 className="text-sm font-bold text-black">Top Cities by Engagement</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                 <tr>
                   <th className="py-2 px-2.5">City</th>
                   <th className="py-2 px-2.5 text-right">Users</th>
@@ -856,14 +846,14 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   <th className="py-2 px-2.5 text-right">Avg Score</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#014BAA]/10 text-black">
                 {data.geo.topCities.map((c, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-2 px-2.5 font-medium text-slate-900">{c.city}</td>
-                    <td className="py-2 px-2.5 text-right font-mono text-slate-700">{c.users}</td>
-                    <td className="py-2 px-2.5 text-right font-mono text-emerald-700 font-medium">{c.engaged}</td>
-                    <td className="py-2 px-2.5 text-right font-mono text-blue-700 font-medium">{c.subscribers}</td>
-                    <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-900">{c.avgScore}</td>
+                  <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <td className="py-2 px-2.5 font-medium text-black">{c.city}</td>
+                    <td className="py-2 px-2.5 text-right font-mono text-black/70">{c.users}</td>
+                    <td className="py-2 px-2.5 text-right font-mono text-[#014BAA] font-semibold">{c.engaged}</td>
+                    <td className="py-2 px-2.5 text-right font-mono text-[#014BAA] font-semibold">{c.subscribers}</td>
+                    <td className="py-2 px-2.5 text-right font-mono font-bold text-black">{c.avgScore}</td>
                   </tr>
                 ))}
               </tbody>
@@ -872,11 +862,11 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         </div>
 
         {/* Top States */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-2xs">
-          <h3 className="text-sm font-bold text-slate-900">Top States by Engagement</h3>
+        <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-3 shadow-2xs">
+          <h3 className="text-sm font-bold text-black">Top States by Engagement</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
                 <tr>
                   <th className="py-2 px-2.5">State</th>
                   <th className="py-2 px-2.5 text-right">Users</th>
@@ -885,14 +875,14 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   <th className="py-2 px-2.5 text-right">Avg Score</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#014BAA]/10 text-black">
                 {data.geo.topStates.map((s, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-2 px-2.5 font-medium text-slate-900">{s.state}</td>
-                    <td className="py-2 px-2.5 text-right font-mono text-slate-700">{s.users}</td>
-                    <td className="py-2 px-2.5 text-right font-mono text-emerald-700 font-medium">{s.engaged}</td>
-                    <td className="py-2 px-2.5 text-right font-mono text-blue-700 font-medium">{s.subscribers}</td>
-                    <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-900">{s.avgScore}</td>
+                  <tr key={idx} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <td className="py-2 px-2.5 font-medium text-black">{s.state}</td>
+                    <td className="py-2 px-2.5 text-right font-mono text-black/70">{s.users}</td>
+                    <td className="py-2 px-2.5 text-right font-mono text-[#014BAA] font-semibold">{s.engaged}</td>
+                    <td className="py-2 px-2.5 text-right font-mono text-[#014BAA] font-semibold">{s.subscribers}</td>
+                    <td className="py-2 px-2.5 text-right font-mono font-bold text-black">{s.avgScore}</td>
                   </tr>
                 ))}
               </tbody>
@@ -902,16 +892,16 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
       </div>
 
       {/* 12. CUSTOMER SUCCESS OPPORTUNITIES (OUTREACH ENGINE) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4 shadow-2xs">
+      <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 space-y-4 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-blue-600" />
-              <h3 className="text-sm font-bold text-slate-900">
+              <Users className="w-4 h-4 text-[#014BAA]" />
+              <h3 className="text-sm font-bold text-black">
                 Customer Success Opportunities ({filteredCSOpps.length})
               </h3>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-black/60 mt-0.5">
               Auto-detected users and salons requiring proactive outreach, onboarding support, or churn intervention.
             </p>
           </div>
@@ -935,7 +925,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         {/* Filters and Search Bar */}
         <div className="flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between">
           <div className="relative flex-1 max-w-sm">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-black/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={csSearch}
@@ -944,13 +934,13 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                 setCsPage(1);
               }}
               placeholder="Search salon, phone, city, or reason..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400"
+              className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-xs text-black focus:outline-none focus:border-[#014BAA]"
             />
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Priority Filter */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs">
+            <div className="flex items-center gap-1 bg-[#014BAA]/10 p-1 rounded-lg text-xs border border-[#014BAA]/15">
               {(['All', 'High', 'Medium', 'Low'] as const).map((p) => (
                 <button
                   key={p}
@@ -960,8 +950,8 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                   }}
                   className={`px-2.5 py-1 rounded font-medium transition-all cursor-pointer ${
                     csPriorityFilter === p
-                      ? 'bg-white text-slate-900 font-bold shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-[#014BAA] text-white font-bold shadow-2xs'
+                      : 'text-black/70 hover:text-black'
                   }`}
                 >
                   {p}
@@ -976,7 +966,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                 setCsReasonFilter(e.target.value);
                 setCsPage(1);
               }}
-              className="py-1.5 px-2 rounded-lg border border-slate-200 text-xs text-slate-700 bg-white"
+              className="py-1.5 px-2 rounded-lg border border-[#014BAA]/20 text-xs text-black bg-[#F8F3F0] focus:outline-none focus:border-[#014BAA]"
             >
               <option value="All">All Reasons</option>
               <option value="Viewed subscription, did not pay">Viewed subscription, did not pay</option>
@@ -990,7 +980,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         {/* Opportunities Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+            <thead className="bg-[#014BAA]/5 text-black/70 font-semibold border-b border-[#014BAA]/20">
               <tr>
                 <th className="py-2.5 px-3">Priority</th>
                 <th className="py-2.5 px-3">Salon / User</th>
@@ -1001,10 +991,10 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                 <th className="py-2.5 px-3 text-right">Outreach Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#014BAA]/10 text-black">
               {paginatedCSOpps.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400">
+                  <td colSpan={7} className="py-8 text-center text-black/50">
                     No customer success opportunities match the selected criteria.
                   </td>
                 </tr>
@@ -1012,33 +1002,33 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                 paginatedCSOpps.map((opp) => {
                   const cleanPhone = opp.phone.replace(/\D/g, '').slice(-10);
                   return (
-                    <tr key={opp.id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr key={opp.id} className="hover:bg-[#014BAA]/5 transition-colors">
                       <td className="py-2.5 px-3">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                             opp.priority === 'High'
-                              ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                              ? 'bg-[#014BAA] text-white'
                               : opp.priority === 'Medium'
-                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                              : 'bg-slate-100 text-slate-700 border border-slate-200'
+                              ? 'bg-[#014BAA]/15 text-[#014BAA] border border-[#014BAA]/30'
+                              : 'bg-[#F8F3F0] text-black/70 border border-[#014BAA]/20'
                           }`}
                         >
                           {opp.priority}
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 font-semibold text-slate-900">
+                      <td className="py-2.5 px-3 font-semibold text-black">
                         {opp.shopName}
                       </td>
-                      <td className="py-2.5 px-3 font-mono text-slate-600">
+                      <td className="py-2.5 px-3 font-mono text-black/70">
                         {opp.phone}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-700">
+                      <td className="py-2.5 px-3 text-black/80">
                         {opp.city}
                       </td>
-                      <td className="py-2.5 px-3 font-medium text-slate-800">
+                      <td className="py-2.5 px-3 font-medium text-black">
                         {opp.reason}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-500 max-w-xs truncate" title={opp.detail}>
+                      <td className="py-2.5 px-3 text-black/60 max-w-xs truncate" title={opp.detail}>
                         {opp.detail}
                       </td>
                       <td className="py-2.5 px-3 text-right">
@@ -1049,7 +1039,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                                 href={`https://wa.me/91${cleanPhone}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-[11px] font-medium border border-emerald-200"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#014BAA] text-white hover:bg-[#013b86] text-[11px] font-semibold transition-colors"
                                 title="Chat on WhatsApp"
                               >
                                 <MessageCircle className="w-3 h-3" />
@@ -1057,7 +1047,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                               </a>
                               <a
                                 href={`tel:${cleanPhone}`}
-                                className="p-1 rounded text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+                                className="p-1 rounded text-black/60 hover:text-black hover:bg-[#014BAA]/10"
                                 title="Direct Phone Call"
                               >
                                 <Phone className="w-3.5 h-3.5" />
@@ -1068,7 +1058,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
                             onClick={() => {
                               if (onNavigate) onNavigate('support_messages');
                             }}
-                            className="p-1 rounded text-slate-500 hover:text-blue-600 hover:bg-blue-50"
+                            className="p-1 rounded text-black/60 hover:text-[#014BAA] hover:bg-[#014BAA]/10"
                             title="Send Push Notification Shortcut"
                           >
                             <Send className="w-3.5 h-3.5" />
@@ -1085,7 +1075,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
 
         {/* Pagination */}
         {totalCsPages > 1 && (
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-500">
+          <div className="flex items-center justify-between pt-2 border-t border-[#014BAA]/15 text-xs text-black/60">
             <span>
               Showing {(csPage - 1) * csPageSize + 1} to{' '}
               {Math.min(csPage * csPageSize, filteredCSOpps.length)} of {filteredCSOpps.length} opportunities
@@ -1094,17 +1084,17 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
               <button
                 onClick={() => setCsPage((p) => Math.max(1, p - 1))}
                 disabled={csPage === 1}
-                className="p-1.5 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                className="p-1.5 rounded border border-[#014BAA]/20 hover:bg-[#014BAA]/10 disabled:opacity-40 cursor-pointer text-black"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <span className="font-mono px-2 font-medium text-slate-800">
+              <span className="font-mono px-2 font-medium text-black">
                 {csPage} / {totalCsPages}
               </span>
               <button
                 onClick={() => setCsPage((p) => Math.min(totalCsPages, p + 1))}
                 disabled={csPage === totalCsPages}
-                className="p-1.5 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                className="p-1.5 rounded border border-[#014BAA]/20 hover:bg-[#014BAA]/10 disabled:opacity-40 cursor-pointer text-black"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>

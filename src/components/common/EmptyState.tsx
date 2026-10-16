@@ -19,16 +19,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed border-[#E5E7EB] bg-white ${className}`}>
-      <div className="w-12 h-12 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-900 mb-3.5 shadow-xs">
+    <div className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed border-[#014BAA]/25 bg-[#F8F3F0] ${className}`}>
+      <div className="w-12 h-12 rounded-xl bg-[#014BAA]/10 border border-[#014BAA]/20 flex items-center justify-center text-[#014BAA] mb-3.5 shadow-xs">
         <Icon className="w-6 h-6 stroke-[1.75]" />
       </div>
-      <h3 className="text-sm font-bold text-neutral-900 mb-1">{title}</h3>
-      <p className="text-xs text-neutral-500 max-w-sm mb-4 leading-relaxed">{description}</p>
+      <h3 className="text-sm font-bold text-black mb-1">{title}</h3>
+      <p className="text-xs text-black/60 max-w-sm mb-4 leading-relaxed">{description}</p>
       {actionText && onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#111827] text-white hover:bg-neutral-800 transition-colors shadow-xs cursor-pointer"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#014BAA] text-white hover:bg-[#013b86] transition-colors shadow-xs cursor-pointer"
         >
           {actionText}
         </button>

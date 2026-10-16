@@ -138,10 +138,10 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   return (
     <div className="space-y-6 font-sans text-neutral-900 pb-12">
       {/* 1. TOP NAVIGATION & ACTIONS BAR */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0e5e9] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F8F3F0] pb-4">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer self-start"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer self-start"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back</span>
@@ -151,24 +151,24 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e0e5e9] bg-white hover:bg-neutral-50 text-[#004e64] text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#F8F3F0] bg-white hover:bg-neutral-50 text-[#014BAA] text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-[#004e64]" />
+              <RotateCcw className="w-3.5 h-3.5 text-[#014BAA]" />
               <span>Refresh</span>
             </button>
           )}
-          <span className="text-xs font-mono text-[#004e64] bg-[#e0e5e9] px-2.5 py-1 rounded border border-[#004e64]/20">
+          <span className="text-xs font-mono text-[#014BAA] bg-[#F8F3F0] px-2.5 py-1 rounded border border-[#014BAA]/20">
             ID: {shop.id.slice(0, 8)}...
           </span>
         </div>
       </div>
 
       {/* 2. SALON PROFILE HERO BANNER */}
-      <div className="bg-white rounded-2xl border border-[#e0e5e9] p-6 shadow-2xs">
+      <div className="bg-white rounded-2xl border border-[#F8F3F0] p-6 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#004e64] text-white flex items-center justify-center font-bold text-xl shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-[#014BAA] text-white flex items-center justify-center font-bold text-xl shadow-xs">
                 {shop.name ? shop.name.charAt(0).toUpperCase() : 'S'}
               </div>
               <div>
@@ -177,12 +177,12 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 </h1>
                 <div className="flex items-center gap-2 text-xs text-neutral-600 mt-0.5">
                   <span className="inline-flex items-center gap-1 font-medium">
-                    <MapPin className="w-3.5 h-3.5 text-[#004e64]" />
+                    <MapPin className="w-3.5 h-3.5 text-[#014BAA]" />
                     {shop.city || 'Tamil Nadu'}
                   </span>
                   <span>•</span>
                   <span className="inline-flex items-center gap-1 font-mono font-bold text-neutral-800">
-                    <Phone className="w-3.5 h-3.5 text-[#004e64]" />
+                    <Phone className="w-3.5 h-3.5 text-[#014BAA]" />
                     {shop.phone || 'No phone'}
                   </span>
                   <span>•</span>
@@ -203,7 +203,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
 
           {/* Plan Limit / Status badge */}
           <div className="flex flex-col items-start md:items-end gap-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e0e5e9] border border-[#004e64]/30 text-[#004e64] text-xs font-bold font-mono">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F8F3F0] border border-[#014BAA]/30 text-[#014BAA] text-xs font-bold font-mono">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>
                 {shop.free_sales_limit && shop.free_sales_limit > 100
@@ -218,9 +218,9 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
 
         {/* 4 Primary KPI Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#e0e5e9]">
-          <div className="bg-[#e0e5e9]/30 rounded-xl p-3.5 border border-[#e0e5e9]">
-            <div className="text-[11px] font-bold text-[#004e64] uppercase font-mono">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#F8F3F0]">
+          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
+            <div className="text-[11px] font-bold text-[#014BAA] uppercase font-mono">
               Total Revenue
             </div>
             <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
@@ -228,8 +228,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             </div>
           </div>
 
-          <div className="bg-[#e0e5e9]/30 rounded-xl p-3.5 border border-[#e0e5e9]">
-            <div className="text-[11px] font-bold text-[#004e64] uppercase font-mono">
+          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
+            <div className="text-[11px] font-bold text-[#014BAA] uppercase font-mono">
               Bills Issued
             </div>
             <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
@@ -237,8 +237,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             </div>
           </div>
 
-          <div className="bg-[#e0e5e9]/30 rounded-xl p-3.5 border border-[#e0e5e9]">
-            <div className="text-[11px] font-bold text-[#004e64] uppercase font-mono">
+          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
+            <div className="text-[11px] font-bold text-[#014BAA] uppercase font-mono">
               Stylists & Staff
             </div>
             <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
@@ -246,8 +246,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             </div>
           </div>
 
-          <div className="bg-[#e0e5e9]/30 rounded-xl p-3.5 border border-[#e0e5e9]">
-            <div className="text-[11px] font-bold text-[#004e64] uppercase font-mono">
+          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
+            <div className="text-[11px] font-bold text-[#014BAA] uppercase font-mono">
               Services Offered
             </div>
             <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
@@ -257,14 +257,14 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
       </div>
 
-      {/* 3. SECTION TABS (Two-color scheme: #004e64 & #e0e5e9) */}
-      <div className="flex items-center gap-1.5 border-b border-[#e0e5e9] pb-2 overflow-x-auto text-xs">
+      {/* 3. SECTION TABS (Two-color scheme: #014BAA & #F8F3F0) */}
+      <div className="flex items-center gap-1.5 border-b border-[#F8F3F0] pb-2 overflow-x-auto text-xs">
         <button
           onClick={() => setActiveTab('overview')}
           className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
             activeTab === 'overview'
-              ? 'bg-[#004e64] text-white shadow-xs'
-              : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
+              ? 'bg-[#014BAA] text-white shadow-xs'
+              : 'bg-[#F8F3F0] text-[#014BAA] hover:bg-[#d0d8dd]'
           }`}
         >
           Owner & Business Info
@@ -274,8 +274,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           onClick={() => setActiveTab('staff')}
           className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
             activeTab === 'staff'
-              ? 'bg-[#004e64] text-white shadow-xs'
-              : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
+              ? 'bg-[#014BAA] text-white shadow-xs'
+              : 'bg-[#F8F3F0] text-[#014BAA] hover:bg-[#d0d8dd]'
           }`}
         >
           Staff & Stylists ({salonStaff.length})
@@ -285,8 +285,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           onClick={() => setActiveTab('services')}
           className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
             activeTab === 'services'
-              ? 'bg-[#004e64] text-white shadow-xs'
-              : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
+              ? 'bg-[#014BAA] text-white shadow-xs'
+              : 'bg-[#F8F3F0] text-[#014BAA] hover:bg-[#d0d8dd]'
           }`}
         >
           Services ({services.length})
@@ -296,8 +296,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           onClick={() => setActiveTab('bills')}
           className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
             activeTab === 'bills'
-              ? 'bg-[#004e64] text-white shadow-xs'
-              : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
+              ? 'bg-[#014BAA] text-white shadow-xs'
+              : 'bg-[#F8F3F0] text-[#014BAA] hover:bg-[#d0d8dd]'
           }`}
         >
           Bills & Orders ({salonBills.length})
@@ -307,8 +307,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           onClick={() => setActiveTab('appointments')}
           className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
             activeTab === 'appointments'
-              ? 'bg-[#004e64] text-white shadow-xs'
-              : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
+              ? 'bg-[#014BAA] text-white shadow-xs'
+              : 'bg-[#F8F3F0] text-[#014BAA] hover:bg-[#d0d8dd]'
           }`}
         >
           Appointments ({salonAppointments.length})
@@ -394,7 +394,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
                   Invoice Prefix
                 </span>
-                <span className="text-sm font-mono font-bold text-[#004e64]">
+                <span className="text-sm font-mono font-bold text-[#014BAA]">
                   {shop.invoice_prefix || 'INV'}
                 </span>
               </div>
@@ -585,7 +585,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 ) : (
                   salonBills.map((b) => (
                     <tr key={b.id} className="hover:bg-neutral-50/70 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-[#004e64]">
+                      <td className="py-3 px-4 font-mono font-bold text-[#014BAA]">
                         {b.invoice_number}
                       </td>
                       <td className="py-3 px-3 font-mono text-neutral-700 text-[11px]">

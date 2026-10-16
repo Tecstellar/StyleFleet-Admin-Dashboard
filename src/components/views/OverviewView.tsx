@@ -320,7 +320,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       {/* 1. TOP HEADER & CONTROLS */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-1">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#004e64] block">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#014BAA] block">
             STYLEFLEET PLATFORM
           </span>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-black mt-0.5">
@@ -333,9 +333,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
         {/* Top Action Controls */}
         <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto">
-          {/* Live Sync Badge (Clean #004e64 & #e0e5e9) */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#e0e5e9] text-[#004e64] border border-[#e0e5e9]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#004e64] animate-pulse" />
+          {/* Live Sync Badge (Clean #014BAA & #F8F3F0) */}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F8F3F0] text-[#014BAA] border border-[#F8F3F0]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#014BAA] animate-pulse" />
             <span>Live Sync</span>
           </div>
 
@@ -344,7 +344,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <select
               value={selectedOption}
               onChange={(e) => setSelectedOption(e.target.value as DateFilterOption)}
-              className="appearance-none pl-7 pr-7 py-1 text-xs font-semibold rounded-full border border-[#e0e5e9] bg-white text-black hover:border-[#004e64] focus:outline-none cursor-pointer shadow-2xs"
+              className="appearance-none pl-7 pr-7 py-1 text-xs font-semibold rounded-full border border-[#F8F3F0] bg-white text-black hover:border-[#014BAA] focus:outline-none cursor-pointer shadow-2xs"
             >
               <option value="all_time">All Time</option>
               <option value="today">Today</option>
@@ -352,8 +352,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <option value="last_7_days">Last 7 Days</option>
               <option value="last_30_days">Last 30 Days</option>
             </select>
-            <Calendar className="w-3.5 h-3.5 text-[#004e64] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <ChevronDown className="w-3 h-3 text-[#004e64] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Calendar className="w-3.5 h-3.5 text-[#014BAA] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3 h-3 text-[#014BAA] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           {/* Top Export Button */}
@@ -377,7 +377,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           {/* Refresh Button */}
           <button
             onClick={() => window.location.reload()}
-            className="p-1.5 rounded-full border border-[#e0e5e9] bg-white hover:bg-[#e0e5e9]/50 text-black transition-colors cursor-pointer shadow-2xs"
+            className="p-1.5 rounded-full border border-[#F8F3F0] bg-white hover:bg-[#F8F3F0]/50 text-black transition-colors cursor-pointer shadow-2xs"
             title="Refresh Data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -386,10 +386,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       </div>
 
       {/* 2. THE COMPLETE FILTER TOOLBAR (ALL BUTTONS RESTORED, STRICT 2-COLOR DESIGN) */}
-      <div className="bg-white rounded-2xl border border-[#e0e5e9] p-4 sm:p-5 shadow-2xs space-y-3">
-        <div className="flex items-center justify-between pb-1 border-b border-[#e0e5e9]/60">
+      <div className="bg-white rounded-2xl border border-[#F8F3F0] p-4 sm:p-5 shadow-2xs space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-[#F8F3F0]/60">
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-[#004e64]" />
+            <Filter className="w-3.5 h-3.5 text-[#014BAA]" />
             <span className="text-xs font-bold uppercase tracking-wider text-black">
               Merchant Filters
             </span>
@@ -407,8 +407,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter('all')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'all'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Registered <span className="font-mono ml-1">{pillCounts.total}</span>
@@ -419,8 +419,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'active' ? 'all' : 'active')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'active'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Active <span className="font-mono ml-1">{pillCounts.active}</span>
@@ -431,8 +431,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'inactive' ? 'all' : 'inactive')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'inactive'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Inactive <span className="font-mono ml-1">{pillCounts.inactive}</span>
@@ -443,8 +443,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'free_plan' ? 'all' : 'free_plan')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'free_plan'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Free Plan (100 limit) <span className="font-mono ml-1">{pillCounts.freePlan}</span>
@@ -455,8 +455,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'pro_plan' ? 'all' : 'pro_plan')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'pro_plan'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Pro Plan <span className="font-mono ml-1">{pillCounts.proPlan}</span>
@@ -467,8 +467,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'with_bills' ? 'all' : 'with_bills')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'with_bills'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Shops w/ Bills <span className="font-mono ml-1">{pillCounts.withBills}</span>
@@ -479,8 +479,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'zero_bills' ? 'all' : 'zero_bills')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'zero_bills'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Zero Bills Yet <span className="font-mono ml-1">{pillCounts.zeroBills}</span>
@@ -494,8 +494,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'with_customers' ? 'all' : 'with_customers')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'with_customers'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Shops w/ Customers <span className="font-mono ml-1">{pillCounts.withCustomers}</span>
@@ -506,8 +506,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'near_limit' ? 'all' : 'near_limit')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'near_limit'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Near 100 Limit (&gt;80) <span className="font-mono ml-1">{pillCounts.nearLimit}</span>
@@ -518,8 +518,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'staff_configured' ? 'all' : 'staff_configured')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'staff_configured'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             Staff Configured <span className="font-mono ml-1">{pillCounts.staffConfigured}</span>
@@ -530,8 +530,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'gst_enabled' ? 'all' : 'gst_enabled')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'gst_enabled'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             GST Enabled <span className="font-mono ml-1">{pillCounts.gstEnabled}</span>
@@ -542,8 +542,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'ten_plus_bills' ? 'all' : 'ten_plus_bills')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'ten_plus_bills'
-                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
-                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+                ? 'bg-[#014BAA] text-white border-[#014BAA] shadow-xs'
+                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#014BAA]/40'
             }`}
           >
             10+ Bills <span className="font-mono ml-1">{pillCounts.tenPlusBills}</span>
@@ -551,7 +551,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
 
         {/* 3. FILTER TABS ROW (All shops, Active, Inactive, Pro Tier, etc.) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-1 border-t border-[#e0e5e9]/60 text-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-1 border-t border-[#F8F3F0]/60 text-xs">
           {[
             { id: 'all' as PillFilterType, label: `All shops (${pillCounts.total})` },
             { id: 'active' as PillFilterType, label: `Active (${pillCounts.active})` },
@@ -571,8 +571,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 onClick={() => setActivePillFilter(tab.id)}
                 className={`px-3 py-1 rounded-full transition-all cursor-pointer whitespace-nowrap text-xs ${
                   isActive
-                    ? 'bg-[#004e64] text-white shadow-xs font-semibold'
-                    : 'text-black hover:text-[#004e64] hover:bg-[#e0e5e9]/40 bg-transparent font-medium'
+                    ? 'bg-[#014BAA] text-white shadow-xs font-semibold'
+                    : 'text-black hover:text-[#014BAA] hover:bg-[#F8F3F0]/40 bg-transparent font-medium'
                 }`}
               >
                 {tab.label}
@@ -586,13 +586,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           <div className="flex items-center gap-2 flex-1 flex-wrap">
             {/* Search Input */}
             <div className="relative flex-1 min-w-[240px]">
-              <Search className="w-3.5 h-3.5 text-[#004e64]/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-[#014BAA]/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search shop name, owner, phone, city, or shop ID.."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-[#e0e5e9] bg-white text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#004e64] transition-all shadow-2xs"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-[#F8F3F0] bg-white text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#014BAA] transition-all shadow-2xs"
               />
             </div>
 
@@ -603,7 +603,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 setCityFilter('all');
                 setActivePillFilter('all');
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white transition-colors cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white transition-colors cursor-pointer shadow-xs"
             >
               <Filter className="w-3 h-3" />
               <span>Reset Filters</span>
@@ -614,7 +614,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <select
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-semibold rounded-lg border border-[#e0e5e9] bg-white text-black hover:bg-[#e0e5e9]/30 focus:outline-none cursor-pointer shadow-2xs"
+                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-semibold rounded-lg border border-[#F8F3F0] bg-white text-black hover:bg-[#F8F3F0]/30 focus:outline-none cursor-pointer shadow-2xs"
               >
                 <option value="all">Filter Geography ({uniqueCities.length})</option>
                 {uniqueCities.map((c) => (
@@ -623,15 +623,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   </option>
                 ))}
               </select>
-              <MapPin className="w-3.5 h-3.5 text-[#004e64] absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <ChevronDown className="w-3 h-3 text-[#004e64] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <MapPin className="w-3.5 h-3.5 text-[#014BAA] absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-3 h-3 text-[#014BAA] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             {/* Clear Tab Pill Button */}
             {activePillFilter !== 'all' && (
               <button
                 onClick={() => setActivePillFilter('all')}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-[#e0e5e9] bg-white text-black hover:bg-[#e0e5e9]/50 transition-colors cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-[#F8F3F0] bg-white text-black hover:bg-[#F8F3F0]/50 transition-colors cursor-pointer shadow-2xs"
               >
                 <X className="w-3 h-3" />
                 <span>Clear tab</span>
@@ -646,9 +646,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
 
         {/* 5. THE MERCHANT LEDGER TABLE */}
-        <div className="overflow-x-auto rounded-xl border border-[#e0e5e9]">
+        <div className="overflow-x-auto rounded-xl border border-[#F8F3F0]">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#e0e5e9]/50 text-[#004e64] font-semibold uppercase tracking-wider text-[10.5px] border-b border-[#e0e5e9] select-none font-mono">
+            <thead className="bg-[#F8F3F0]/50 text-[#014BAA] font-semibold uppercase tracking-wider text-[10.5px] border-b border-[#F8F3F0] select-none font-mono">
               <tr>
                 <th
                   onClick={() => handleSort('ownerName')}
@@ -656,7 +656,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center gap-1">
                     <span>NAME</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th
@@ -665,7 +665,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center gap-1">
                     <span>SHOP</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th
@@ -674,7 +674,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center gap-1">
                     <span>PHONE</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th
@@ -683,7 +683,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center gap-1">
                     <span>LOCATION</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th
@@ -692,7 +692,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center gap-1">
                     <span>REGISTERED</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th className="px-3 py-2.5 text-center">PLATFORM</th>
@@ -705,7 +705,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center justify-center gap-1">
                     <span>BILLS</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th
@@ -714,13 +714,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 >
                   <div className="flex items-center justify-end gap-1">
                     <span>TOTAL SALES (₹)</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                    <ArrowUpDown className="w-3 h-3 text-[#014BAA]/60" />
                   </div>
                 </th>
                 <th className="px-3 py-2.5 text-center">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e0e5e9]/70 font-sans text-black">
+            <tbody className="divide-y divide-[#F8F3F0]/70 font-sans text-black">
               {displayedSalons.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="px-4 py-12 text-center text-xs text-neutral-400">
@@ -734,7 +734,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     s.created_at && new Date(s.created_at).toDateString() === new Date().toDateString();
 
                   return (
-                    <tr key={s.id} className="hover:bg-[#e0e5e9]/20 transition-colors">
+                    <tr key={s.id} className="hover:bg-[#F8F3F0]/20 transition-colors">
                       {/* 1. NAME (Owner) */}
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         <span className="font-semibold text-black text-xs">
@@ -752,12 +752,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                         >
                           <span
                             className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 transition-transform group-hover:scale-110"
-                            style={{ backgroundColor: s.accent_color || '#004e64' }}
+                            style={{ backgroundColor: s.accent_color || '#014BAA' }}
                           />
-                          <span className="font-bold text-black group-hover:text-[#004e64] group-hover:underline text-xs">
+                          <span className="font-bold text-black group-hover:text-[#014BAA] group-hover:underline text-xs">
                             {s.name}
                           </span>
-                          <span className="text-[10px] text-[#004e64] bg-[#e0e5e9] px-1 rounded-sm border border-[#e0e5e9] opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span className="text-[10px] text-[#014BAA] bg-[#F8F3F0] px-1 rounded-sm border border-[#F8F3F0] opacity-0 group-hover:opacity-100 transition-opacity">
                             Details
                           </span>
                         </button>
@@ -769,10 +769,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           href={`https://wa.me/91${cleanDigits(s.phone)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-black hover:text-[#004e64] transition-colors font-mono text-xs"
+                          className="inline-flex items-center gap-1.5 text-black hover:text-[#014BAA] transition-colors font-mono text-xs"
                           title="Contact on WhatsApp"
                         >
-                          <span className="w-4 h-4 rounded-full bg-[#e0e5e9] text-[#004e64] flex items-center justify-center shrink-0">
+                          <span className="w-4 h-4 rounded-full bg-[#F8F3F0] text-[#014BAA] flex items-center justify-center shrink-0">
                             <MessageCircle className="w-2.5 h-2.5" />
                           </span>
                           <span>{s.phone || s.ownerPhone || 'No phone'}</span>
@@ -795,7 +795,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       {/* 6. PLATFORM */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         <div className="inline-flex items-center gap-1 text-[11px] text-black font-medium">
-                          <Smartphone className="w-3.5 h-3.5 text-[#004e64]" />
+                          <Smartphone className="w-3.5 h-3.5 text-[#014BAA]" />
                           <span>Android POS</span>
                         </div>
                       </td>
@@ -803,16 +803,16 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       {/* 7. ACTIVITY (Live / Today / Inactive - strict 2-color) */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         {isLive ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#004e64] text-white shadow-2xs font-mono">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#014BAA] text-white shadow-2xs font-mono">
                             <span className="w-1.5 h-1.5 rounded-full bg-white" />
                             Live
                           </span>
                         ) : isToday ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#e0e5e9] text-[#004e64] border border-[#e0e5e9] font-mono">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#F8F3F0] text-[#014BAA] border border-[#F8F3F0] font-mono">
                             Today
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-[#e0e5e9]/60 text-black border border-[#e0e5e9] font-mono">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-[#F8F3F0]/60 text-black border border-[#F8F3F0] font-mono">
                             Inactive
                           </span>
                         )}
@@ -821,11 +821,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       {/* 8. PLAN (FREE / PRO - strict 2-color) */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         {s.quotaStatus === 'limit' ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#004e64] text-white shadow-2xs font-mono">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#014BAA] text-white shadow-2xs font-mono">
                             PRO
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#e0e5e9] text-black border border-[#e0e5e9] font-mono">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#F8F3F0] text-black border border-[#F8F3F0] font-mono">
                             FREE
                           </span>
                         )}
@@ -842,9 +842,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                               {s.quotaPercent}%
                             </span>
                           </div>
-                          <div className="w-full h-1.5 rounded-full bg-[#e0e5e9] overflow-hidden">
+                          <div className="w-full h-1.5 rounded-full bg-[#F8F3F0] overflow-hidden">
                             <div
-                              className="h-full rounded-full transition-all bg-[#004e64]"
+                              className="h-full rounded-full transition-all bg-[#014BAA]"
                               style={{ width: `${s.quotaPercent}%` }}
                             />
                           </div>
@@ -853,7 +853,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
                       {/* 10. BILLS */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-[#e0e5e9] text-black border border-[#e0e5e9] tabular-nums">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-[#F8F3F0] text-black border border-[#F8F3F0] tabular-nums">
                           {s.lifetimeSalesCount} bills
                         </span>
                       </td>
@@ -867,7 +867,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         <button
                           onClick={() => handleViewSalon(s.shopObj)}
-                          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white shadow-xs transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white shadow-xs transition-colors cursor-pointer"
                         >
                           <span>View Salon</span>
                           <ChevronRight className="w-3 h-3" />
@@ -882,12 +882,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
       </div>
 
-      {/* 6. GEOGRAPHIC DISTRIBUTION (Clean #004e64 & #e0e5e9) */}
+      {/* 6. GEOGRAPHIC DISTRIBUTION (Clean #014BAA & #F8F3F0) */}
       {cityDistribution.length > 0 && (
-        <div className="bg-white rounded-2xl border border-[#e0e5e9] p-5 shadow-2xs space-y-3">
+        <div className="bg-white rounded-2xl border border-[#F8F3F0] p-5 shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-black flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-[#004e64]" />
+              <MapPin className="w-4 h-4 text-[#014BAA]" />
               Geographic Distribution
             </h3>
             <span className="text-xs text-neutral-500 font-mono">
@@ -897,16 +897,16 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {cityDistribution.map((item, idx) => (
-              <div key={idx} className="p-2.5 rounded-xl border border-[#e0e5e9] bg-white space-y-1.5">
+              <div key={idx} className="p-2.5 rounded-xl border border-[#F8F3F0] bg-white space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-black">{item.name}</span>
                   <span className="text-neutral-700 font-mono text-[11px] tabular-nums">
                     {item.count} shop(s) ({item.percent}%)
                   </span>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-[#e0e5e9] overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-[#F8F3F0] overflow-hidden">
                   <div
-                    className="h-full bg-[#004e64] rounded-full"
+                    className="h-full bg-[#014BAA] rounded-full"
                     style={{ width: `${item.percent}%` }}
                   />
                 </div>

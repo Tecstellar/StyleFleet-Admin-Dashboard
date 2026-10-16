@@ -30,7 +30,7 @@ export const KPICard: React.FC<KPICardProps> = ({
         <span
           className={`${
             isXs ? 'text-[9.5px]' : isSm ? 'text-[10px]' : 'text-[11px]'
-          } font-medium uppercase tracking-wider text-slate-500 truncate`}
+          } font-medium uppercase tracking-wider text-black/60 truncate`}
         >
           {title}
         </span>
@@ -39,7 +39,7 @@ export const KPICard: React.FC<KPICardProps> = ({
       {/* Main Metric Value */}
       <div className={isXs ? 'my-0' : isSm ? 'my-0' : 'my-0.5'}>
         {isUnavailable ? (
-          <div className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded inline-block">
+          <div className="text-xs font-medium text-[#014BAA] bg-[#014BAA]/10 px-2 py-0.5 rounded inline-block">
             Unavailable
           </div>
         ) : (
@@ -50,7 +50,7 @@ export const KPICard: React.FC<KPICardProps> = ({
                 : isSm
                 ? 'text-lg sm:text-xl'
                 : 'text-2xl sm:text-[28px]'
-            } font-semibold tracking-tight text-slate-900 font-sans tabular-nums leading-tight`}
+            } font-semibold tracking-tight text-black font-sans tabular-nums leading-tight`}
           >
             {value}
           </div>
@@ -60,12 +60,12 @@ export const KPICard: React.FC<KPICardProps> = ({
       {/* Footer: Subtitle and Trend */}
       <div className={`${isXs ? 'mt-0' : isSm ? 'mt-0.5' : 'mt-1'} flex items-center justify-between gap-1.5 text-xs`}>
         {isUnavailable ? (
-          <span className="text-slate-400 text-[9.5px]">
+          <span className="text-black/50 text-[9.5px]">
             {unavailableReason || 'Source unavailable'}
           </span>
         ) : (
           <>
-            <span className={`text-slate-500 ${isXs ? 'text-[9.5px]' : isSm ? 'text-[10px]' : 'text-[11px]'} truncate`}>
+            <span className={`text-black/60 ${isXs ? 'text-[9.5px]' : isSm ? 'text-[10px]' : 'text-[11px]'} truncate`}>
               {subtitle || (isDateFilterable ? 'Filtered period' : 'All-time')}
             </span>
 
@@ -75,10 +75,10 @@ export const KPICard: React.FC<KPICardProps> = ({
                   isXs ? 'text-[9px]' : isSm ? 'text-[10px]' : 'text-[11px]'
                 } shrink-0 ${
                   changeType === 'positive'
-                    ? 'text-emerald-600'
+                    ? 'text-[#014BAA]'
                     : changeType === 'negative'
-                    ? 'text-rose-600'
-                    : 'text-slate-500'
+                    ? 'text-black/80'
+                    : 'text-black/60'
                 }`}
               >
                 {changeType === 'positive' && <TrendingUp className="w-2.5 h-2.5 stroke-[2.2]" />}

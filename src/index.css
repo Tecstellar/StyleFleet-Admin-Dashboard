@@ -4,71 +4,76 @@
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --color-sidebar-bg: #0F1B3D;
-  --color-sidebar-bg-elevated: #0B1530;
-  --color-sidebar-text: #e0f2fe;
-  --color-sidebar-text-active: #1D4ED8;
+  --color-royal-blue: #014BAA;
+  --color-royal-blue-hover: #013b86;
+  --color-light-cream: #F8F3F0;
+  --color-sidebar-bg: #014BAA;
+  --color-sidebar-text: #F8F3F0;
+  --color-sidebar-text-active: #014BAA;
   --color-sidebar-accent: #ffffff;
-  --color-brand: #1D4ED8;
-  --color-brand-hover: #1E40AF;
-  --color-brand-soft: #eff6ff;
-  --color-bg-app: #f6f7f9;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f8fafc;
-  --color-line: #e5e7eb;
+  --color-brand: #014BAA;
+  --color-brand-hover: #013b86;
+  --color-brand-soft: #F8F3F0;
+  --color-bg-app: #F8F3F0;
+  --color-surface: #F8F3F0;
+  --color-surface-muted: #F8F3F0;
+  --color-line: rgba(1, 75, 170, 0.15);
 }
 
 :root {
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --bg-app: #f6f7f9;
-  --bg-subtle: #e4e4e7;
-  --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --surface-hover: #f1f5f9;
-  --sidebar-bg: #0F1B3D;
-  --sidebar-bg-elevated: #0B1530;
-  --sidebar-text: #e0f2fe;
-  --sidebar-text-active: #1D4ED8;
-  --sidebar-border: #1E2D5A;
+  --royal-blue: #014BAA;
+  --royal-blue-hover: #013b86;
+  --light-cream: #F8F3F0;
+  --bg-app: #F8F3F0;
+  --bg-subtle: #F8F3F0;
+  --surface: #F8F3F0;
+  --surface-muted: #F8F3F0;
+  --surface-hover: rgba(1, 75, 170, 0.05);
+  --sidebar-bg: #014BAA;
+  --sidebar-bg-elevated: #013b86;
+  --sidebar-text: #F8F3F0;
+  --sidebar-text-active: #014BAA;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
   --sidebar-accent: #ffffff;
-  --text: #0f172a;
-  --text-secondary: #0f172a;
-  --muted: #64748b;
-  --line: #e5e7eb;
-  --line-strong: #94a3b8;
-  --brand: #1D4ED8;
-  --brand-hover: #1E40AF;
-  --brand-soft: #eff6ff;
-  --accent: #1D4ED8;
-  --accent-soft: #eff6ff;
-  --danger: #dc2626;
-  --danger-soft: #fef2f2;
-  --success: #059669;
-  --success-soft: #ecfdf5;
-  --warning: #d97706;
-  --warning-soft: #fffbeb;
+  --text: #000000;
+  --text-secondary: #1e293b;
+  --muted: #475569;
+  --line: rgba(1, 75, 170, 0.15);
+  --line-strong: rgba(1, 75, 170, 0.3);
+  --brand: #014BAA;
+  --brand-hover: #013b86;
+  --brand-soft: #F8F3F0;
+  --accent: #014BAA;
+  --accent-soft: #F8F3F0;
+  --danger: #014BAA;
+  --danger-soft: #F8F3F0;
+  --success: #014BAA;
+  --success-soft: #F8F3F0;
+  --warning: #014BAA;
+  --warning-soft: #F8F3F0;
   --radius-sm: 8px;
   --radius: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 12px 24px -8px rgba(15, 23, 42, 0.12);
+  --shadow-xs: 0 1px 2px rgba(1, 75, 170, 0.05);
+  --shadow-sm: 0 1px 3px rgba(1, 75, 170, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(1, 75, 170, 0.08);
+  --shadow-lg: 0 12px 24px -8px rgba(1, 75, 170, 0.12);
   --sidebar-width: 240px;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-app);
-  color: var(--text);
+  background-color: #F8F3F0;
+  color: #000000;
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom thin scrollbar - IronDrobe Style */
+/* Custom thin scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -77,21 +82,21 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(1, 75, 170, 0.25);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: rgba(1, 75, 170, 0.45);
 }
 
-/* Metric Card - Clean Modern SaaS Card Style */
+/* Metric Card - Clean Royal Blue & Light Cream */
 .metric-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  background: #F8F3F0;
+  border: 1px solid rgba(1, 75, 170, 0.18);
+  border-radius: 12px;
   padding: 16px 18px;
   box-shadow: none;
-  transition: border-color 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -100,7 +105,7 @@ body {
   box-sizing: border-box;
 }
 .metric-card:hover {
-  border-color: #cbd5e1;
+  border-color: #014BAA;
 }
 
 .metric-card.metric-card-sm {
@@ -119,12 +124,12 @@ body {
   line-height: 1.15;
 }
 
-/* Stat strip - one joined row of key numbers, numbers first */
+/* Stat strip */
 .stat-strip {
   display: grid;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  background: #F8F3F0;
+  border: 1px solid rgba(1, 75, 170, 0.18);
+  border-radius: 12px;
   overflow: hidden;
 }
 .stat-strip .metric-card {
@@ -136,11 +141,11 @@ body {
   box-shadow: none;
 }
 .stat-strip .metric-card + .metric-card {
-  border-left: 1px solid #eef0f3;
+  border-left: 1px solid rgba(1, 75, 170, 0.15);
 }
 @media (max-width: 1023px) {
   .stat-strip .metric-card:nth-child(n + 3) {
-    border-top: 1px solid #eef0f3;
+    border-top: 1px solid rgba(1, 75, 170, 0.15);
   }
   .stat-strip .metric-card:nth-child(odd) {
     border-left: none;
@@ -148,15 +153,15 @@ body {
 }
 
 .metric-card .metric-value {
-  color: #0f172a;
+  color: #000000;
   font-weight: 700;
 }
 
-/* Panel - Clean Surface */
+/* Panel - Clean Light Cream Surface with Royal Blue subtle border */
 .panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  background: #F8F3F0;
+  border: 1px solid rgba(1, 75, 170, 0.18);
+  border-radius: 12px;
   padding: 16px 18px;
   box-shadow: none;
 }
@@ -167,24 +172,24 @@ body {
   flex-direction: column;
   gap: 6px;
   padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(1, 75, 170, 0.18);
+  background: #F8F3F0;
 }
 .overview-section-title {
   margin: 0;
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #64748b;
+  color: #014BAA;
 }
 
 /* SaaS Controls */
 .btn-export {
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #334155;
+  border: 1px solid rgba(1, 75, 170, 0.2);
+  background: #F8F3F0;
+  color: #014BAA;
   font-size: 12px;
   font-weight: 600;
   padding: 6px 12px;
@@ -196,22 +201,22 @@ body {
   gap: 6px;
 }
 .btn-export:hover {
-  background: #f8fafc;
-  color: #0f172a;
-  border-color: #cbd5e1;
+  background: #014BAA;
+  color: #ffffff;
+  border-color: #014BAA;
 }
 
 .segmented-control {
   display: inline-flex;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(1, 75, 170, 0.2);
   border-radius: 8px;
   padding: 2px;
-  background: #f8fafc;
+  background: #F8F3F0;
 }
 .segmented-control .segment {
   border: none;
   background: transparent;
-  color: #64748b;
+  color: #000000;
   font-size: 12px;
   font-weight: 500;
   padding: 5px 12px;
@@ -220,14 +225,14 @@ body {
   transition: all 150ms ease;
 }
 .segmented-control .segment:hover {
-  color: #0f172a;
+  color: #014BAA;
 }
 .segmented-control .segment.active {
-  background: #ffffff;
-  color: #0f172a;
+  background: #014BAA;
+  color: #ffffff;
   font-weight: 600;
   box-shadow: none;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #014BAA;
 }
 
 /* Ensure input autofill maintains contrast */
@@ -235,9 +240,9 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-text-fill-color: #0f172a !important;
-  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
-  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #000000 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #F8F3F0 inset !important;
+  box-shadow: 0 0 0px 1000px #F8F3F0 inset !important;
   transition: background-color 5000s ease-in-out 0s;
-  caret-color: #0f172a !important;
+  caret-color: #000000 !important;
 }

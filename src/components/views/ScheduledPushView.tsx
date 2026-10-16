@@ -82,13 +82,13 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-[0.08em] text-[#3B82F6] uppercase font-mono">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-[#014BAA] uppercase font-mono">
               AUTOMATION ENGINE
             </span>
-            <span className="text-neutral-300">•</span>
-            <span className="text-[11px] text-neutral-500 font-medium">Scheduled & Event-Triggered Notifications</span>
+            <span className="text-black/20">•</span>
+            <span className="text-[11px] text-black/60 font-medium">Scheduled & Event-Triggered Notifications</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-black tracking-tight mt-0.5">
             Scheduled Push
           </h1>
         </div>
@@ -158,8 +158,8 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
                   onClick={() => toggleRule(r.id)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                     r.status === 'active'
-                      ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
-                      : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
+                      ? 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
+                      : 'bg-[#014BAA] text-white hover:bg-[#013b86]'
                   }`}
                 >
                   {r.status === 'active' ? (
@@ -176,7 +176,7 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
                 </button>
               </div>
 
-              <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200/70 text-xs text-neutral-700 font-mono mt-3">
+              <div className="p-3 bg-[#014BAA]/5 rounded-lg border border-[#014BAA]/15 text-xs text-black/80 font-mono mt-3">
                 "{r.messageTemplate}"
               </div>
             </div>

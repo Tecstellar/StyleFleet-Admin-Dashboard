@@ -126,13 +126,13 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               <span>{shop.name}</span>
               {shop.duplicate_count && shop.duplicate_count > 0 ? (
                 <span
-                  className="px-1.5 py-0.5 text-[9px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-300 rounded"
+                  className="px-1.5 py-0.5 text-[9px] font-bold bg-[#014BAA]/10 text-black border border-[#014BAA]/20 rounded"
                   title={`${shop.duplicate_count} duplicate registration(s) detected and merged into this canonical active salon record`}
                 >
                   Deduplicated ({shop.duplicate_count} merged)
                 </span>
               ) : (
-                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded">
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#014BAA] text-white border border-[#014BAA] rounded">
                   Verified Real
                 </span>
               )}
@@ -236,9 +236,9 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
                 {remaining === 0 ? 'Limit Reached' : `${remaining} left`}
               </span>
             </div>
-            <div className="w-full bg-neutral-200 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-[#014BAA]/15 h-1.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-black rounded-full transition-all"
+                className="h-full bg-[#014BAA] rounded-full transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -250,7 +250,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       key: 'created_at',
       header: 'Registered',
       render: (shop) => (
-        <span className="text-neutral-700 text-xs font-mono">
+        <span className="text-black/80 text-xs font-mono">
           {formatDate(shop.created_at)}
         </span>
       ),
@@ -266,7 +266,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               setModalTab('overview');
               setInternalSelectedShop(shop);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-800 hover:border-[#1c1f26] hover:bg-[#1c1f26] hover:text-white shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#014BAA]/20 bg-[#F8F3F0] text-black hover:bg-[#014BAA] hover:text-white shadow-xs transition-colors cursor-pointer"
             title="View salon overview & team"
           >
             <Eye className="w-3.5 h-3.5" />
@@ -279,7 +279,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               setModalTab('billing');
               setInternalSelectedShop(shop);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-neutral-100 text-neutral-900 hover:bg-[#1c1f26] hover:text-white hover:border-[#1c1f26] shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#014BAA]/20 bg-[#014BAA]/10 text-black hover:bg-[#014BAA] hover:text-white shadow-xs transition-colors cursor-pointer"
             title="Inspect all bills and filter by date for this salon"
           >
             <Receipt className="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               setModalTab('settings');
               setInternalSelectedShop(shop);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-neutral-200 bg-white text-neutral-800 hover:border-[#1c1f26] hover:bg-[#1c1f26] hover:text-white shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#014BAA]/20 bg-[#F8F3F0] text-black hover:bg-[#014BAA] hover:text-white shadow-xs transition-colors cursor-pointer"
             title="Increase or reset this salon's free sales limit"
           >
             <Gauge className="w-3.5 h-3.5" />
@@ -334,36 +334,36 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       </div>
 
       {/* Real Data Integrity Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs">
-        <div className="flex items-center gap-2 text-emerald-800">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-[#014BAA]/20 bg-[#014BAA]/10 text-xs">
+        <div className="flex items-center gap-2 text-black">
+          <ShieldCheck className="w-4 h-4 text-[#014BAA] shrink-0" />
           <span className="font-semibold">Production Data Guarantee:</span>
           <span>Deduplication engine active. Only verified real salons are tracked (Zero duplicates, Zero random/dummy data).</span>
         </div>
-        <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-700">
+        <div className="flex items-center gap-3 text-[11px] font-mono text-[#014BAA]">
           <span>Active Unique Salons: {filteredShops.length}</span>
         </div>
       </div>
 
       {/* Multi-Attribute Filter Toolbar */}
-      <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100">
-          <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
-            <Sparkles className="w-4 h-4 text-black" />
+      <div className="p-4 rounded-2xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#014BAA]/15">
+          <div className="flex items-center gap-2 text-xs font-bold text-black">
+            <Sparkles className="w-4 h-4 text-[#014BAA]" />
             <span>Salon Filters &amp; Date Targeting</span>
           </div>
 
           {/* Quick Date Presets */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-semibold text-neutral-400 mr-1">Presets:</span>
+            <span className="text-[11px] font-semibold text-black/50 mr-1">Presets:</span>
             {(['all', 'today', 'yesterday', '7d', '30d'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => handlePreset(p)}
                 className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors capitalize ${
                   datePreset === p && !exactDate
-                    ? 'bg-black text-white'
-                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                    ? 'bg-[#014BAA] text-white'
+                    : 'bg-[#014BAA]/10 text-black/80 hover:bg-[#014BAA]/20'
                 }`}
               >
                 {p === '7d' ? 'Last 7 Days' : p === '30d' ? 'Last 30 Days' : p}
@@ -375,8 +375,8 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* 1. Exact Registration Date */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-bold text-black/70 uppercase mb-1 flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-black/40" />
               <span>Exact Registration Date</span>
             </label>
             <input
@@ -386,20 +386,20 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
                 setExactDate(e.target.value);
                 setDatePreset('all');
               }}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] transition-all"
             />
           </div>
 
           {/* 2. City Filter */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-bold text-black/70 uppercase mb-1 flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-black/40" />
               <span>Filter by City</span>
             </label>
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] transition-all cursor-pointer"
             >
               <option value="all">All Cities ({uniqueCities.length})</option>
               {uniqueCities.map((c) => (
@@ -412,14 +412,14 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
 
           {/* 3. Staff Onboarding Status */}
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 uppercase mb-1 flex items-center gap-1">
-              <User className="w-3 h-3 text-neutral-400" />
+            <label className="block text-[11px] font-bold text-black/70 uppercase mb-1 flex items-center gap-1">
+              <User className="w-3 h-3 text-black/40" />
               <span>Team Status</span>
             </label>
             <select
               value={staffFilter}
               onChange={(e) => setStaffFilter(e.target.value as any)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:border-black transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] transition-all cursor-pointer"
             >
               <option value="all">All Salons</option>
               <option value="with_staff">Has Staff Members (&gt;0)</option>

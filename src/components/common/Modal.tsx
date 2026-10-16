@@ -55,28 +55,28 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${widthClasses} rounded-2xl border border-[#E5E7EB] bg-white text-neutral-900 shadow-2xl shadow-black/10 overflow-hidden z-10 my-8`}
+        className={`relative w-full ${widthClasses} rounded-2xl border border-[#014BAA]/25 bg-[#F8F3F0] text-black shadow-2xl overflow-hidden z-10 my-8`}
         role="dialog"
         aria-modal="true"
       >
-        {/* Top Black Accent */}
-        <div className="h-1 bg-[#111827]" />
+        {/* Top Royal Blue Accent */}
+        <div className="h-1.5 bg-[#014BAA]" />
 
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#E5E7EB]">
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#014BAA]/15">
           <div>
-            <h3 className="text-base sm:text-lg font-semibold tracking-tight text-neutral-900">
+            <h3 className="text-base sm:text-lg font-semibold tracking-tight text-black">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-xs text-neutral-500 mt-0.5">
+              <p className="text-xs text-black/60 mt-0.5">
                 {subtitle}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+            className="p-1.5 rounded-lg text-black/60 hover:text-black hover:bg-[#014BAA]/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

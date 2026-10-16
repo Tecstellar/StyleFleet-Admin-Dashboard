@@ -621,7 +621,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                     <td className="px-4 py-3 font-mono text-neutral-700">{row.phone}</td>
                     <td className="px-4 py-3 text-neutral-700">{row.reason}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-50 text-rose-700 border border-rose-200">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#014BAA]/10 text-black border border-[#014BAA]/20">
                         {row.status}
                       </span>
                     </td>

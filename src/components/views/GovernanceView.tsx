@@ -97,7 +97,7 @@ export const GovernanceView: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs text-xs">
               <span className="text-neutral-500">Integrity Checks Passed:</span>
-              <div className="text-2xl font-bold font-mono text-emerald-600 mt-1">
+              <div className="text-2xl font-bold font-mono text-[#014BAA] mt-1">
                 {passedChecks} checks
               </div>
               <span className="text-[10px] text-neutral-400 mt-1 block">Verified healthy in database</span>

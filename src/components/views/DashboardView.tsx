@@ -82,7 +82,7 @@ interface DashboardViewProps {
 }
 
 // Brand Design System Palette for Data Visualizations
-const CHART_PALETTE = ['#1D4ED8', '#3B82F6', '#93C5FD', '#BFDBFE', '#94a3b8', '#cbd5e1'];
+const CHART_PALETTE = ['#014BAA', '#013b86', 'rgba(1, 75, 170, 0.7)', 'rgba(1, 75, 170, 0.4)', 'rgba(1, 75, 170, 0.2)', '#111827'];
 
 const Metric: React.FC<{ label: string; value: string; sub?: string; onClick?: () => void }> = ({
   label,
@@ -802,7 +802,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`px-0.5 pb-2.5 -mb-px border-b-2 text-xs transition-colors cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'border-[#1D4ED8] text-slate-900 font-semibold'
+                  ? 'border-[#014BAA] text-[#014BAA] font-semibold'
                   : 'border-transparent text-slate-500 hover:text-slate-900 font-medium'
               }`}
             >
@@ -844,8 +844,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           color: '#0f172a',
                         }}
                       />
-                      <Bar dataKey="revenue" fill="#1D4ED8" radius={[3, 3, 0, 0]} name="Sales (₹)" maxBarSize={28} />
-                      <Bar dataKey="bills" fill="#BFDBFE" radius={[3, 3, 0, 0]} name="Sales Count" maxBarSize={28} />
+                      <Bar dataKey="revenue" fill="#014BAA" radius={[3, 3, 0, 0]} name="Sales (₹)" maxBarSize={28} />
+                      <Bar dataKey="bills" fill="rgba(1, 75, 170, 0.25)" radius={[3, 3, 0, 0]} name="Sales Count" maxBarSize={28} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -976,7 +976,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-1.5 text-xs text-slate-600">
-                          <span className="text-emerald-700 font-medium">{row.paidBillsCount} paid</span>
+                          <span className="text-[#014BAA] font-medium">{row.paidBillsCount} paid</span>
                           <span className="text-slate-300">•</span>
                           <span>{row.pendingBillsCount} pending</span>
                         </div>
@@ -995,7 +995,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             e.stopPropagation();
                             handleSelectDayDrilldown(row.rawDate);
                           }}
-                          className="text-xs font-medium text-[#1D4ED8] hover:text-[#1E40AF] hover:underline cursor-pointer"
+                          className="text-xs font-medium text-[#014BAA] hover:underline cursor-pointer"
                         >
                           View
                         </button>
@@ -1206,7 +1206,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         <div className="flex items-center gap-2">
                           <div className="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                             <div
-                              className="h-full bg-[#1D4ED8] rounded-full"
+                              className="h-full bg-[#014BAA] rounded-full"
                               style={{ width: `${Math.min(100, sc.percentShare)}%` }}
                             />
                           </div>
@@ -1276,11 +1276,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium">
                   <div className="flex items-center gap-1.5 text-slate-700">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#1D4ED8] inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#014BAA] inline-block" />
                     <span>Collected INR</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-slate-700">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#013b86] inline-block" />
                     <span>Invoiced INR</span>
                   </div>
                 </div>
@@ -1313,19 +1313,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         type="monotone"
                         dataKey="collected"
                         name="Collected Revenue"
-                        stroke="#1D4ED8"
+                        stroke="#014BAA"
                         strokeWidth={2}
-                        fill="#1D4ED8"
+                        fill="#014BAA"
                         fillOpacity={0.12}
                       />
                       <Area
                         type="monotone"
                         dataKey="invoiced"
                         name="Invoiced Total"
-                        stroke="#3B82F6"
+                        stroke="#013b86"
                         strokeWidth={1.75}
                         strokeDasharray="4 4"
-                        fill="#3B82F6"
+                        fill="#013b86"
                         fillOpacity={0.06}
                       />
                     </AreaChart>
@@ -1350,7 +1350,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     name: 'Pro SaaS Tier',
                     desc: 'Multi-stylist (>2 staff) or high sales volume',
                     count: salonTierLedger.filter((s) => s.tier === 'Pro SaaS').length,
-                    badge: 'bg-blue-50 text-[#1D4ED8] border-blue-200/70',
+                    badge: 'bg-[#014BAA] text-white border-[#014BAA]',
                   },
                   {
                     name: 'Starter SaaS Tier',
@@ -1362,7 +1362,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     name: 'Free Trial (100 Sales Quota)',
                     desc: 'Newly registered salons using 100 free sales',
                     count: salonTierLedger.filter((s) => s.tier === 'Free Trial').length,
-                    badge: 'bg-amber-50 text-amber-700 border-amber-200/70',
+                    badge: 'bg-[#014BAA]/10 text-[#014BAA] border-[#014BAA]/20',
                   },
                 ].map((tier, idx) => (
                   <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
@@ -1454,7 +1454,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             setActiveTab('all_bills');
                             setBillsPage(1);
                           }}
-                          className="text-xs font-medium text-[#1D4ED8] hover:underline cursor-pointer"
+                          className="text-xs font-medium text-[#014BAA] hover:underline cursor-pointer"
                         >
                           View Sales
                         </button>

@@ -376,21 +376,21 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
         <div
           className={`p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between shadow-md transition-all ${
             feedbackMessage.type === 'success'
-              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-              : 'bg-rose-50 text-rose-900 border-rose-300'
+              ? 'bg-[#014BAA]/15 text-black border-[#014BAA]/30'
+              : 'bg-[#014BAA]/10 text-black border-[#014BAA]/25'
           }`}
         >
           <div className="flex items-center gap-2">
             {feedbackMessage.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#014BAA] shrink-0" />
             ) : (
-              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-[#014BAA] shrink-0" />
             )}
             <span>{feedbackMessage.text}</span>
           </div>
           <button
             onClick={() => setFeedbackMessage(null)}
-            className="text-neutral-500 hover:text-black ml-4"
+            className="text-black/50 hover:text-black ml-4 cursor-pointer"
           >
             ✕
           </button>
@@ -448,7 +448,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search stylist by name, phone, salon, or role..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1D4ED8] focus:bg-white transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#014BAA] focus:bg-white transition-all"
               />
             </div>
 
@@ -457,7 +457,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               <select
                 value={selectedShopFilter}
                 onChange={(e) => setSelectedShopFilter(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#1D4ED8] transition-all"
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#014BAA] transition-all"
               >
                 <option value="all">All Salons ({shops.length})</option>
                 {shops.map((s) => (
@@ -473,7 +473,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
               <select
                 value={inviteStatusFilter}
                 onChange={(e) => setInviteStatusFilter(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#1D4ED8] transition-all"
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/70 text-slate-800 focus:outline-none focus:border-[#014BAA] transition-all"
               >
                 <option value="all">All Invite Statuses</option>
                 <option value="active">App Active</option>
@@ -511,7 +511,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
             <button
               onClick={handleOpenAdd}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1D4ED8] text-white hover:bg-[#0c3c49] text-xs font-semibold transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#014BAA] text-white hover:bg-[#013b86] text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 text-white" />
               <span>Add Stylist</span>
@@ -616,7 +616,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                               title="Copy mobile number"
                             >
                               {copiedPhoneId === st.id ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                <Check className="w-3.5 h-3.5 text-[#014BAA]" />
                               ) : (
                                 <Copy className="w-3.5 h-3.5" />
                               )}
@@ -630,20 +630,20 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                       {/* Invitation Status */}
                       <td className="py-3.5 px-4">
                         {isAppActive ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-neutral-900 text-white border border-neutral-900 shadow-2xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-[#014BAA] text-white border border-[#014BAA] shadow-2xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                             <span>App Active</span>
                           </span>
                         ) : isInvited ? (
                           <span
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-neutral-100 text-neutral-800 border border-neutral-300"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-[#014BAA]/10 text-black border border-[#014BAA]/20"
                             title={st.invited_at ? `Invited on ${formatDateTime(st.invited_at)}` : 'Invited'}
                           >
-                            <MessageCircle className="w-3.5 h-3.5 text-neutral-700" />
+                            <MessageCircle className="w-3.5 h-3.5 text-[#014BAA]" />
                             <span>Invited {st.invited_at ? `(${formatDate(st.invited_at)})` : ''}</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-[#014BAA]/5 text-black/70 border border-[#014BAA]/15">
                             <span>Not Invited</span>
                           </span>
                         )}
@@ -656,14 +656,14 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                           onClick={() => handleToggleActive(st)}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all border cursor-pointer ${
                             st.is_active
-                              ? 'bg-neutral-900 text-white border-black'
-                              : 'bg-neutral-100 text-neutral-500 border-neutral-300 hover:bg-neutral-200'
+                              ? 'bg-[#014BAA] text-white border-[#014BAA]'
+                              : 'bg-[#014BAA]/10 text-black/70 border-[#014BAA]/20 hover:bg-[#014BAA]/20'
                           }`}
                           title={`Click to ${st.is_active ? 'deactivate' : 'activate'} this stylist`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              st.is_active ? 'bg-emerald-400' : 'bg-neutral-400'
+                              st.is_active ? 'bg-white' : 'bg-black/40'
                             }`}
                           />
                           <span>{st.is_active ? 'Active' : 'Disabled'}</span>
@@ -740,10 +740,10 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                           <button
                             type="button"
                             onClick={() => setDeleteConfirmStaff(st)}
-                            className="p-1.5 rounded-lg border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 transition-colors"
+                            className="p-1.5 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black/60 hover:text-black hover:bg-[#014BAA]/10 transition-colors cursor-pointer"
                             title="Remove Stylist"
                           >
-                            <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
@@ -883,14 +883,14 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
           <form onSubmit={handleSaveStaffForm} className="space-y-4">
             {/* Salon Selection */}
             <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-1">
-                Select Salon <span className="text-rose-500">*</span>
+              <label className="block text-xs font-bold text-black/80 mb-1">
+                Select Salon <span className="text-[#014BAA]">*</span>
               </label>
               <select
                 value={formShopId}
                 onChange={(e) => setFormShopId(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-black"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA]"
               >
                 <option value="">-- Choose a salon --</option>
                 {shops.map((s) => (
@@ -903,8 +903,8 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
 
             {/* Stylist Name */}
             <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-1">
-                Stylist Full Name <span className="text-rose-500">*</span>
+              <label className="block text-xs font-bold text-black/80 mb-1">
+                Stylist Full Name <span className="text-[#014BAA]">*</span>
               </label>
               <input
                 type="text"
@@ -912,7 +912,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder="e.g. Rahul Sharma"
                 required
-                className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-black"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA]"
               />
             </div>
 
@@ -1017,16 +1017,16 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
           maxWidth="sm"
         >
           <div className="space-y-4">
-            <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50 text-xs text-rose-800 leading-relaxed">
+            <div className="p-3.5 rounded-xl border border-[#014BAA]/20 bg-[#014BAA]/10 text-xs text-black leading-relaxed">
               This will remove <strong>{deleteConfirmStaff.name}</strong> from salon{' '}
               <strong>{deleteConfirmStaff.shop?.name || 'assigned salon'}</strong>. Past bills and historical reports will retain historical stylist attribution.
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E7EB]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#014BAA]/15">
               <button
                 type="button"
                 onClick={() => setDeleteConfirmStaff(null)}
-                className="px-3.5 py-1.5 rounded-xl border border-[#E5E7EB] text-xs font-semibold text-neutral-700 hover:bg-neutral-50 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl border border-[#014BAA]/30 text-xs font-semibold text-black/70 hover:bg-[#014BAA]/10 cursor-pointer"
               >
                 Cancel
               </button>
@@ -1034,7 +1034,7 @@ export const StylistsView: React.FC<StylistsViewProps> = ({
                 type="button"
                 onClick={handleDeleteStaff}
                 disabled={actionLoading}
-                className="px-4 py-1.5 rounded-xl bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-1.5 rounded-xl bg-[#014BAA] text-white hover:bg-[#013b86] font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 {actionLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Confirm Delete</span>

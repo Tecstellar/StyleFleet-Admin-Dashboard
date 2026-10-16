@@ -428,7 +428,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9FA] text-[#111827] transition-colors">
+    <div className="flex min-h-screen bg-[#F8F3F0] text-black transition-colors">
       {/* Left Sidebar — Exact 9 options */}
       <Sidebar
         currentView={currentView}
@@ -473,14 +473,14 @@ export const App: React.FC = () => {
 
         {/* Global Error Banner */}
         {fetchError && (
-          <div className="mx-4 sm:mx-6 mt-4 p-4 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-300 text-xs flex items-center justify-between gap-4">
+          <div className="mx-4 sm:mx-6 mt-4 p-4 rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-[#014BAA] text-xs flex items-center justify-between gap-4 shadow-xs">
             <div>
-              <span className="font-semibold text-rose-200">Unable to load salon data: </span>
+              <span className="font-semibold text-black">Unable to load salon data: </span>
               {fetchError}
             </div>
             <button
               onClick={handleManualRefresh}
-              className="px-3 py-1 rounded bg-rose-500 text-white font-medium hover:bg-rose-600 transition-colors shrink-0"
+              className="px-3 py-1 rounded-lg bg-[#014BAA] text-white font-medium hover:bg-[#013b86] transition-colors shrink-0 cursor-pointer"
             >
               Retry
             </button>

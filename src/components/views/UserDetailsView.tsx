@@ -32,18 +32,13 @@ interface UserDetailsViewProps {
   onSelectSalon?: (shop: Shop) => void;
 }
 
-// Pastel avatar color configurations matching reference UI
+// Two-color avatar theme configurations matching dashboard standard
 const AVATAR_COLORS = [
-  'bg-purple-100 text-purple-700',
-  'bg-amber-100 text-amber-800',
-  'bg-sky-100 text-sky-700',
-  'bg-teal-100 text-teal-700',
-  'bg-pink-100 text-pink-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-indigo-100 text-indigo-700',
-  'bg-rose-100 text-rose-700',
-  'bg-blue-100 text-blue-700',
-  'bg-orange-100 text-orange-800',
+  'bg-[#014BAA] text-white',
+  'bg-[#014BAA]/15 text-[#014BAA]',
+  'bg-[#014BAA]/10 text-black',
+  'bg-[#014BAA] text-white',
+  'bg-[#014BAA]/20 text-[#014BAA]',
 ];
 
 function getAvatarInitials(name: string): string {
@@ -414,9 +409,9 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
             {/* Export Excel Button */}
             <button
               onClick={handleExportExcel}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] hover:bg-[#014BAA]/10 text-black text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              <FileSpreadsheet className="w-3.5 h-3.5 text-[#014BAA]" />
               <span>Export Excel</span>
             </button>
 
@@ -494,7 +489,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                           {/* Shop Name */}
                           <button
                             onClick={() => onSelectSalon && onSelectSalon(row.shop)}
-                            className="font-bold text-neutral-900 hover:text-blue-600 transition-colors truncate text-left cursor-pointer"
+                            className="font-bold text-neutral-900 hover:text-[#014BAA] transition-colors truncate text-left cursor-pointer"
                             title={`View ${row.name} in Salon 360`}
                           >
                             {row.name}
@@ -507,7 +502,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                         {row.phone !== '—' ? (
                           <a
                             href={`tel:${row.phone}`}
-                            className="hover:text-blue-600 transition-colors"
+                            className="hover:text-[#014BAA] transition-colors"
                           >
                             {row.phone}
                           </a>
@@ -529,11 +524,11 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                       {/* STATUS */}
                       <td className="py-3 px-3 whitespace-nowrap">
                         {row.isSubscribed ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#014BAA] text-white border border-[#014BAA]">
                             Pro plan
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#014BAA]/10 text-black border border-[#014BAA]/30">
                             Free plan
                           </span>
                         )}
@@ -546,7 +541,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                             <div className="font-mono font-semibold text-neutral-900 text-xs">
                               Unlimited
                             </div>
-                            <div className="text-[10px] text-blue-600 font-medium">
+                            <div className="text-[10px] text-[#014BAA] font-semibold">
                               Active Pro
                             </div>
                           </div>
@@ -592,7 +587,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                           {/* Delete Button */}
                           <button
                             onClick={() => setDeletingShop(row.shop)}
-                            className="p-1.5 rounded border border-neutral-300 hover:border-red-400 hover:bg-red-50 text-neutral-600 hover:text-red-600 transition-colors cursor-pointer"
+                            className="p-1.5 rounded border border-[#014BAA]/20 hover:bg-[#014BAA]/10 text-black/60 hover:text-black transition-colors cursor-pointer"
                             title="Delete User / Salon"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -611,8 +606,8 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
       {/* EDIT SALON DETAILS MODAL */}
       {editingShop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-neutral-200">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-4">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#014BAA]/20">
+            <div className="flex items-center justify-between pb-3 border-b border-[#014BAA]/15 mb-4">
               <div>
                 <h3 className="text-base font-bold text-neutral-900">
                   Edit Salon Details
@@ -638,7 +633,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                   required
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500"
+                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
                 />
               </div>
 
@@ -650,7 +645,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
                   placeholder="10-digit mobile number"
-                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500 font-mono"
+                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] font-mono"
                 />
               </div>
 
@@ -662,7 +657,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                   value={editCity}
                   onChange={(e) => setEditCity(e.target.value)}
                   placeholder="e.g. Chennai, Coimbatore, Theni"
-                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500"
+                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
                 />
               </div>
 
@@ -674,7 +669,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                   value={editAddress}
                   onChange={(e) => setEditAddress(e.target.value)}
                   placeholder="Street / Shop location"
-                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500"
+                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
                 />
               </div>
 
@@ -688,7 +683,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                   min="0"
                   value={editLimit}
                   onChange={(e) => setEditLimit(Number(e.target.value))}
-                  className="w-full p-2 text-xs rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:border-blue-500 font-mono"
+                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] font-mono"
                 />
                 <p className="text-[10px] text-neutral-400">
                   Default is 100 sales. Set higher or 10000 for unlimited Pro access.
@@ -696,7 +691,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-neutral-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-[#014BAA]/15 flex items-center justify-between">
                 {onSelectSalon && (
                   <button
                     type="button"
@@ -705,7 +700,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                       setEditingShop(null);
                       onSelectSalon(s);
                     }}
-                    className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs text-[#014BAA] hover:underline font-semibold cursor-pointer"
                   >
                     <span>View Salon 360</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -715,14 +710,14 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setEditingShop(null)}
-                    className="px-3.5 py-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-medium transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-lg border border-[#014BAA]/30 hover:bg-[#014BAA]/10 text-black/70 font-medium transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSavingEdit}
-                    className="px-4 py-1.5 rounded-lg bg-neutral-900 hover:bg-black text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    className="px-4 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isSavingEdit ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -736,22 +731,22 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
       {/* DELETE CONFIRMATION MODAL */}
       {deletingShop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-neutral-200 text-center">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-[#014BAA]/20 text-center">
+            <div className="w-12 h-12 rounded-full bg-[#014BAA]/10 text-[#014BAA] flex items-center justify-center mx-auto mb-3">
               <AlertTriangle className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-neutral-900">
+            <h3 className="text-base font-bold text-black">
               Delete Salon Shop?
             </h3>
-            <p className="text-xs text-neutral-500 mt-1.5">
-              Are you sure you want to delete <span className="font-semibold text-neutral-800">{deletingShop.name}</span>? This action will remove the shop record from the active database.
+            <p className="text-xs text-black/70 mt-1.5">
+              Are you sure you want to delete <span className="font-semibold text-black">{deletingShop.name}</span>? This action will remove the shop record from the active database.
             </p>
 
             <div className="flex items-center justify-center gap-2 mt-5">
               <button
                 type="button"
                 onClick={() => setDeletingShop(null)}
-                className="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-xs text-neutral-700 font-semibold transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-[#014BAA]/30 hover:bg-[#014BAA]/10 text-xs text-black/70 font-semibold transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -759,7 +754,7 @@ export const UserDetailsView: React.FC<UserDetailsViewProps> = ({
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-xs text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-xs text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isDeleting ? 'Deleting...' : 'Delete Salon'}
               </button>

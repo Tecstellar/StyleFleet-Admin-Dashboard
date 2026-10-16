@@ -286,15 +286,15 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
     switch (salon.status) {
       case 'pro_required':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-black text-white border border-black shadow-xs">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#014BAA] text-white border border-[#014BAA] shadow-xs">
+            <AlertTriangle className="w-3.5 h-3.5 text-white" />
             PRO UPGRADE REQUIRED
           </span>
         );
       case 'nearing_limit':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-neutral-900 text-amber-300 border border-neutral-700 shadow-xs">
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#014BAA]/15 text-black border border-[#014BAA]/30 shadow-xs">
+            <Clock className="w-3.5 h-3.5 text-[#014BAA]" />
             NEARING 100 LIMIT
           </span>
         );
@@ -306,16 +306,16 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             ? 'PRO 6M (₹2,799)'
             : 'PRO 1Y (₹4,999)';
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-black text-white border border-white/20 shadow-xs">
-            <Crown className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#014BAA] text-white border border-[#014BAA] shadow-xs">
+            <Crown className="w-3.5 h-3.5 text-white fill-white" />
             {planName}
           </span>
         );
       case 'free_active':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-neutral-100 text-neutral-800 border border-neutral-300">
-            <CheckCircle2 className="w-3.5 h-3.5 text-black" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#014BAA]/10 text-black border border-[#014BAA]/20">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#014BAA]" />
             FREE TIER ACTIVE
           </span>
         );
@@ -325,17 +325,17 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner / Header */}
-      <div className="bg-[#1D4ED8] text-white p-6 sm:p-7 rounded-2xl border border-[#1E40AF] shadow-sm relative overflow-hidden">
+      <div className="bg-[#014BAA] text-white p-6 sm:p-7 rounded-2xl border border-[#014BAA] shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-xs font-semibold border border-white/20">
-              <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+              <Crown className="w-3.5 h-3.5 text-white fill-white" />
               <span>Free Tier Quota: 100 Sales per Registered Salon</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Subscription &amp; Free Sales Quota Hub
             </h1>
-            <p className="text-blue-100/90 text-xs sm:text-sm leading-relaxed">
+            <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
               Every salon gets <strong>100 free sales from their registration date</strong>. Monitor completed sales, quota consumption, and manage Pro Plan upgrades in real time.
             </p>
           </div>
@@ -415,7 +415,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by salon name, city, or phone..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-hidden focus:border-[#3B82F6] transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-hidden focus:border-[#014BAA] transition-all"
             />
             {searchQuery && (
               <button
@@ -481,14 +481,14 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
 
         {/* Status Pills Quick Filter */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-100 text-xs">
-          <span className="text-[11px] font-semibold uppercase text-slate-400 mr-1">Quick View:</span>
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#014BAA]/15 text-xs">
+          <span className="text-[11px] font-semibold uppercase text-black/50 mr-1">Quick View:</span>
           <button
             onClick={() => setStatusFilter('all')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'all'
-                ? 'bg-[#1D4ED8] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-[#014BAA] text-white shadow-xs'
+                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
             }`}
           >
             All Salons ({quotaSummaries.length})
@@ -497,8 +497,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('nearing_limit')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'nearing_limit'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
+                ? 'bg-[#014BAA] text-white shadow-xs'
+                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -508,8 +508,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('free_active')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'free_active'
-                ? 'bg-[#1D4ED8] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-[#014BAA] text-white shadow-xs'
+                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -519,8 +519,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('pro_required')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'pro_required'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                ? 'bg-[#014BAA] text-white shadow-xs'
+                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
             }`}
           >
             <AlertTriangle className="w-3.5 h-3.5" />
@@ -531,11 +531,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               onClick={() => setStatusFilter('upgraded')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'upgraded'
-                  ? 'bg-[#1D4ED8] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                  ? 'bg-[#014BAA] text-white shadow-xs'
+                  : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
               }`}
             >
-              <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <Crown className="w-3.5 h-3.5" />
               Pro Active ({upgradedCount})
             </button>
           )}
@@ -665,8 +665,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-full font-mono font-extrabold text-xs ${
                               salon.salesRemaining <= 50
-                                ? 'bg-neutral-900 text-amber-300 border border-neutral-700'
-                                : 'bg-neutral-100 text-neutral-800 border border-neutral-200'
+                                ? 'bg-[#014BAA]/15 text-[#014BAA] border border-[#014BAA]/30'
+                                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20'
                             }`}
                           >
                             {salon.salesRemaining} left
@@ -713,10 +713,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                             }}
                             className={`px-2.5 py-1.5 rounded-lg font-bold text-xs cursor-pointer border transition-colors ${
                               salon.upgradedPlan
-                                ? 'bg-black text-white border-black'
+                                ? 'bg-[#014BAA] text-white border-[#014BAA]'
                                 : salon.status === 'pro_required'
-                                ? 'bg-neutral-900 text-amber-300 border-black'
-                                : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                ? 'bg-[#014BAA]/15 text-[#014BAA] border-[#014BAA]/40'
+                                : 'bg-[#F8F3F0] text-black border-[#014BAA]/30 hover:border-[#014BAA]'
                             }`}
                             title="Assign or upgrade Pro Plan tier"
                           >
@@ -878,7 +878,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </div>
 
           {/* Plan 4: Pro 1 Year */}
-          <div className="border border-neutral-300 rounded-2xl p-5 bg-neutral-900 text-white flex flex-col justify-between space-y-4 shadow-sm">
+          <div className="border border-[#014BAA] rounded-2xl p-5 bg-[#014BAA] text-white flex flex-col justify-between space-y-4 shadow-sm">
             <div className="space-y-3">
               <div className="inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white">
                 BEST VALUE • SAVE ₹1,000
@@ -886,36 +886,36 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               <h4 className="text-lg font-black text-white">Pro (1 Year)</h4>
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl sm:text-3xl font-black text-white">₹4,999</span>
-                <span className="text-xs text-neutral-400">/ year</span>
+                <span className="text-xs text-white/80">/ year</span>
               </div>
-              <p className="text-xs text-neutral-300 leading-relaxed">
+              <p className="text-xs text-white/90 leading-relaxed">
                 ~₹416 / month. Complete full-year suite for salon owners.
               </p>
-              <ul className="space-y-2 text-xs text-neutral-300 pt-2 border-t border-white/10">
+              <ul className="space-y-2 text-xs text-white/90 pt-2 border-t border-white/20">
                 <li className="flex items-center gap-2 font-bold text-white">
-                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-white shrink-0" />
                   <span><strong>Unlimited Sales & Bills</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-white shrink-0" />
                   <span><strong>Unlimited Stylists & Staff</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-white shrink-0" />
                   <span>Advanced BI & Profit Reports</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-white shrink-0" />
                   <span>Custom Salon Logo Header</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-white shrink-0" />
                   <span>VIP WhatsApp Support</span>
                 </li>
               </ul>
             </div>
-            <div className="pt-3 border-t border-white/10 text-[11px] font-bold text-amber-300 text-center flex items-center justify-center gap-1">
-              <Crown className="w-3.5 h-3.5 fill-amber-300" />
+            <div className="pt-3 border-t border-white/20 text-[11px] font-bold text-white text-center flex items-center justify-center gap-1">
+              <Crown className="w-3.5 h-3.5 fill-white" />
               <span>Full Platinum Suite</span>
             </div>
           </div>

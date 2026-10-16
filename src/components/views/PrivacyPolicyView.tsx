@@ -116,7 +116,7 @@ export const PrivacyPolicyView: React.FC<PrivacyPolicyViewProps> = ({
               <span>Effective Date: <strong className="text-neutral-900 font-medium">{effectiveDate}</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#014BAA]" />
               <span>Last Updated: <strong className="text-neutral-900 font-medium">{lastUpdated}</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
