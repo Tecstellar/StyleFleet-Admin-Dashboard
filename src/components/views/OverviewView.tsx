@@ -207,9 +207,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   return (
     <div className="space-y-6 font-sans text-neutral-900 select-none pb-12">
       {/* 1. TOP HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0e5e9] pb-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-[#004e64] tracking-tight">
             Overview
           </h1>
           <p className="text-xs text-neutral-500 mt-0.5">
@@ -238,7 +238,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           {/* Refresh Button */}
           <button
             onClick={() => window.location.reload()}
-            className="p-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-700 transition-colors cursor-pointer shadow-2xs"
+            className="p-1.5 rounded-lg border border-[#e0e5e9] bg-white hover:bg-neutral-50 text-[#004e64] transition-colors cursor-pointer shadow-2xs"
             title="Refresh Data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -246,8 +246,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
       </div>
 
-      {/* 2. UNIFIED 2-COLOR FILTER TOOLBAR (NO RAINBOW MULTI-COLORS) */}
-      <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-5 shadow-2xs space-y-4">
+      {/* 2. UNIFIED 2-COLOR FILTER TOOLBAR (#004e64 & #e0e5e9) */}
+      <div className="bg-white rounded-2xl border border-[#e0e5e9] p-4 sm:p-5 shadow-2xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* 3 Clean Filter Tabs: All, Active, Inactive */}
           <div className="flex items-center gap-2">
@@ -255,8 +255,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               onClick={() => setActiveTabFilter('all')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTabFilter === 'all'
-                  ? 'bg-[#0f172a] text-white shadow-xs'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  ? 'bg-[#004e64] text-white shadow-xs'
+                  : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
               }`}
             >
               All Salons ({tabCounts.total})
@@ -266,8 +266,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               onClick={() => setActiveTabFilter('active')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTabFilter === 'active'
-                  ? 'bg-[#0f172a] text-white shadow-xs'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  ? 'bg-[#004e64] text-white shadow-xs'
+                  : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
               }`}
             >
               Active ({tabCounts.active})
@@ -277,8 +277,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               onClick={() => setActiveTabFilter('inactive')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTabFilter === 'inactive'
-                  ? 'bg-[#0f172a] text-white shadow-xs'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  ? 'bg-[#004e64] text-white shadow-xs'
+                  : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
               }`}
             >
               Inactive ({tabCounts.inactive})
@@ -288,13 +288,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           {/* Search Input & City Dropdown */}
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative min-w-[220px]">
-              <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-[#004e64]/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search salon, owner, phone, city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#0f172a] shadow-2xs"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-[#e0e5e9] bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#004e64] shadow-2xs"
               />
             </div>
 
@@ -302,7 +302,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <select
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                className="text-xs px-3 py-1.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 font-medium focus:outline-none cursor-pointer shadow-2xs"
+                className="text-xs px-3 py-1.5 rounded-lg border border-[#e0e5e9] bg-white text-[#004e64] font-medium focus:outline-none cursor-pointer shadow-2xs"
               >
                 <option value="all">All Cities</option>
                 {uniqueCities.map((c) => (
@@ -315,11 +315,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
         </div>
 
-        {/* 3. SALONS OVERVIEW TABLE (CLEAR DARK LETTERS, NO MULTI-COLORS) */}
-        <div className="overflow-x-auto border-t border-neutral-100 pt-3">
+        {/* 3. SALONS OVERVIEW TABLE (CLEAR DARK LETTERS, 2-COLOR DESIGN) */}
+        <div className="overflow-x-auto border-t border-[#e0e5e9] pt-3">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="border-b border-neutral-200 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/60 font-mono">
+              <tr className="border-b border-[#e0e5e9] text-[10px] font-bold uppercase tracking-wider text-[#004e64] bg-[#e0e5e9]/40 font-mono">
                 <th className="py-3 px-3">SALON NAME</th>
                 <th className="py-3 px-3">OWNER NAME</th>
                 <th className="py-3 px-3">PHONE</th>
@@ -332,7 +332,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 <th className="py-3 px-3 text-center">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 text-neutral-900">
+            <tbody className="divide-y divide-[#e0e5e9]/60 text-neutral-900">
               {displayedSalons.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="py-12 text-center text-xs text-neutral-400">
@@ -343,7 +343,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 displayedSalons.map((s) => (
                   <tr
                     key={s.id}
-                    className="hover:bg-neutral-50/80 transition-colors"
+                    className="hover:bg-[#e0e5e9]/20 transition-colors"
                   >
                     {/* 1. SALON NAME (Clickable to Fresh Page) */}
                     <td className="py-3 px-3">
@@ -352,10 +352,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           if (onSelectSalon) onSelectSalon(s.shopObj);
                           else setSelectedDetailSalon(s.shopObj);
                         }}
-                        className="text-left font-bold text-neutral-900 hover:text-[#0f766e] hover:underline cursor-pointer flex items-center gap-1.5"
+                        className="text-left font-bold text-neutral-900 hover:text-[#004e64] hover:underline cursor-pointer flex items-center gap-1.5"
                       >
                         <span>{s.name}</span>
-                        <ChevronRight className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <ChevronRight className="w-3 h-3 text-[#004e64]/60 shrink-0" />
                       </button>
                     </td>
 
@@ -370,7 +370,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                         href={`https://wa.me/91${cleanDigits(s.phone)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-[#0f766e] transition-colors"
+                        className="hover:text-[#004e64] transition-colors"
                       >
                         {s.phone || s.ownerPhone || '—'}
                       </a>
@@ -387,13 +387,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       {s.created_at ? formatDate(s.created_at) : '—'}
                     </td>
 
-                    {/* 6. STATUS (Clean 2-Color Mono Badges) */}
+                    {/* 6. STATUS (Strict 2-Color Mono Badges) */}
                     <td className="py-3 px-3 text-center">
                       <span
                         className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold font-mono ${
                           s.isLive
-                            ? 'bg-[#0f766e]/10 text-[#0f766e] border border-[#0f766e]/30'
-                            : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
+                            ? 'bg-[#004e64] text-white shadow-2xs'
+                            : 'bg-[#e0e5e9] text-[#004e64] border border-[#004e64]/20'
                         }`}
                       >
                         {s.isLive ? 'ACTIVE' : 'INACTIVE'}
@@ -405,8 +405,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
                           s.isPro
-                            ? 'bg-[#0f172a] text-white'
-                            : 'bg-neutral-100 text-neutral-700 border border-neutral-300'
+                            ? 'bg-[#004e64] text-white shadow-2xs'
+                            : 'bg-[#e0e5e9] text-[#004e64] border border-[#004e64]/20'
                         }`}
                       >
                         {s.isPro ? 'PRO' : 'FREE'}
@@ -430,7 +430,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           if (onSelectSalon) onSelectSalon(s.shopObj);
                           else setSelectedDetailSalon(s.shopObj);
                         }}
-                        className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-[#0f172a] hover:bg-slate-800 text-white shadow-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white shadow-xs transition-colors cursor-pointer"
                       >
                         <span>View Salon</span>
                         <ChevronRight className="w-3 h-3" />

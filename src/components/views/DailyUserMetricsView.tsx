@@ -843,7 +843,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
                           setDrilldownData(null);
                           onSelectSalon(item.shop!);
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
                       >
                         <span>View Salon</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -859,7 +859,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
               <span>Touch any salon above to inspect complete 360 profile.</span>
               <button
                 onClick={() => setDrilldownData(null)}
-                className="px-4 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                className="px-4 py-1.5 bg-[#e0e5e9] hover:bg-[#d0d8dd] text-[#004e64] rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 Close
               </button>

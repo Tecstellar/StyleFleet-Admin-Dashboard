@@ -872,7 +872,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                         {matchedShop && onSelectSalon ? (
                           <button
                             onClick={() => onSelectSalon(matchedShop)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0f172a] hover:bg-slate-800 text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#004e64] hover:bg-[#003d4f] text-white text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             <span>View Salon</span>
                             <ArrowRight className="w-3 h-3" />

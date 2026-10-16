@@ -624,7 +624,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                       </td>
 
                       {/* UPI */}
-                      <td className="py-3 px-3 text-center font-mono text-[#0f766e] font-semibold">
+                      <td className="py-3 px-3 text-center font-mono text-[#004e64] font-semibold">
                         {s.upiCount}
                       </td>
 
@@ -646,7 +646,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                               setSelectedPopupDate(null);
                               onSelectSalon(s.shopObj!);
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0f172a] hover:bg-slate-800 text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#004e64] hover:bg-[#003d4f] text-white text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             <span>View Salon</span>
                             <ChevronRight className="w-3 h-3" />
@@ -665,7 +665,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
             <div className="pt-3 border-t border-neutral-100 flex items-center justify-end">
               <button
                 onClick={() => setSelectedPopupDate(null)}
-                className="px-4 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                className="px-4 py-1.5 bg-[#e0e5e9] hover:bg-[#d0d8dd] text-[#004e64] rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 Close
               </button>
