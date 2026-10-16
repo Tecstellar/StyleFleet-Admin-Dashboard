@@ -5,7 +5,7 @@ export async function fetchBills(): Promise<{ data: Bill[]; error: string | null
   try {
     const { data, error } = await supabase
       .from('bills')
-      .select('*, shop:shops(id, name), customer:customers(id, name, phone)')
+      .select('*, shop:shops(id, name), customer:customers(id, name, phone), bill_items(id, quantity, service_name_snapshot, line_total_minor)')
       .not('shop_id', 'is', null)
       .order('issued_at', { ascending: false });
 

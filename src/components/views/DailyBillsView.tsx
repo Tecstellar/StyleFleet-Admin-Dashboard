@@ -37,6 +37,8 @@ interface ShopDailyMetrics {
   partialCount: number;
   dueAmountMinor: number;
   revenueMinor: number;
+  servicesCount: number;
+  servicesList: { name: string; count: number }[];
   shopObj?: Shop;
 }
 
@@ -52,6 +54,7 @@ interface DayMetricsRow {
   partialCount: number;
   dueAmountMinor: number;
   revenueMinor: number;
+  servicesCount: number;
   shops: ShopDailyMetrics[];
 }
 
@@ -97,6 +100,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         partialCount: number;
         dueAmountMinor: number;
         revenueMinor: number;
+        servicesCount: number;
         shopData: Map<
           string,
           {
@@ -108,6 +112,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
             partialCount: number;
             dueAmountMinor: number;
             revenueMinor: number;
+            servicesCount: number;
+            servicesMap: Map<string, number>;
           }
         >;
       }
@@ -127,12 +133,29 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           partialCount: 0,
           dueAmountMinor: 0,
           revenueMinor: 0,
+          servicesCount: 0,
           shopData: new Map(),
         });
       }
 
       const dayEntry = map.get(rawD)!;
       dayEntry.totalOrders += 1;
+
+      // Calculate real services used from bill_items
+      let billServicesCount = 0;
+      const billServicesNames: string[] = [];
+      if (b.bill_items && b.bill_items.length > 0) {
+        b.bill_items.forEach((item) => {
+          const qty = item.quantity && item.quantity > 0 ? item.quantity : 1;
+          billServicesCount += qty;
+          const sName = (item.service_name_snapshot || 'Service').trim();
+          billServicesNames.push(sName);
+        });
+      } else {
+        billServicesCount = 1;
+      }
+
+      dayEntry.servicesCount += billServicesCount;
 
       // Determine payment method and partial pay
       const p = paymentByBillId.get(b.id);
@@ -174,10 +197,17 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           partialCount: 0,
           dueAmountMinor: 0,
           revenueMinor: 0,
+          servicesCount: 0,
+          servicesMap: new Map(),
         });
       }
       const sEntry = dayEntry.shopData.get(sId)!;
       sEntry.totalOrders += 1;
+      sEntry.servicesCount += billServicesCount;
+      billServicesNames.forEach((name) => {
+        sEntry.servicesMap.set(name, (sEntry.servicesMap.get(name) || 0) + 1);
+      });
+
       if (isPartial) {
         sEntry.partialCount += 1;
         sEntry.dueAmountMinor += dueMinor;
@@ -211,6 +241,10 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       const shopMetrics: ShopDailyMetrics[] = [];
       data.shopData.forEach((sVals, sId) => {
         const matchedShop = shopMap.get(sId);
+        const servicesList = Array.from(sVals.servicesMap.entries())
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count);
+
         shopMetrics.push({
           shopId: sId,
           shopName: matchedShop?.name || 'Salon Account',
@@ -224,6 +258,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           partialCount: sVals.partialCount,
           dueAmountMinor: sVals.dueAmountMinor,
           revenueMinor: sVals.revenueMinor,
+          servicesCount: sVals.servicesCount,
+          servicesList,
           shopObj: matchedShop,
         });
       });
@@ -243,6 +279,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         partialCount: data.partialCount,
         dueAmountMinor: data.dueAmountMinor,
         revenueMinor: data.revenueMinor,
+        servicesCount: data.servicesCount,
         shops: shopMetrics,
       });
     });
@@ -295,6 +332,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
     let upiCount = 0;
     let upiAmountMinor = 0;
     let partialCount = 0;
+    let dueAmountMinor = 0;
+    let servicesCount = 0;
     let revenueMinor = 0;
 
     filteredRows.forEach((r) => {
@@ -304,6 +343,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       upiCount += r.upiCount;
       upiAmountMinor += r.upiAmountMinor;
       partialCount += r.partialCount;
+      dueAmountMinor += r.dueAmountMinor;
+      servicesCount += r.servicesCount;
       revenueMinor += r.revenueMinor;
     });
 
@@ -314,6 +355,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       upiCount,
       upiAmount: Math.round(upiAmountMinor / 100),
       partialCount,
+      dueAmount: Math.round(dueAmountMinor / 100),
+      servicesCount,
       revenue: Math.round(revenueMinor / 100),
     };
   }, [filteredRows]);
@@ -328,6 +371,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       'UPI Orders': r.upiCount,
       'UPI (INR)': Math.round(r.upiAmountMinor / 100),
       'Partial / Due Orders': r.partialCount,
+      'Due Amount (INR)': Math.round(r.dueAmountMinor / 100),
+      'Services Used': r.servicesCount,
       'Revenue (INR)': Math.round(r.revenueMinor / 100),
     }));
     exportToCSV(exportData, `stylefleet_daily_orders_${new Date().toISOString().slice(0, 10)}`);
@@ -493,39 +538,37 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                 <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 font-mono">
                   <th className="py-3 px-4">DATE</th>
                   <th className="py-3 px-3 text-center">TOTAL ORDERS</th>
-                  <th className="py-3 px-3 text-center">CASH ORDERS</th>
+                  <th className="py-3 px-3 text-center">CASH</th>
                   <th className="py-3 px-3 text-center">UPI / ONLINE</th>
                   <th className="py-3 px-3 text-center">PARTIAL / DUE</th>
+                  <th className="py-3 px-3 text-center">SERVICES USED</th>
                   <th className="py-3 px-4 text-right">REVENUE</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 text-neutral-800">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-xs text-neutral-400">
+                    <td colSpan={7} className="py-12 text-center text-xs text-neutral-400">
                       Loading daily order metrics...
                     </td>
                   </tr>
                 ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-xs text-neutral-400">
+                    <td colSpan={7} className="py-12 text-center text-xs text-neutral-400">
                       No order records found for the selected filter.
                     </td>
                   </tr>
                 ) : (
                   filteredRows.map((row) => (
                     <tr key={row.rawDate} className="hover:bg-neutral-50/70 transition-colors">
-                      {/* DATE WITH VIEW SHOP BREAKDOWN BUTTON */}
+                      {/* DATE (UNDERLINED & CLICKABLE TO OPEN DETAILS POPUP) */}
                       <td className="py-3 px-4">
-                        <div className="font-bold text-black text-xs">
-                          {row.friendlyDate}
-                        </div>
                         <button
                           onClick={() => setSelectedPopupDate(row)}
-                          className="mt-0.5 text-[11px] font-bold text-[#071952] hover:underline cursor-pointer inline-flex items-center gap-1"
+                          className="font-bold text-black text-xs underline decoration-[#071952]/40 hover:text-[#071952] hover:decoration-[#071952] cursor-pointer text-left transition-colors"
+                          title="Click to view shop breakdown"
                         >
-                          <span>View shop breakdown</span>
-                          <ChevronRight className="w-3 h-3" />
+                          {row.friendlyDate}
                         </button>
                       </td>
 
@@ -535,18 +578,34 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                       </td>
 
                       {/* CASH ORDERS */}
-                      <td className="py-3 px-3 text-center font-semibold text-black/80 font-mono">
-                        {row.cashCount}
+                      <td className="py-3 px-3 text-center font-mono">
+                        <span className="font-bold text-black">{row.cashCount}</span>
+                        <span className="text-[11px] text-black/60 ml-1">
+                          (₹{Math.round(row.cashAmountMinor / 100).toLocaleString()})
+                        </span>
                       </td>
 
                       {/* UPI ORDERS */}
-                      <td className="py-3 px-3 text-center font-semibold text-[#071952] font-mono">
-                        {row.upiCount}
+                      <td className="py-3 px-3 text-center font-mono">
+                        <span className="font-bold text-[#071952]">{row.upiCount}</span>
+                        <span className="text-[11px] text-[#071952]/80 ml-1">
+                          (₹{Math.round(row.upiAmountMinor / 100).toLocaleString()})
+                        </span>
                       </td>
 
                       {/* PARTIAL / DUE */}
-                      <td className="py-3 px-3 text-center font-semibold text-black/70 font-mono">
-                        {row.partialCount}
+                      <td className="py-3 px-3 text-center font-mono">
+                        <span className="font-bold text-black/80">{row.partialCount}</span>
+                        {row.dueAmountMinor > 0 && (
+                          <span className="text-[11px] text-black/60 ml-1">
+                            (₹{Math.round(row.dueAmountMinor / 100).toLocaleString()})
+                          </span>
+                        )}
+                      </td>
+
+                      {/* SERVICES USED */}
+                      <td className="py-3 px-3 text-center font-mono font-semibold text-black">
+                        {row.servicesCount} <span className="text-[11px] text-black/50 font-normal">services</span>
                       </td>
 
                       {/* REVENUE */}
@@ -565,7 +624,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       {/* 5. CENTERED POPUP MODAL FOR SALON BREAKDOWN (REQUESTED BY USER) */}
       {selectedPopupDate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-[#F8F3F0] rounded-2xl max-w-4xl w-full p-6 shadow-2xl border border-[#071952]/30 max-h-[85vh] flex flex-col">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-5xl w-full p-6 shadow-2xl border border-[#071952]/30 max-h-[85vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15">
               <div>
@@ -573,7 +632,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                   Salon Order Breakdown — {selectedPopupDate.friendlyDate}
                 </h3>
                 <p className="text-xs text-black/60 mt-0.5">
-                  Detailed salon order metrics: Total orders, Cash, UPI, and Partial pay
+                  Detailed salon order metrics: Total orders, Cash, UPI, Partial pay, and Services used
                 </p>
               </div>
               <button
@@ -595,6 +654,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                     <th className="py-3 px-3 text-center">CASH</th>
                     <th className="py-3 px-3 text-center">UPI</th>
                     <th className="py-3 px-3 text-center">PARTIAL / DUE</th>
+                    <th className="py-3 px-3">SERVICES USED</th>
                     <th className="py-3 px-3 text-right">REVENUE</th>
                     <th className="py-3 px-3 text-center">ACTION</th>
                   </tr>
@@ -620,17 +680,35 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
 
                       {/* CASH */}
                       <td className="py-3 px-3 text-center font-mono text-black/80 font-semibold">
-                        {s.cashCount}
+                        <div>{s.cashCount}</div>
+                        <div className="text-[10px] text-black/50 font-normal">₹{Math.round(s.cashAmountMinor / 100).toLocaleString()}</div>
                       </td>
 
                       {/* UPI */}
                       <td className="py-3 px-3 text-center font-mono text-[#071952] font-semibold">
-                        {s.upiCount}
+                        <div>{s.upiCount}</div>
+                        <div className="text-[10px] text-[#071952]/70 font-normal">₹{Math.round(s.upiAmountMinor / 100).toLocaleString()}</div>
                       </td>
 
                       {/* PARTIAL / DUE */}
                       <td className="py-3 px-3 text-center font-mono text-black/70">
-                        {s.partialCount}
+                        <div>{s.partialCount}</div>
+                        {s.dueAmountMinor > 0 && (
+                          <div className="text-[10px] text-black/50 font-normal">₹{Math.round(s.dueAmountMinor / 100).toLocaleString()}</div>
+                        )}
+                      </td>
+
+                      {/* SERVICES USED */}
+                      <td className="py-3 px-3 text-[11px]">
+                        <div className="font-bold text-black font-mono">
+                          {s.servicesCount} services
+                        </div>
+                        {s.servicesList.length > 0 && (
+                          <div className="text-black/60 max-w-[200px] truncate" title={s.servicesList.map(item => `${item.name} (${item.count})`).join(', ')}>
+                            {s.servicesList.slice(0, 3).map(item => item.name).join(', ')}
+                            {s.servicesList.length > 3 ? '...' : ''}
+                          </div>
+                        )}
                       </td>
 
                       {/* REVENUE */}

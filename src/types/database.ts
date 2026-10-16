@@ -143,6 +143,7 @@ export interface Bill {
   updated_at: string;
   shop?: Shop;
   customer?: Customer;
+  bill_items?: BillItem[];
 }
 
 export interface BillItem {

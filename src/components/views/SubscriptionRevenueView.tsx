@@ -50,6 +50,16 @@ export interface CompanySubscriptionItem {
   source: 'gateway_payment' | 'database_subscription' | 'manual_activation';
 }
 
+export interface RevenuePeriodItem {
+  periodKey: string;
+  label: string;
+  fullLabel: string;
+  revenue: number;
+  change: number | null;
+  growthPct: number | null;
+  subscribers: CompanySubscriptionItem[];
+}
+
 interface SubscriptionRevenueViewProps {
   payments: Payment[];
   bills: Bill[];
@@ -93,6 +103,9 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
   const [selectedMonth, setSelectedMonth] = useState<number>(() => new Date().getMonth());
   const [selectedWeek, setSelectedWeek] = useState<string>('W42');
   const [compareMode, setCompareMode] = useState<'previous_period' | 'previous_year' | 'none'>('previous_period');
+
+  // Period Subscribers Popup State (e.g. clicking ₹499 in October opens subscribers modal)
+  const [selectedPeriodPopup, setSelectedPeriodPopup] = useState<RevenuePeriodItem | null>(null);
 
   // Manual Subscription Modal State
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
@@ -278,37 +291,29 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
 
   // PERIOD BREAKDOWN DATA CALCULATION ACCORDING TO SELECTED GRANULARITY
   const periodData = useMemo(() => {
-    interface PeriodItem {
-      periodKey: string;
-      label: string;
-      revenue: number;
-      change: number | null;
-      growthPct: number | null;
-    }
-
-    const items: PeriodItem[] = [];
+    const items: RevenuePeriodItem[] = [];
 
     if (granularity === 'month') {
       // 12 months for selectedYear
       for (let m = 0; m < 12; m++) {
-        const monthRev = allCompanySubscriptions
-          .filter((sub) => {
-            const d = new Date(sub.activatedAt);
-            return d.getFullYear() === selectedYear && d.getMonth() === m;
-          })
-          .reduce((sum, s) => sum + s.amountINR, 0);
+        const monthSubs = allCompanySubscriptions.filter((sub) => {
+          const d = new Date(sub.activatedAt);
+          return d.getFullYear() === selectedYear && d.getMonth() === m;
+        });
+        const monthRev = monthSubs.reduce((sum, s) => sum + s.amountINR, 0);
 
         items.push({
           periodKey: `${selectedYear}-${String(m + 1).padStart(2, '0')}`,
           label: MONTH_NAMES[m],
+          fullLabel: `${MONTH_NAMES_FULL[m]} ${selectedYear}`,
           revenue: monthRev,
           change: null,
           growthPct: null,
+          subscribers: monthSubs,
         });
       }
     } else if (granularity === 'week') {
       // 4-5 weeks in selectedMonth of selectedYear
-      // Week 1: 1-7, Week 2: 8-14, Week 3: 15-21, Week 4: 22-28, Week 5: 29-end
       const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
       const weekRanges = [
         { label: 'Week 1', start: 1, end: 7 },
@@ -321,27 +326,27 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       }
 
       weekRanges.forEach((w) => {
-        const weekRev = allCompanySubscriptions
-          .filter((sub) => {
-            const d = new Date(sub.activatedAt);
-            if (d.getFullYear() !== selectedYear || d.getMonth() !== selectedMonth) return false;
-            const day = d.getDate();
-            return day >= w.start && day <= w.end;
-          })
-          .reduce((sum, s) => sum + s.amountINR, 0);
+        const weekSubs = allCompanySubscriptions.filter((sub) => {
+          const d = new Date(sub.activatedAt);
+          if (d.getFullYear() !== selectedYear || d.getMonth() !== selectedMonth) return false;
+          const day = d.getDate();
+          return day >= w.start && day <= w.end;
+        });
+        const weekRev = weekSubs.reduce((sum, s) => sum + s.amountINR, 0);
 
         items.push({
           periodKey: `${w.label}`,
           label: w.label,
+          fullLabel: `${w.label} (${MONTH_NAMES_FULL[selectedMonth]} ${selectedYear})`,
           revenue: weekRev,
           change: null,
           growthPct: null,
+          subscribers: weekSubs,
         });
       });
     } else {
       // Daily calendar week (Mon - Sun for selectedWeek e.g. W42)
       const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      // Use current week dates
       const now = new Date();
       const currentDay = now.getDay();
       const distanceToMon = currentDay === 0 ? -6 : 1 - currentDay;
@@ -353,19 +358,20 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         d.setDate(monday.getDate() + i);
         const dateStr = d.toISOString().split('T')[0];
 
-        const dayRev = allCompanySubscriptions
-          .filter((sub) => {
-            const subDate = new Date(sub.activatedAt).toISOString().split('T')[0];
-            return subDate === dateStr;
-          })
-          .reduce((sum, s) => sum + s.amountINR, 0);
+        const daySubs = allCompanySubscriptions.filter((sub) => {
+          const subDate = new Date(sub.activatedAt).toISOString().split('T')[0];
+          return subDate === dateStr;
+        });
+        const dayRev = daySubs.reduce((sum, s) => sum + s.amountINR, 0);
 
         items.push({
           periodKey: dateStr,
           label: `${dayNames[i]}`,
+          fullLabel: `${dayNames[i]}, ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`,
           revenue: dayRev,
           change: null,
           growthPct: null,
+          subscribers: daySubs,
         });
       }
     }
@@ -774,8 +780,18 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                     </td>
 
                     {/* Revenue */}
-                    <td className="py-3 px-3 font-mono font-semibold text-neutral-900">
-                      ₹{formatNumber(row.revenue)}
+                    <td className="py-3 px-3 font-mono">
+                      {row.revenue > 0 ? (
+                        <button
+                          onClick={() => setSelectedPeriodPopup(row)}
+                          className="font-semibold text-[#071952] underline decoration-[#071952]/40 hover:text-[#0b2575] hover:decoration-[#071952] cursor-pointer transition-colors"
+                          title={`Click to view Pro subscribers for ${row.fullLabel}`}
+                        >
+                          ₹{formatNumber(row.revenue)}
+                        </button>
+                      ) : (
+                        <span className="text-neutral-400">₹0</span>
+                      )}
                     </td>
 
                     {/* Change */}
@@ -803,94 +819,121 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         </div>
       </div>
 
-      {/* 5. SUBSCRIBERS IN SELECTED MONTH */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 shadow-2xs p-5 sm:p-7 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h3 className="text-base font-bold text-black tracking-tight">
-              Pro Subscribers in {MONTH_NAMES_FULL[selectedMonth]} {selectedYear}
-            </h3>
-            <p className="text-xs text-black/60 mt-0.5">
-              Salons subscribed to paid Pro plans (e.g. ₹499 monthly) during this period
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#071952]/10 border border-[#071952]/20 text-[#071952] text-xs font-mono font-bold self-start sm:self-auto">
-            <span>{monthSubscribers.length}</span>
-            <span>{monthSubscribers.length === 1 ? 'Subscriber' : 'Subscribers'}</span>
-          </span>
-        </div>
+      {/* POPUP MODAL FOR PRO SUBSCRIBERS IN SELECTED PERIOD */}
+      {selectedPeriodPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-4xl w-full p-6 shadow-2xl border border-[#071952]/30 max-h-[85vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15">
+              <div>
+                <h3 className="text-base font-bold text-black tracking-tight">
+                  Pro Subscribers in {selectedPeriodPopup.fullLabel}
+                </h3>
+                <p className="text-xs text-black/60 mt-0.5">
+                  Salons subscribed to paid Pro plans (₹{formatNumber(selectedPeriodPopup.revenue)} total revenue)
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#071952] text-white text-xs font-mono font-bold">
+                  <span>{selectedPeriodPopup.subscribers.length}</span>
+                  <span>{selectedPeriodPopup.subscribers.length === 1 ? 'Subscriber' : 'Subscribers'}</span>
+                </span>
+                <button
+                  onClick={() => setSelectedPeriodPopup(null)}
+                  className="p-1.5 rounded-lg text-black/60 hover:text-black hover:bg-[#071952]/10 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#071952]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#071952]/5 font-mono">
-                <th className="py-3 px-3">SALON SHOP</th>
-                <th className="py-3 px-3">PHONE & CITY</th>
-                <th className="py-3 px-3">PLAN TIER</th>
-                <th className="py-3 px-3 text-right">AMOUNT PAID</th>
-                <th className="py-3 px-3">ACTIVATED ON</th>
-                <th className="py-3 px-3">SOURCE</th>
-                <th className="py-3 px-3 text-center">STATUS</th>
-                <th className="py-3 px-3 text-center">ACTION</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#071952]/10 text-black">
-              {monthSubscribers.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-8 text-center text-xs text-black/50">
-                    No active subscribers recorded for {MONTH_NAMES_FULL[selectedMonth]} {selectedYear}.
-                  </td>
-                </tr>
-              ) : (
-                monthSubscribers.map((sub) => {
-                  const matchedShop = shopMap.get(sub.shopId);
-                  return (
-                    <tr key={sub.id} className="hover:bg-[#071952]/5 transition-colors">
-                      <td className="py-3 px-3 font-bold text-black">
-                        {sub.shopName}
-                      </td>
-                      <td className="py-3 px-3 text-black/70 font-mono text-[11px]">
-                        <div>{sub.city}</div>
-                        <div className="text-black/50">{sub.phone}</div>
-                      </td>
-                      <td className="py-3 px-3 font-medium text-black">
-                        {sub.planName}
-                      </td>
-                      <td className="py-3 px-3 text-right font-black text-black font-mono text-xs">
-                        ₹{formatNumber(sub.amountINR)}
-                      </td>
-                      <td className="py-3 px-3 font-mono text-black/70 text-[11px]">
-                        {formatDate(sub.activatedAt)}
-                      </td>
-                      <td className="py-3 px-3 text-black/70 font-mono text-[11px]">
-                        {sub.paymentMethod}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#071952] text-white">
-                          ACTIVE
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        {matchedShop && onSelectSalon ? (
-                          <button
-                            onClick={() => onSelectSalon(matchedShop)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#071952] hover:bg-[#0b2575] text-white text-[11px] font-semibold transition-colors cursor-pointer"
-                          >
-                            <span>View Salon</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </button>
-                        ) : (
-                          <span className="text-black/40">—</span>
-                        )}
+            {/* Subscribers Table */}
+            <div className="overflow-x-auto flex-1 mt-4">
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-[#071952]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#071952]/5 font-mono">
+                    <th className="py-3 px-3">SALON SHOP</th>
+                    <th className="py-3 px-3">PHONE & CITY</th>
+                    <th className="py-3 px-3">PLAN TIER</th>
+                    <th className="py-3 px-3 text-right">AMOUNT PAID</th>
+                    <th className="py-3 px-3">ACTIVATED ON</th>
+                    <th className="py-3 px-3">SOURCE</th>
+                    <th className="py-3 px-3 text-center">STATUS</th>
+                    <th className="py-3 px-3 text-center">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#071952]/10 text-black">
+                  {selectedPeriodPopup.subscribers.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center text-xs text-black/50">
+                        No active subscribers recorded for {selectedPeriodPopup.fullLabel}.
                       </td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                  ) : (
+                    selectedPeriodPopup.subscribers.map((sub) => {
+                      const matchedShop = shopMap.get(sub.shopId);
+                      return (
+                        <tr key={sub.id} className="hover:bg-[#071952]/5 transition-colors">
+                          <td className="py-3 px-3 font-bold text-black">
+                            {sub.shopName}
+                          </td>
+                          <td className="py-3 px-3 text-black/70 font-mono text-[11px]">
+                            <div>{sub.city}</div>
+                            <div className="text-black/50">{sub.phone}</div>
+                          </td>
+                          <td className="py-3 px-3 font-medium text-black">
+                            {sub.planName}
+                          </td>
+                          <td className="py-3 px-3 text-right font-black text-black font-mono text-xs">
+                            ₹{formatNumber(sub.amountINR)}
+                          </td>
+                          <td className="py-3 px-3 font-mono text-black/70 text-[11px]">
+                            {formatDate(sub.activatedAt)}
+                          </td>
+                          <td className="py-3 px-3 text-black/70 font-mono text-[11px]">
+                            {sub.paymentMethod}
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#071952] text-white">
+                              ACTIVE
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            {matchedShop && onSelectSalon ? (
+                              <button
+                                onClick={() => {
+                                  setSelectedPeriodPopup(null);
+                                  onSelectSalon(matchedShop);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#071952] hover:bg-[#0b2575] text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                              >
+                                <span>View Salon</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </button>
+                            ) : (
+                              <span className="text-black/40">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-[#071952]/15 flex items-center justify-end">
+              <button
+                onClick={() => setSelectedPeriodPopup(null)}
+                className="px-4 py-1.5 bg-[#F8F3F0] hover:bg-[#071952]/10 text-[#071952] border border-[#071952]/30 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* RECORD / UPGRADE PRO SUBSCRIPTION MODAL */}
       {isRecordModalOpen && (

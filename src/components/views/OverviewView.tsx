@@ -334,7 +334,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         {/* Top Action Controls */}
         <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto">
           {/* Live Sync Badge (Clean #071952 & #F8F3F0) */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F8F3F0] text-[#071952] border border-[#F8F3F0]">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F8F3F0] text-[#071952] border border-[#071952]/25">
             <span className="w-1.5 h-1.5 rounded-full bg-[#071952] animate-pulse" />
             <span>Live Sync</span>
           </div>
@@ -344,7 +344,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <select
               value={selectedOption}
               onChange={(e) => setSelectedOption(e.target.value as DateFilterOption)}
-              className="appearance-none pl-7 pr-7 py-1 text-xs font-semibold rounded-full border border-[#F8F3F0] bg-white text-black hover:border-[#071952] focus:outline-none cursor-pointer shadow-2xs"
+              className="appearance-none pl-7 pr-7 py-1 text-xs font-semibold rounded-full border border-[#071952]/25 bg-white text-black hover:border-[#071952] focus:outline-none cursor-pointer shadow-2xs"
             >
               <option value="all_time">All Time</option>
               <option value="today">Today</option>
@@ -377,7 +377,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           {/* Refresh Button */}
           <button
             onClick={() => window.location.reload()}
-            className="p-1.5 rounded-full border border-[#F8F3F0] bg-white hover:bg-[#F8F3F0]/50 text-black transition-colors cursor-pointer shadow-2xs"
+            className="p-1.5 rounded-full border border-[#071952]/25 bg-white hover:bg-[#F8F3F0]/50 text-black transition-colors cursor-pointer shadow-2xs"
             title="Refresh Data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -408,7 +408,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'all'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Registered <span className="font-mono ml-1">{pillCounts.total}</span>
@@ -420,7 +420,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'active'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Active <span className="font-mono ml-1">{pillCounts.active}</span>
@@ -432,7 +432,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'inactive'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Inactive <span className="font-mono ml-1">{pillCounts.inactive}</span>
@@ -444,7 +444,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'free_plan'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Free Plan (100 limit) <span className="font-mono ml-1">{pillCounts.freePlan}</span>
@@ -456,7 +456,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'pro_plan'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Pro Plan <span className="font-mono ml-1">{pillCounts.proPlan}</span>
@@ -468,7 +468,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'with_bills'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Shops w/ Bills <span className="font-mono ml-1">{pillCounts.withBills}</span>
@@ -480,7 +480,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'zero_bills'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Zero Bills Yet <span className="font-mono ml-1">{pillCounts.zeroBills}</span>
@@ -495,7 +495,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'with_customers'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Shops w/ Customers <span className="font-mono ml-1">{pillCounts.withCustomers}</span>
@@ -507,7 +507,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'near_limit'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Near 100 Limit (&gt;80) <span className="font-mono ml-1">{pillCounts.nearLimit}</span>
@@ -519,7 +519,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'staff_configured'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Staff Configured <span className="font-mono ml-1">{pillCounts.staffConfigured}</span>
@@ -531,7 +531,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'gst_enabled'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             GST Enabled <span className="font-mono ml-1">{pillCounts.gstEnabled}</span>
@@ -543,7 +543,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'ten_plus_bills'
                 ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
-                : 'bg-white text-black border-[#F8F3F0] hover:bg-[#F8F3F0]/50 hover:border-[#071952]/40'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             10+ Bills <span className="font-mono ml-1">{pillCounts.tenPlusBills}</span>
@@ -569,10 +569,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActivePillFilter(tab.id)}
-                className={`px-3 py-1 rounded-full transition-all cursor-pointer whitespace-nowrap text-xs ${
+                className={`px-3 py-1 rounded-full transition-all cursor-pointer whitespace-nowrap text-xs border ${
                   isActive
-                    ? 'bg-[#071952] text-white shadow-xs font-semibold'
-                    : 'text-black hover:text-[#071952] hover:bg-[#F8F3F0]/40 bg-transparent font-medium'
+                    ? 'bg-[#071952] text-white border-[#071952] shadow-xs font-semibold'
+                    : 'text-black hover:text-[#071952] hover:bg-[#F8F3F0]/40 bg-white border-[#071952]/25 font-medium'
                 }`}
               >
                 {tab.label}
@@ -750,14 +750,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           className="group inline-flex items-center gap-1.5 text-left cursor-pointer hover:opacity-90 transition-all focus:outline-hidden"
                           title="Touch to view complete salon details"
                         >
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 transition-transform group-hover:scale-110"
-                            style={{ backgroundColor: s.accent_color || '#071952' }}
-                          />
                           <span className="font-bold text-black group-hover:text-[#071952] group-hover:underline text-xs">
                             {s.name}
                           </span>
-                          <span className="text-[10px] text-[#071952] bg-[#F8F3F0] px-1 rounded-sm border border-[#F8F3F0] opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span className="text-[10px] text-[#071952] bg-[#F8F3F0] px-1 rounded-sm border border-[#071952]/20 opacity-0 group-hover:opacity-100 transition-opacity">
                             Details
                           </span>
                         </button>
@@ -772,7 +768,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           className="inline-flex items-center gap-1.5 text-black hover:text-[#071952] transition-colors font-mono text-xs"
                           title="Contact on WhatsApp"
                         >
-                          <span className="w-4 h-4 rounded-full bg-[#F8F3F0] text-[#071952] flex items-center justify-center shrink-0">
+                          <span className="w-4 h-4 rounded-full bg-[#F8F3F0] text-[#071952] border border-[#071952]/20 flex items-center justify-center shrink-0">
                             <MessageCircle className="w-2.5 h-2.5" />
                           </span>
                           <span>{s.phone || s.ownerPhone || 'No phone'}</span>
@@ -796,36 +792,33 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         <div className="inline-flex items-center gap-1 text-[11px] text-black font-medium">
                           <Smartphone className="w-3.5 h-3.5 text-[#071952]" />
-                          <span>Android POS</span>
+                          <span>Android</span>
                         </div>
                       </td>
 
-                      {/* 7. ACTIVITY (Live / Today / Inactive - strict 2-color) */}
+                      {/* 7. ACTIVITY (Green dot for Active / Red dot for Inactive) */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
-                        {isLive ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#071952] text-white shadow-2xs font-mono">
-                            <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                            Live
-                          </span>
-                        ) : isToday ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#F8F3F0] text-[#071952] border border-[#F8F3F0] font-mono">
-                            Today
+                        {isLive || isToday ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#F8F3F0] text-black border border-[#071952]/25 shadow-2xs font-mono">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
+                            {isLive ? 'Active' : 'Today'}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-[#F8F3F0]/60 text-black border border-[#F8F3F0] font-mono">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-medium bg-[#F8F3F0] text-black/70 border border-[#071952]/25 font-mono">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block shrink-0" />
                             Inactive
                           </span>
                         )}
                       </td>
 
-                      {/* 8. PLAN (FREE / PRO - strict 2-color) */}
+                      {/* 8. PLAN (FREE / PRO - with crisp border) */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         {s.quotaStatus === 'limit' ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#071952] text-white shadow-2xs font-mono">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#071952] text-white border border-[#071952] shadow-2xs font-mono">
                             PRO
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#F8F3F0] text-black border border-[#F8F3F0] font-mono">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#F8F3F0] text-black border border-[#071952]/25 font-mono">
                             FREE
                           </span>
                         )}
