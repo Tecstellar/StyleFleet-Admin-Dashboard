@@ -39,7 +39,7 @@ export const KPICard: React.FC<KPICardProps> = ({
       {/* Main Metric Value */}
       <div className={isXs ? 'my-0' : isSm ? 'my-0' : 'my-0.5'}>
         {isUnavailable ? (
-          <div className="text-xs font-medium text-[#014BAA] bg-[#014BAA]/10 px-2 py-0.5 rounded inline-block">
+          <div className="text-xs font-medium text-[#071952] bg-[#071952]/10 px-2 py-0.5 rounded inline-block">
             Unavailable
           </div>
         ) : (
@@ -75,7 +75,7 @@ export const KPICard: React.FC<KPICardProps> = ({
                   isXs ? 'text-[9px]' : isSm ? 'text-[10px]' : 'text-[11px]'
                 } shrink-0 ${
                   changeType === 'positive'
-                    ? 'text-[#014BAA]'
+                    ? 'text-[#071952]'
                     : changeType === 'negative'
                     ? 'text-black/80'
                     : 'text-black/60'

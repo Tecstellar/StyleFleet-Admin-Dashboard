@@ -296,11 +296,11 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       key: 'type',
       header: 'Operation Type',
       render: (item) => {
-        let colorClass = 'bg-[#014BAA]/10 text-black border-[#014BAA]/20';
-        if (item.type === 'Payment') colorClass = 'bg-[#014BAA] text-white border-[#014BAA]';
-        if (item.type === 'Deletion') colorClass = 'bg-[#014BAA]/20 text-black border-[#014BAA]/40';
-        if (item.type === 'Booking') colorClass = 'bg-[#014BAA] text-white border-[#014BAA]';
-        if (item.type === 'Invoice') colorClass = 'bg-[#014BAA] text-white border-[#014BAA]';
+        let colorClass = 'bg-[#071952]/10 text-black border-[#071952]/20';
+        if (item.type === 'Payment') colorClass = 'bg-[#071952] text-white border-[#071952]';
+        if (item.type === 'Deletion') colorClass = 'bg-[#071952]/20 text-black border-[#071952]/40';
+        if (item.type === 'Booking') colorClass = 'bg-[#071952] text-white border-[#071952]';
+        if (item.type === 'Invoice') colorClass = 'bg-[#071952] text-white border-[#071952]';
 
         return (
           <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono border font-semibold ${colorClass}`}>

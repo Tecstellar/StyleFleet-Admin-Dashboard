@@ -286,15 +286,15 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
     switch (salon.status) {
       case 'pro_required':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#014BAA] text-white border border-[#014BAA] shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#071952] text-white border border-[#071952] shadow-xs">
             <AlertTriangle className="w-3.5 h-3.5 text-white" />
             PRO UPGRADE REQUIRED
           </span>
         );
       case 'nearing_limit':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#014BAA]/15 text-black border border-[#014BAA]/30 shadow-xs">
-            <Clock className="w-3.5 h-3.5 text-[#014BAA]" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#071952]/15 text-black border border-[#071952]/30 shadow-xs">
+            <Clock className="w-3.5 h-3.5 text-[#071952]" />
             NEARING 100 LIMIT
           </span>
         );
@@ -306,7 +306,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             ? 'PRO 6M (₹2,799)'
             : 'PRO 1Y (₹4,999)';
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#014BAA] text-white border border-[#014BAA] shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#071952] text-white border border-[#071952] shadow-xs">
             <Crown className="w-3.5 h-3.5 text-white fill-white" />
             {planName}
           </span>
@@ -314,8 +314,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       case 'free_active':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#014BAA]/10 text-black border border-[#014BAA]/20">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#014BAA]" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#071952]/10 text-black border border-[#071952]/20">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#071952]" />
             FREE TIER ACTIVE
           </span>
         );
@@ -325,7 +325,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner / Header */}
-      <div className="bg-[#014BAA] text-white p-6 sm:p-7 rounded-2xl border border-[#014BAA] shadow-sm relative overflow-hidden">
+      <div className="bg-[#071952] text-white p-6 sm:p-7 rounded-2xl border border-[#071952] shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-xs font-semibold border border-white/20">
@@ -415,7 +415,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by salon name, city, or phone..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-hidden focus:border-[#014BAA] transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-hidden focus:border-[#071952] transition-all"
             />
             {searchQuery && (
               <button
@@ -481,14 +481,14 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
 
         {/* Status Pills Quick Filter */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#014BAA]/15 text-xs">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#071952]/15 text-xs">
           <span className="text-[11px] font-semibold uppercase text-black/50 mr-1">Quick View:</span>
           <button
             onClick={() => setStatusFilter('all')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'all'
-                ? 'bg-[#014BAA] text-white shadow-xs'
-                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
+                ? 'bg-[#071952] text-white shadow-xs'
+                : 'bg-[#071952]/10 text-black border border-[#071952]/20 hover:bg-[#071952]/20'
             }`}
           >
             All Salons ({quotaSummaries.length})
@@ -497,8 +497,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('nearing_limit')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'nearing_limit'
-                ? 'bg-[#014BAA] text-white shadow-xs'
-                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
+                ? 'bg-[#071952] text-white shadow-xs'
+                : 'bg-[#071952]/10 text-black border border-[#071952]/20 hover:bg-[#071952]/20'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -508,8 +508,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('free_active')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'free_active'
-                ? 'bg-[#014BAA] text-white shadow-xs'
-                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
+                ? 'bg-[#071952] text-white shadow-xs'
+                : 'bg-[#071952]/10 text-black border border-[#071952]/20 hover:bg-[#071952]/20'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -519,8 +519,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setStatusFilter('pro_required')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               statusFilter === 'pro_required'
-                ? 'bg-[#014BAA] text-white shadow-xs'
-                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
+                ? 'bg-[#071952] text-white shadow-xs'
+                : 'bg-[#071952]/10 text-black border border-[#071952]/20 hover:bg-[#071952]/20'
             }`}
           >
             <AlertTriangle className="w-3.5 h-3.5" />
@@ -531,8 +531,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               onClick={() => setStatusFilter('upgraded')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'upgraded'
-                  ? 'bg-[#014BAA] text-white shadow-xs'
-                  : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
+                  ? 'bg-[#071952] text-white shadow-xs'
+                  : 'bg-[#071952]/10 text-black border border-[#071952]/20 hover:bg-[#071952]/20'
               }`}
             >
               <Crown className="w-3.5 h-3.5" />
@@ -665,8 +665,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-full font-mono font-extrabold text-xs ${
                               salon.salesRemaining <= 50
-                                ? 'bg-[#014BAA]/15 text-[#014BAA] border border-[#014BAA]/30'
-                                : 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20'
+                                ? 'bg-[#071952]/15 text-[#071952] border border-[#071952]/30'
+                                : 'bg-[#071952]/10 text-black border border-[#071952]/20'
                             }`}
                           >
                             {salon.salesRemaining} left
@@ -713,10 +713,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                             }}
                             className={`px-2.5 py-1.5 rounded-lg font-bold text-xs cursor-pointer border transition-colors ${
                               salon.upgradedPlan
-                                ? 'bg-[#014BAA] text-white border-[#014BAA]'
+                                ? 'bg-[#071952] text-white border-[#071952]'
                                 : salon.status === 'pro_required'
-                                ? 'bg-[#014BAA]/15 text-[#014BAA] border-[#014BAA]/40'
-                                : 'bg-[#F8F3F0] text-black border-[#014BAA]/30 hover:border-[#014BAA]'
+                                ? 'bg-[#071952]/15 text-[#071952] border-[#071952]/40'
+                                : 'bg-[#F8F3F0] text-black border-[#071952]/30 hover:border-[#071952]'
                             }`}
                             title="Assign or upgrade Pro Plan tier"
                           >
@@ -878,7 +878,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </div>
 
           {/* Plan 4: Pro 1 Year */}
-          <div className="border border-[#014BAA] rounded-2xl p-5 bg-[#014BAA] text-white flex flex-col justify-between space-y-4 shadow-sm">
+          <div className="border border-[#071952] rounded-2xl p-5 bg-[#071952] text-white flex flex-col justify-between space-y-4 shadow-sm">
             <div className="space-y-3">
               <div className="inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white">
                 BEST VALUE • SAVE ₹1,000

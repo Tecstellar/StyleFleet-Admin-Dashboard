@@ -235,27 +235,27 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
       </div>
 
       {/* TOP DROP-OFF SUMMARY PANEL */}
-      <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-2xl p-4 sm:p-5">
+      <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 sm:p-5">
         <div className="text-[10px] font-bold uppercase tracking-wider text-black/60 mb-3 font-mono">
           DROP-OFF SUMMARY
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {/* 1. INCOMPLETE */}
-          <div className="bg-[#F8F3F0] border border-[#014BAA]/30 rounded-xl p-3.5 shadow-2xs">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-[#014BAA]">
+          <div className="bg-[#F8F3F0] border border-[#071952]/30 rounded-xl p-3.5 shadow-2xs">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#071952]">
               INCOMPLETE
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-[#014BAA] mt-1 font-mono">
+            <div className="text-2xl sm:text-3xl font-extrabold text-[#071952] mt-1 font-mono">
               {totalIncomplete}
             </div>
-            <div className="text-[11px] text-[#014BAA]/70 mt-0.5">
+            <div className="text-[11px] text-[#071952]/70 mt-0.5">
               Unique phones, no account
             </div>
           </div>
 
           {/* 2. PENDING OTP */}
-          <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-xl p-3.5 shadow-2xs">
+          <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-xl p-3.5 shadow-2xs">
             <div className="text-[11px] font-bold uppercase tracking-wider text-black/80">
               PENDING OTP
             </div>
@@ -268,7 +268,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
           </div>
 
           {/* 3. EXPIRED */}
-          <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-xl p-3.5 shadow-2xs">
+          <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-xl p-3.5 shadow-2xs">
             <div className="text-[11px] font-bold uppercase tracking-wider text-black/80">
               EXPIRED
             </div>
@@ -281,7 +281,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
           </div>
 
           {/* 4. WRONG OTP */}
-          <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-xl p-3.5 shadow-2xs">
+          <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-xl p-3.5 shadow-2xs">
             <div className="text-[11px] font-bold uppercase tracking-wider text-black/80">
               WRONG OTP
             </div>
@@ -294,7 +294,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
           </div>
 
           {/* 5. BLOCKED */}
-          <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-xl p-3.5 shadow-2xs">
+          <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-xl p-3.5 shadow-2xs">
             <div className="text-[11px] font-bold uppercase tracking-wider text-black/80">
               BLOCKED
             </div>
@@ -312,12 +312,12 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Date Scope Pills */}
-          <div className="inline-flex items-center p-0.5 bg-[#014BAA]/10 rounded-lg text-xs font-medium border border-[#014BAA]/20">
+          <div className="inline-flex items-center p-0.5 bg-[#071952]/10 rounded-lg text-xs font-medium border border-[#071952]/20">
             <button
               onClick={() => setDateScope('7d')}
               className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
                 dateScope === '7d'
-                  ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                  ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                   : 'text-black/70 hover:text-black'
               }`}
             >
@@ -327,7 +327,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
               onClick={() => setDateScope('30d')}
               className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
                 dateScope === '30d'
-                  ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                  ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                   : 'text-black/70 hover:text-black'
               }`}
             >
@@ -337,7 +337,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
               onClick={() => setDateScope('90d')}
               className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
                 dateScope === '90d'
-                  ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                  ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                   : 'text-black/70 hover:text-black'
               }`}
             >
@@ -347,7 +347,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
               onClick={() => setDateScope('all')}
               className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
                 dateScope === 'all'
-                  ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                  ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                   : 'text-black/70 hover:text-black'
               }`}
             >
@@ -359,7 +359,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs px-3 py-1.5 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none cursor-pointer"
+            className="text-xs px-3 py-1.5 rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none cursor-pointer"
           >
             <option value="all">All statuses</option>
             <option value="OTP expired">OTP expired</option>
@@ -371,7 +371,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
           {/* Export CSV Button */}
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] hover:bg-[#014BAA]/10 text-black text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#071952]/20 bg-[#F8F3F0] hover:bg-[#071952]/10 text-black text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -385,11 +385,11 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
       </div>
 
       {/* INCOMPLETE SIGNUPS TABLE */}
-      <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 shadow-2xs overflow-hidden">
+      <div className="bg-[#F8F3F0] rounded-xl border border-[#071952]/20 shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="border-b border-[#014BAA]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#014BAA]/5 font-mono">
+              <tr className="border-b border-[#071952]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#071952]/5 font-mono">
                 <th className="py-3 px-3.5">PHONE</th>
                 <th className="py-3 px-3">STATUS</th>
                 <th className="py-3 px-3">OTP SENT</th>
@@ -400,7 +400,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
                 <th className="py-3 px-3 text-center">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#014BAA]/10 text-black">
+            <tbody className="divide-y divide-[#071952]/10 text-black">
               {loading ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-xs text-black/50">
@@ -417,11 +417,11 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
                 filteredRecords.map((r) => {
                   let statusColor = 'text-black/70';
                   if (r.status === 'Wrong OTP') statusColor = 'text-black font-semibold';
-                  if (r.status === 'Pending OTP') statusColor = 'text-[#014BAA] font-semibold';
+                  if (r.status === 'Pending OTP') statusColor = 'text-[#071952] font-semibold';
                   if (r.status === 'Blocked') statusColor = 'text-black/90 font-bold';
 
                   return (
-                    <tr key={r.id} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <tr key={r.id} className="hover:bg-[#071952]/5 transition-colors">
                       {/* PHONE */}
                       <td className="py-3 px-3.5 font-mono font-bold text-black whitespace-nowrap">
                         {r.phone}
@@ -461,7 +461,7 @@ export const IncompleteSignupsView: React.FC<IncompleteSignupsViewProps> = ({
                       <td className="py-3 px-3 text-center whitespace-nowrap">
                         <button
                           onClick={() => handleDeleteRecord(r.id, r.phone)}
-                          className="px-3.5 py-1 rounded bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                          className="px-3.5 py-1 rounded bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
                         >
                           Delete
                         </button>

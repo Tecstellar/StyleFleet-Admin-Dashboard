@@ -85,7 +85,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-[0.08em] text-[#014BAA] uppercase font-mono">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-[#071952] uppercase font-mono">
               ENGAGEMENT PLATFORM
             </span>
             <span className="text-neutral-300">•</span>
@@ -98,7 +98,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
 
         <button
           onClick={() => setIsComposerOpen(true)}
-          className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>New Broadcast</span>
@@ -139,10 +139,10 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
 
       {/* Broadcast Composer Modal */}
       {isComposerOpen && (
-        <div className="panel p-5 border border-[#014BAA]/20 bg-[#F8F3F0]">
+        <div className="panel p-5 border border-[#071952]/20 bg-[#F8F3F0]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-              <Megaphone className="w-4 h-4 text-[#014BAA]" />
+              <Megaphone className="w-4 h-4 text-[#071952]" />
               Compose Platform Broadcast
             </h3>
             <button
@@ -164,7 +164,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
                 placeholder="e.g. Quota Notice: Free Tier Expiring Soon"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#014BAA]"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#071952]"
               />
             </div>
 
@@ -178,7 +178,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
                 placeholder="Type your message to salon owners..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#014BAA]"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#071952]"
               />
             </div>
 
@@ -192,8 +192,8 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
                     onClick={() => setNewChannel(ch)}
                     className={`px-2.5 py-1 text-xs rounded-md border font-medium cursor-pointer ${
                       newChannel === ch
-                        ? 'bg-[#014BAA] text-white border-[#014BAA]'
-                        : 'bg-[#F8F3F0] text-neutral-600 border-[#014BAA]/20 hover:bg-[#014BAA]/10'
+                        ? 'bg-[#071952] text-white border-[#071952]'
+                        : 'bg-[#F8F3F0] text-neutral-600 border-[#071952]/20 hover:bg-[#071952]/10'
                     }`}
                   >
                     {ch}
@@ -203,7 +203,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
 
               <button
                 type="submit"
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold rounded-lg shadow-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-xs cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Publish Broadcast</span>
@@ -226,7 +226,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-neutral-900 text-sm">{b.title}</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#014BAA] text-white border border-[#014BAA]">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#071952] text-white border border-[#071952]">
                     {b.channel}
                   </span>
                 </div>
@@ -241,7 +241,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
                 <span>•</span>
                 <span>Reach: <strong>{b.recipientsCount} salons</strong></span>
                 <span>•</span>
-                <span className="text-[#014BAA] font-semibold">Delivered</span>
+                <span className="text-[#071952] font-semibold">Delivered</span>
               </div>
             </div>
           ))}

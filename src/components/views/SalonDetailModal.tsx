@@ -341,7 +341,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
       maxWidth="4xl"
     >
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-[#014BAA]/15 pb-3 mb-5 overflow-x-auto text-xs">
+      <div className="flex items-center gap-1 border-b border-[#071952]/15 pb-3 mb-5 overflow-x-auto text-xs">
         {[
           { id: 'overview', label: 'Overview', icon: Store },
           { id: 'staff', label: `Staff (${details?.staff.length || 0})`, icon: Users },
@@ -358,8 +358,8 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-colors shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-[#014BAA] text-white shadow-xs'
-                  : 'text-black/70 hover:text-black hover:bg-[#014BAA]/10'
+                  ? 'bg-[#071952] text-white shadow-xs'
+                  : 'text-black/70 hover:text-black hover:bg-[#071952]/10'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -380,7 +380,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
             <div className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Salon Information Card */}
-                <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] space-y-3 shadow-xs">
+                <div className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] space-y-3 shadow-xs">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-black/70">
                     Salon Information
                   </h4>
@@ -415,7 +415,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                 </div>
 
                 {/* Owner Information Card */}
-                <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] space-y-3 shadow-xs">
+                <div className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] space-y-3 shadow-xs">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-black/70">
                     Owner Profile &amp; Account
                   </h4>
@@ -447,12 +447,12 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3 rounded-lg bg-[#014BAA]/10 border border-[#014BAA]/25 text-xs text-black">
+                    <div className="p-3 rounded-lg bg-[#071952]/10 border border-[#071952]/25 text-xs text-black">
                       No linked owner profile (owner_profile_id is NULL). This salon may be an unassigned or test record.
                     </div>
                   )}
 
-                  <div className="pt-2 border-t border-[#014BAA]/15 space-y-2 text-xs">
+                  <div className="pt-2 border-t border-[#071952]/15 space-y-2 text-xs">
                     <div className="flex justify-between">
                       <span className="text-black/70">Registered On:</span>
                       <span className="text-black">{formatDateTime(shop.created_at)}</span>
@@ -461,10 +461,10 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                       <span className="text-black/70">Theme Accent:</span>
                       <span className="flex items-center gap-1.5 font-mono text-xs text-black">
                         <span
-                          className="w-3 h-3 rounded-full border border-[#014BAA]/30"
-                          style={{ backgroundColor: shop.accent_color || '#014BAA' }}
+                          className="w-3 h-3 rounded-full border border-[#071952]/30"
+                          style={{ backgroundColor: shop.accent_color || '#071952' }}
                         />
-                        {shop.accent_color || '#014BAA'}
+                        {shop.accent_color || '#071952'}
                       </span>
                     </div>
                   </div>
@@ -473,9 +473,9 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
 
               {/* Linked Deletions or Support Messages if any */}
               {details?.deletions && details.deletions.length > 0 && (
-                <div className="p-4 rounded-xl border border-[#014BAA]/30 bg-[#014BAA]/10 space-y-2">
+                <div className="p-4 rounded-xl border border-[#071952]/30 bg-[#071952]/10 space-y-2">
                   <div className="flex items-center gap-2 text-black font-semibold text-xs">
-                    <ShieldAlert className="w-4 h-4 text-[#014BAA]" />
+                    <ShieldAlert className="w-4 h-4 text-[#071952]" />
                     <span>Account Deletion Record Detected</span>
                   </div>
                   <p className="text-xs text-black/80">
@@ -491,7 +491,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
           {/* TAB 2: STAFF & STYLIST PERMISSIONS */}
           {activeTab === 'staff' && (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-[#014BAA]/15">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-[#071952]/15">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-black">
                     Stylist Access & Module Permissions
@@ -502,15 +502,15 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   {savingStaffId && (
-                    <span className="flex items-center gap-1.5 text-xs text-black bg-[#014BAA]/10 px-2.5 py-1 rounded-md border border-[#014BAA]/25 animate-pulse font-medium">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#014BAA]" />
+                    <span className="flex items-center gap-1.5 text-xs text-black bg-[#071952]/10 px-2.5 py-1 rounded-md border border-[#071952]/25 animate-pulse font-medium">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#071952]" />
                       <span>Saving...</span>
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => setIsAddingStaff(!isAddingStaff)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#014BAA] text-white hover:bg-[#013b86] text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#071952] text-white hover:bg-[#0b2575] text-xs font-bold transition-all shadow-xs cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>{isAddingStaff ? 'Cancel' : 'Add Stylist'}</span>
@@ -519,8 +519,8 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
               </div>
 
               {staffActionMsg && (
-                <div className="p-2.5 rounded-lg bg-[#014BAA]/10 text-black text-xs font-semibold border border-[#014BAA]/25 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#014BAA]" />
+                <div className="p-2.5 rounded-lg bg-[#071952]/10 text-black text-xs font-semibold border border-[#071952]/25 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#071952]" />
                   <span>{staffActionMsg}</span>
                 </div>
               )}
@@ -529,10 +529,10 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
               {isAddingStaff && (
                 <form
                   onSubmit={handleCreateStaff}
-                  className="p-4 rounded-xl border border-[#014BAA]/25 bg-[#F8F3F0] space-y-3"
+                  className="p-4 rounded-xl border border-[#071952]/25 bg-[#F8F3F0] space-y-3"
                 >
                   <div className="font-bold text-xs text-black flex items-center gap-1.5">
-                    <Plus className="w-3.5 h-3.5 text-[#014BAA]" />
+                    <Plus className="w-3.5 h-3.5 text-[#071952]" />
                     <span>Add Stylist to {shop.name}</span>
                   </div>
 
@@ -547,7 +547,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                         value={newStaffName}
                         onChange={(e) => setNewStaffName(e.target.value)}
                         placeholder="e.g. Priya Sharma"
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
                       />
                     </div>
 
@@ -561,7 +561,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                         value={newStaffPhone}
                         onChange={(e) => setNewStaffPhone(e.target.value)}
                         placeholder="10-digit phone"
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black font-mono focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black font-mono focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
                       />
                     </div>
 
@@ -574,7 +574,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                         value={newStaffRole}
                         onChange={(e) => setNewStaffRole(e.target.value)}
                         placeholder="e.g. Senior Stylist"
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
+                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
                       />
                     </div>
                   </div>
@@ -583,14 +583,14 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setIsAddingStaff(false)}
-                      className="px-3 py-1.5 rounded-lg border border-[#014BAA]/30 text-xs font-semibold text-black/70 hover:bg-[#014BAA]/10 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg border border-[#071952]/30 text-xs font-semibold text-black/70 hover:bg-[#071952]/10 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={newStaffLoading}
-                      className="px-4 py-1.5 rounded-lg bg-[#014BAA] text-white hover:bg-[#013b86] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="px-4 py-1.5 rounded-lg bg-[#071952] text-white hover:bg-[#0b2575] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       {newStaffLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                       <span>Save Stylist</span>
@@ -621,10 +621,10 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     return (
                       <div
                         key={st.id}
-                        className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs space-y-3.5"
+                        className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs space-y-3.5"
                       >
                         {/* Header: Stylist Info & Status Badges */}
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#014BAA]/15 pb-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#071952]/15 pb-2.5">
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-black text-xs">{st.name}</span>
@@ -641,28 +641,28 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleSendWhatsAppInvite(st)}
-                                className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-[#014BAA]/30 bg-[#014BAA]/10 text-[#014BAA] hover:bg-[#014BAA]/20 flex items-center gap-1 transition-colors cursor-pointer"
+                                className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-[#071952]/30 bg-[#071952]/10 text-[#071952] hover:bg-[#071952]/20 flex items-center gap-1 transition-colors cursor-pointer"
                                 title={st.invitation_status === 'invited' ? 'Resend WhatsApp Invite' : 'Send WhatsApp Invite'}
                               >
-                                <MessageCircle className="w-3 h-3 text-[#014BAA]" />
+                                <MessageCircle className="w-3 h-3 text-[#071952]" />
                                 <span>{st.invitation_status === 'invited' ? 'Resend Invite' : 'WhatsApp Invite'}</span>
                               </button>
                             )}
 
                             {/* Invitation Status */}
                             {st.invitation_status === 'active' ? (
-                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#014BAA] text-white border border-[#014BAA]">
+                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#071952] text-white border border-[#071952]">
                                 App Active
                               </span>
                             ) : st.invitation_status === 'invited' ? (
                               <span
-                                className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#014BAA]/10 text-[#014BAA] border border-[#014BAA]/20"
+                                className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#071952]/10 text-[#071952] border border-[#071952]/20"
                                 title={st.invited_at ? `Invited on ${formatDateTime(st.invited_at)}` : 'Invited via WhatsApp'}
                               >
                                 Invited {st.invited_at ? `(${formatDate(st.invited_at)})` : ''}
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#014BAA]/5 text-black/70 border border-[#014BAA]/15">
+                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#071952]/5 text-black/70 border border-[#071952]/15">
                                 Not Invited
                               </span>
                             )}
@@ -692,7 +692,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                                 type="button"
                                 onClick={() => handleToggleAllPermissions(st, true)}
                                 disabled={isSavingThis}
-                                className="text-[10px] font-bold text-[#014BAA] hover:underline cursor-pointer"
+                                className="text-[10px] font-bold text-[#071952] hover:underline cursor-pointer"
                               >
                                 Grant All
                               </button>
@@ -719,8 +719,8 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                                   disabled={isSavingThis}
                                   className={`flex items-center justify-between p-2 rounded-lg border text-xs transition-all text-left ${
                                     isGranted
-                                      ? 'border-[#014BAA] bg-[#014BAA] text-white font-semibold shadow-xs'
-                                      : 'border-[#014BAA]/20 bg-[#F8F3F0] text-black/70 font-normal hover:border-[#014BAA]/40'
+                                      ? 'border-[#071952] bg-[#071952] text-white font-semibold shadow-xs'
+                                      : 'border-[#071952]/20 bg-[#F8F3F0] text-black/70 font-normal hover:border-[#071952]/40'
                                   }`}
                                 >
                                   <span className="flex items-center gap-1.5 truncate">
@@ -730,8 +730,8 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                                   <span
                                     className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold shrink-0 ${
                                       isGranted
-                                        ? 'bg-white text-[#014BAA]'
-                                        : 'bg-[#014BAA]/15 text-black/60'
+                                        ? 'bg-white text-[#071952]'
+                                        : 'bg-[#071952]/15 text-black/60'
                                     }`}
                                   >
                                     {isGranted ? '✓' : ''}
@@ -746,7 +746,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                   })}
                 </div>
               ) : (
-                <div className="p-6 text-center text-xs text-black/70 border border-dashed border-[#014BAA]/30 rounded-xl bg-[#F8F3F0]">
+                <div className="p-6 text-center text-xs text-black/70 border border-dashed border-[#071952]/30 rounded-xl bg-[#F8F3F0]">
                   No staff members registered for this salon yet.
                 </div>
               )}
@@ -761,7 +761,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                   {details.services.map((svc) => (
                     <div
                       key={svc.id}
-                      className="p-3 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs flex items-center justify-between text-xs"
+                      className="p-3 rounded-lg border border-[#071952]/20 bg-[#F8F3F0] shadow-xs flex items-center justify-between text-xs"
                     >
                       <div>
                         <div className="font-medium text-black">{svc.name}</div>
@@ -774,7 +774,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="p-6 text-center text-xs text-black/70 border border-dashed border-[#014BAA]/30 rounded-xl bg-[#F8F3F0]">
+                <div className="p-6 text-center text-xs text-black/70 border border-dashed border-[#071952]/30 rounded-xl bg-[#F8F3F0]">
                   No catalog services configured for this salon.
                 </div>
               )}
@@ -864,7 +864,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
             return (
               <div className="space-y-4">
                 {/* Salon Bill Filter Toolbar */}
-                <div className="p-3.5 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] space-y-3">
+                <div className="p-3.5 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] space-y-3">
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                     {/* Exact Single Date Picker */}
                     <div className="flex items-center gap-2 flex-1">
@@ -880,15 +880,15 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                             setBillPresetRange('all');
                           }}
                           className={`w-full text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg border ${
-                            billExactDate ? 'border-[#014BAA] bg-[#F8F3F0] ring-1 ring-[#014BAA]' : 'border-[#014BAA]/30 bg-[#F8F3F0]'
-                          } text-black focus:outline-none focus:border-[#014BAA] cursor-pointer shadow-xs`}
+                            billExactDate ? 'border-[#071952] bg-[#F8F3F0] ring-1 ring-[#071952]' : 'border-[#071952]/30 bg-[#F8F3F0]'
+                          } text-black focus:outline-none focus:border-[#071952] cursor-pointer shadow-xs`}
                         />
                       </div>
                       {billExactDate && (
                         <button
                           type="button"
                           onClick={() => setBillExactDate('')}
-                          className="mt-4 px-2 py-1 text-[11px] font-semibold text-[#014BAA] hover:underline cursor-pointer"
+                          className="mt-4 px-2 py-1 text-[11px] font-semibold text-[#071952] hover:underline cursor-pointer"
                         >
                           Clear
                         </button>
@@ -907,14 +907,14 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                           placeholder="Invoice #, customer name, phone..."
                           value={billSearch}
                           onChange={(e) => setBillSearch(e.target.value)}
-                          className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] shadow-xs"
+                          className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] shadow-xs"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Preset Pills and Status / Method Dropdowns */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#014BAA]/15">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#071952]/15">
                     <div className="flex items-center gap-1 overflow-x-auto">
                       {[
                         { id: 'all', label: 'All Bills' },
@@ -932,8 +932,8 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                           }}
                           className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                             billPresetRange === p.id && !billExactDate
-                              ? 'bg-[#014BAA] text-white font-bold shadow-xs'
-                              : 'bg-[#F8F3F0] border border-[#014BAA]/25 text-black/70 hover:text-black hover:bg-[#014BAA]/10'
+                              ? 'bg-[#071952] text-white font-bold shadow-xs'
+                              : 'bg-[#F8F3F0] border border-[#071952]/25 text-black/70 hover:text-black hover:bg-[#071952]/10'
                           }`}
                         >
                           {p.label}
@@ -945,7 +945,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                       <select
                         value={billStatus}
                         onChange={(e) => setBillStatus(e.target.value)}
-                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none cursor-pointer"
+                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none cursor-pointer"
                       >
                         <option value="all">All Statuses</option>
                         <option value="paid">Paid</option>
@@ -956,7 +956,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                       <select
                         value={billPaymentMethod}
                         onChange={(e) => setBillPaymentMethod(e.target.value)}
-                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none cursor-pointer"
+                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none cursor-pointer"
                       >
                         <option value="all">All Modes</option>
                         <option value="cash">Cash</option>
@@ -974,7 +974,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                             setBillStatus('all');
                             setBillPaymentMethod('all');
                           }}
-                          className="px-2 py-1 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black/70 hover:text-black hover:bg-[#014BAA]/10 text-[11px] font-semibold cursor-pointer"
+                          className="px-2 py-1 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black/70 hover:text-black hover:bg-[#071952]/10 text-[11px] font-semibold cursor-pointer"
                           title="Reset filters"
                         >
                           Reset
@@ -986,7 +986,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
 
                 {/* Filter Summary Metric Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3 rounded-xl border border-[#014BAA]/20 border-l-4 border-l-[#014BAA] bg-[#F8F3F0] shadow-xs">
+                  <div className="p-3 rounded-xl border border-[#071952]/20 border-l-4 border-l-[#071952] bg-[#F8F3F0] shadow-xs">
                     <span className="text-black/70">Invoices Matching Filter:</span>
                     <div className="text-base font-bold font-mono text-black mt-0.5">
                       {filteredBills.length} of {details?.bills.length || 0} total
@@ -996,7 +996,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     )}
                   </div>
 
-                  <div className="p-3 rounded-xl border border-[#014BAA]/20 border-l-4 border-l-[#014BAA] bg-[#F8F3F0] shadow-xs">
+                  <div className="p-3 rounded-xl border border-[#071952]/20 border-l-4 border-l-[#071952] bg-[#F8F3F0] shadow-xs">
                     <span className="text-black/70">Total Billed in Scope:</span>
                     <div className="text-base font-bold font-mono text-black mt-0.5">
                       {formatCurrency(totalBilledMinor)}
@@ -1004,10 +1004,10 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     <span className="text-[10px] text-black/70">Across filtered invoices</span>
                   </div>
 
-                  <div className="p-3 rounded-xl border border-[#014BAA]/20 border-l-4 border-l-[#014BAA] bg-[#F8F3F0] shadow-xs">
+                  <div className="p-3 rounded-xl border border-[#071952]/20 border-l-4 border-l-[#071952] bg-[#F8F3F0] shadow-xs">
                     <span className="text-black/70">Settled vs Pending:</span>
                     <div className="text-base font-bold font-mono text-black mt-0.5 flex items-center gap-2">
-                      <span className="text-[#014BAA] font-semibold">{paidCount} Paid</span>
+                      <span className="text-[#071952] font-semibold">{paidCount} Paid</span>
                       <span className="text-black/30">•</span>
                       <span className="text-black/70">{pendingCount} Pending</span>
                     </div>
@@ -1025,22 +1025,22 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                       <button
                         type="button"
                         onClick={handleExportSalonBills}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#014BAA] hover:underline cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#071952] hover:underline cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Export CSV</span>
                       </button>
                     </div>
 
-                    <div className="divide-y divide-[#014BAA]/15 border border-[#014BAA]/20 rounded-xl overflow-hidden text-xs shadow-xs max-h-80 overflow-y-auto">
+                    <div className="divide-y divide-[#071952]/15 border border-[#071952]/20 rounded-xl overflow-hidden text-xs shadow-xs max-h-80 overflow-y-auto">
                       {filteredBills.map((b) => {
                         const linkedP = (details?.payments || []).find((p) => p.bill_id === b.id);
                         return (
-                          <div key={b.id} className="p-3 flex items-center justify-between bg-[#F8F3F0] hover:bg-[#014BAA]/5 transition-colors">
+                          <div key={b.id} className="p-3 flex items-center justify-between bg-[#F8F3F0] hover:bg-[#071952]/5 transition-colors">
                             <div className="overflow-hidden pr-2">
                               <div className="flex items-center gap-2">
                                 <span className="font-mono font-bold text-black">{b.invoice_number}</span>
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#014BAA]/10 text-black border border-[#014BAA]/25">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#071952]/10 text-black border border-[#071952]/25">
                                   {linkedP?.method ? linkedP.method.toUpperCase() : 'CASH'}
                                 </span>
                               </div>
@@ -1060,7 +1060,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="p-8 text-center text-xs text-black/70 border border-dashed border-[#014BAA]/30 rounded-xl bg-[#F8F3F0] space-y-2">
+                  <div className="p-8 text-center text-xs text-black/70 border border-dashed border-[#071952]/30 rounded-xl bg-[#F8F3F0] space-y-2">
                     <p className="font-semibold text-black/80">No bills match the selected date or search criteria.</p>
                     {hasActiveFilters && (
                       <button
@@ -1072,7 +1072,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                           setBillStatus('all');
                           setBillPaymentMethod('all');
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#014BAA] text-white hover:bg-[#013b86] text-xs font-semibold cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-[#071952] text-white hover:bg-[#0b2575] text-xs font-semibold cursor-pointer"
                       >
                         Clear Filters
                       </button>
@@ -1086,7 +1086,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
           {/* TAB 5: SETTINGS */}
           {activeTab === 'settings' && (
             <div className="space-y-3">
-              <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs space-y-3 text-xs">
+              <div className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs space-y-3 text-xs">
                 <div className="flex justify-between items-center">
                   <span className="text-black/70">Free sales limit:</span>
                   <span className="font-semibold text-black">
@@ -1104,13 +1104,13 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     onChange={(e) => setLimitInput(e.target.value)}
                     placeholder="e.g. 500"
                     disabled={savingLimit || !details}
-                    className="flex-1 px-3 py-2 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black text-xs"
+                    className="flex-1 px-3 py-2 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black text-xs"
                   />
                   <button
                     type="button"
                     onClick={() => handleSaveLimit(false)}
                     disabled={savingLimit || !details}
-                    className="px-3 py-2 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white font-semibold disabled:opacity-50 cursor-pointer"
+                    className="px-3 py-2 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white font-semibold disabled:opacity-50 cursor-pointer"
                   >
                     {savingLimit ? 'Saving…' : 'Save'}
                   </button>
@@ -1118,20 +1118,20 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     type="button"
                     onClick={() => handleSaveLimit(true)}
                     disabled={savingLimit || !details?.shop.free_sales_limit}
-                    className="px-3 py-2 rounded-lg border border-[#014BAA]/30 text-black/70 hover:bg-[#014BAA]/10 font-semibold disabled:opacity-50 cursor-pointer"
+                    className="px-3 py-2 rounded-lg border border-[#071952]/30 text-black/70 hover:bg-[#071952]/10 font-semibold disabled:opacity-50 cursor-pointer"
                   >
                     Reset
                   </button>
                 </div>
                 {limitMsg && (
-                  <p className={limitMsg.ok ? 'text-[#014BAA] font-semibold' : 'text-black/80 font-semibold'}>{limitMsg.text}</p>
+                  <p className={limitMsg.ok ? 'text-[#071952] font-semibold' : 'text-black/80 font-semibold'}>{limitMsg.text}</p>
                 )}
                 <p className="text-black/60">
                   How many bills this salon can create on the free plan before it needs Pro. Leave empty / Reset for the default of 100.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs space-y-3 text-xs">
+              <div className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs space-y-3 text-xs">
                 <div className="flex justify-between items-center">
                   <span className="text-black/70">Pro plan:</span>
                   <span className="font-semibold text-black">
@@ -1149,7 +1149,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     value={proPlan}
                     onChange={(e) => setProPlan(e.target.value as ManualProPlan)}
                     disabled={proBusy || proLoading}
-                    className="flex-1 px-3 py-2 rounded-lg border border-[#014BAA]/30 text-xs bg-[#F8F3F0] text-black"
+                    className="flex-1 px-3 py-2 rounded-lg border border-[#071952]/30 text-xs bg-[#F8F3F0] text-black"
                   >
                     <option value="3_months">3 months</option>
                     <option value="6_months">6 months</option>
@@ -1159,7 +1159,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     type="button"
                     onClick={handleGrantPro}
                     disabled={proBusy || proLoading}
-                    className="px-3 py-2 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white font-semibold disabled:opacity-50 cursor-pointer"
+                    className="px-3 py-2 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white font-semibold disabled:opacity-50 cursor-pointer"
                   >
                     {proBusy ? 'Working…' : isSubscriptionActive(proSub) ? 'Extend / replace' : 'Grant Pro'}
                   </button>
@@ -1167,18 +1167,18 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                     type="button"
                     onClick={handleRevokePro}
                     disabled={proBusy || proLoading || !isSubscriptionActive(proSub)}
-                    className="px-3 py-2 rounded-lg border border-[#014BAA]/30 text-black/70 hover:bg-[#014BAA]/10 font-semibold disabled:opacity-50 cursor-pointer"
+                    className="px-3 py-2 rounded-lg border border-[#071952]/30 text-black/70 hover:bg-[#071952]/10 font-semibold disabled:opacity-50 cursor-pointer"
                   >
                     End Pro
                   </button>
                 </div>
-                {proMsg && <p className={proMsg.ok ? 'text-[#014BAA] font-semibold' : 'text-black/80 font-semibold'}>{proMsg.text}</p>}
+                {proMsg && <p className={proMsg.ok ? 'text-[#071952] font-semibold' : 'text-black/80 font-semibold'}>{proMsg.text}</p>}
                 <p className="text-black/60">
                   Gives the salon unlimited bills, appointments and report downloads with no payment recorded. Works on every app version.
                 </p>
               </div>
               {details?.settings ? (
-                <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs space-y-3 text-xs">
+                <div className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs space-y-3 text-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-black/70">Appointment Reminders:</span>
                     <span className="font-semibold text-black">
@@ -1205,7 +1205,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="p-6 text-center text-xs text-black/70 border border-dashed border-[#014BAA]/30 rounded-xl bg-[#F8F3F0]">
+                <div className="p-6 text-center text-xs text-black/70 border border-dashed border-[#071952]/30 rounded-xl bg-[#F8F3F0]">
                   No automated settings configured for this salon.
                 </div>
               )}
@@ -1221,7 +1221,7 @@ export const SalonDetailModal: React.FC<SalonDetailModalProps> = ({
                 message="Client device telemetry and app installation tracking are not recorded in the connected database for this salon."
                 details="To see device models, OS versions, and app builds, the mobile application must send device telemetry events."
               />
-              <div className="p-4 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs text-xs space-y-2 text-black/80">
+              <div className="p-4 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs text-xs space-y-2 text-black/80">
                 <div className="font-semibold text-black">Expected Telemetry Fields:</div>
                 <ul className="list-disc list-inside space-y-1 text-black/60 font-mono text-[11px]">
                   <li>device_id: UUID / Hardware string</li>

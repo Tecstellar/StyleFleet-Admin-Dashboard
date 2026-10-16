@@ -499,7 +499,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       {/* Top Action Bar (Record & Refresh) */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#014BAA] bg-[#014BAA]/10 px-2.5 py-1 rounded-full border border-[#014BAA]/20">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#071952] bg-[#071952]/10 px-2.5 py-1 rounded-full border border-[#071952]/20">
             StyleFleet Revenue Trend
           </span>
         </div>
@@ -507,14 +507,14 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsRecordModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>+ Record Pro Subscription</span>
           </button>
           <button
             onClick={() => window.location.reload()}
-            className="p-1.5 rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] hover:bg-[#014BAA]/10 text-black transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg border border-[#071952]/20 bg-[#F8F3F0] hover:bg-[#071952]/10 text-black transition-colors cursor-pointer"
             title="Refresh Data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -523,7 +523,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       </div>
 
       {/* MAIN CONTAINER */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#014BAA]/20 shadow-2xs p-5 sm:p-7 space-y-6">
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 shadow-2xs p-5 sm:p-7 space-y-6">
         {/* Title & Controls Bar */}
         <div className="space-y-4">
           <div>
@@ -538,12 +538,12 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           {/* Granularity Toggles & Filter Selectors Row */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
             {/* Left: Granularity Toggle Pills */}
-            <div className="inline-flex items-center p-1 bg-[#014BAA]/10 rounded-xl text-xs font-medium border border-[#014BAA]/15">
+            <div className="inline-flex items-center p-1 bg-[#071952]/10 rounded-xl text-xs font-medium border border-[#071952]/15">
               <button
                 onClick={() => setGranularity('month')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   granularity === 'month'
-                    ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                    ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                     : 'text-black/70 hover:text-black'
                 }`}
               >
@@ -553,7 +553,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 onClick={() => setGranularity('week')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   granularity === 'week'
-                    ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                    ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                     : 'text-black/70 hover:text-black'
                 }`}
               >
@@ -563,7 +563,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 onClick={() => setGranularity('day')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   granularity === 'day'
-                    ? 'bg-[#014BAA] text-white font-semibold shadow-2xs'
+                    ? 'bg-[#071952] text-white font-semibold shadow-2xs'
                     : 'text-black/70 hover:text-black'
                 }`}
               >
@@ -579,7 +579,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   <option value={2026}>2026</option>
                   <option value={2025}>2025</option>
@@ -593,7 +593,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   {MONTH_NAMES.map((m, idx) => (
                     <option key={m} value={idx}>
@@ -609,7 +609,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <select
                   value={selectedWeek}
                   onChange={(e) => setSelectedWeek(e.target.value)}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   <option value="W42">W42</option>
                   <option value="W41">W41</option>
@@ -625,7 +625,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <select
                   value={compareMode}
                   onChange={(e) => setCompareMode(e.target.value as any)}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   <option value="previous_period">Previous period</option>
                   <option value="previous_year">Previous year</option>
@@ -639,7 +639,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         {/* 4 SUMMARY STAT CARDS */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Total revenue */}
-          <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 shadow-2xs">
+          <div className="bg-[#F8F3F0] rounded-xl border border-[#071952]/20 p-4 shadow-2xs">
             <div className="text-xs text-black/60 font-medium">
               Total revenue
             </div>
@@ -649,7 +649,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           </div>
 
           {/* Latest period */}
-          <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 shadow-2xs">
+          <div className="bg-[#F8F3F0] rounded-xl border border-[#071952]/20 p-4 shadow-2xs">
             <div className="text-xs text-black/60 font-medium">
               Latest period
             </div>
@@ -659,14 +659,14 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           </div>
 
           {/* Growth vs prev */}
-          <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 shadow-2xs">
+          <div className="bg-[#F8F3F0] rounded-xl border border-[#071952]/20 p-4 shadow-2xs">
             <div className="text-xs text-black/60 font-medium">
               Growth vs prev
             </div>
             <div
               className={`text-xl sm:text-2xl font-extrabold mt-1 font-mono tracking-tight ${
                 growthVsPrev > 0
-                  ? 'text-[#014BAA]'
+                  ? 'text-[#071952]'
                   : growthVsPrev < 0
                   ? 'text-black/80'
                   : 'text-black/70'
@@ -677,11 +677,11 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           </div>
 
           {/* Best period */}
-          <div className="bg-[#F8F3F0] rounded-xl border border-[#014BAA]/20 p-4 shadow-2xs">
+          <div className="bg-[#F8F3F0] rounded-xl border border-[#071952]/20 p-4 shadow-2xs">
             <div className="text-xs text-black/60 font-medium">
               Best period
             </div>
-            <div className="text-xl sm:text-2xl font-extrabold text-[#014BAA] mt-1 font-mono tracking-tight">
+            <div className="text-xl sm:text-2xl font-extrabold text-[#071952] mt-1 font-mono tracking-tight">
               {bestPeriod}
             </div>
           </div>
@@ -697,7 +697,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke="rgba(1, 75, 170, 0.15)"
+                stroke="rgba(7, 25, 82, 0.15)"
               />
               <XAxis
                 dataKey="label"
@@ -718,17 +718,17 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                   backgroundColor: '#F8F3F0',
                   borderRadius: '8px',
                   fontSize: '12px',
-                  border: '1px solid rgba(1, 75, 170, 0.25)',
+                  border: '1px solid rgba(7, 25, 82, 0.25)',
                   color: '#000000',
                 }}
               />
               <Line
                 type="monotone"
                 dataKey="revenue"
-                stroke="#014BAA"
+                stroke="#071952"
                 strokeWidth={2.5}
-                dot={{ r: 4, fill: '#014BAA', stroke: '#F8F3F0', strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: '#013b86' }}
+                dot={{ r: 4, fill: '#071952', stroke: '#F8F3F0', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: '#0b2575' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -787,7 +787,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                     <td
                       className={`py-3 px-3 text-right font-mono font-semibold ${
                         row.growthPct && row.growthPct > 0
-                          ? 'text-[#014BAA]'
+                          ? 'text-[#071952]'
                           : row.growthPct && row.growthPct < 0
                           ? 'text-black/80'
                           : 'text-black/60'
@@ -804,7 +804,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       </div>
 
       {/* 5. SUBSCRIBERS IN SELECTED MONTH */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#014BAA]/20 shadow-2xs p-5 sm:p-7 space-y-4">
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 shadow-2xs p-5 sm:p-7 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 className="text-base font-bold text-black tracking-tight">
@@ -814,7 +814,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
               Salons subscribed to paid Pro plans (e.g. ₹499 monthly) during this period
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#014BAA]/10 border border-[#014BAA]/20 text-[#014BAA] text-xs font-mono font-bold self-start sm:self-auto">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#071952]/10 border border-[#071952]/20 text-[#071952] text-xs font-mono font-bold self-start sm:self-auto">
             <span>{monthSubscribers.length}</span>
             <span>{monthSubscribers.length === 1 ? 'Subscriber' : 'Subscribers'}</span>
           </span>
@@ -823,7 +823,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="border-b border-[#014BAA]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#014BAA]/5 font-mono">
+              <tr className="border-b border-[#071952]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#071952]/5 font-mono">
                 <th className="py-3 px-3">SALON SHOP</th>
                 <th className="py-3 px-3">PHONE & CITY</th>
                 <th className="py-3 px-3">PLAN TIER</th>
@@ -834,7 +834,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <th className="py-3 px-3 text-center">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#014BAA]/10 text-black">
+            <tbody className="divide-y divide-[#071952]/10 text-black">
               {monthSubscribers.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-xs text-black/50">
@@ -845,7 +845,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 monthSubscribers.map((sub) => {
                   const matchedShop = shopMap.get(sub.shopId);
                   return (
-                    <tr key={sub.id} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <tr key={sub.id} className="hover:bg-[#071952]/5 transition-colors">
                       <td className="py-3 px-3 font-bold text-black">
                         {sub.shopName}
                       </td>
@@ -866,7 +866,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                         {sub.paymentMethod}
                       </td>
                       <td className="py-3 px-3 text-center">
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#014BAA] text-white">
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#071952] text-white">
                           ACTIVE
                         </span>
                       </td>
@@ -874,7 +874,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                         {matchedShop && onSelectSalon ? (
                           <button
                             onClick={() => onSelectSalon(matchedShop)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#014BAA] hover:bg-[#013b86] text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#071952] hover:bg-[#0b2575] text-white text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             <span>View Salon</span>
                             <ArrowRight className="w-3 h-3" />
@@ -895,8 +895,8 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       {/* RECORD / UPGRADE PRO SUBSCRIPTION MODAL */}
       {isRecordModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-[#F8F3F0] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#014BAA]/30">
-            <div className="flex items-center justify-between pb-3 border-b border-[#014BAA]/15 mb-4">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#071952]/30">
+            <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15 mb-4">
               <div>
                 <h3 className="text-base font-bold text-black">
                   Record Pro Subscription
@@ -907,7 +907,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
               </div>
               <button
                 onClick={() => setIsRecordModalOpen(false)}
-                className="p-1 rounded-lg text-black/60 hover:text-black hover:bg-[#014BAA]/10 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-black/60 hover:text-black hover:bg-[#071952]/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -921,7 +921,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                   required
                   value={modalShopId}
                   onChange={(e) => setModalShopId(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   <option value="">-- Choose a salon --</option>
                   {deduplicatedShops.map((s) => (
@@ -942,7 +942,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                     setModalTier(t);
                     setModalCustomAmount(PLAN_PRICING[t].price.toString());
                   }}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   <option value="1m">1 Month Pro — ₹499</option>
                   <option value="3m">3 Months Pro — ₹1,499</option>
@@ -960,7 +960,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                   required
                   value={modalCustomAmount}
                   onChange={(e) => setModalCustomAmount(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA]"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952]"
                 />
               </div>
 
@@ -970,7 +970,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                 <select
                   value={modalMethod}
                   onChange={(e) => setModalMethod(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 >
                   <option value="UPI">UPI / GPay / PhonePe</option>
                   <option value="Razorpay">Razorpay Gateway</option>
@@ -988,7 +988,7 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                   placeholder="e.g. UPI-92817293 or Payment Receipt"
                   value={modalRef}
                   onChange={(e) => setModalRef(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA]"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952]"
                 />
               </div>
 
@@ -999,23 +999,23 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                   type="date"
                   value={modalDate}
                   onChange={(e) => setModalDate(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-[#014BAA]/15 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-[#071952]/15 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsRecordModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-lg border border-[#014BAA]/20 hover:bg-[#014BAA]/10 text-black/70 font-medium transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg border border-[#071952]/20 hover:bg-[#071952]/10 text-black/70 font-medium transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-4 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isSaving ? 'Recording...' : 'Save Subscription'}
                 </button>

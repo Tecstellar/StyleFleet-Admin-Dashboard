@@ -126,13 +126,13 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               <span>{shop.name}</span>
               {shop.duplicate_count && shop.duplicate_count > 0 ? (
                 <span
-                  className="px-1.5 py-0.5 text-[9px] font-bold bg-[#014BAA]/10 text-black border border-[#014BAA]/20 rounded"
+                  className="px-1.5 py-0.5 text-[9px] font-bold bg-[#071952]/10 text-black border border-[#071952]/20 rounded"
                   title={`${shop.duplicate_count} duplicate registration(s) detected and merged into this canonical active salon record`}
                 >
                   Deduplicated ({shop.duplicate_count} merged)
                 </span>
               ) : (
-                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#014BAA] text-white border border-[#014BAA] rounded">
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#071952] text-white border border-[#071952] rounded">
                   Verified Real
                 </span>
               )}
@@ -236,9 +236,9 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
                 {remaining === 0 ? 'Limit Reached' : `${remaining} left`}
               </span>
             </div>
-            <div className="w-full bg-[#014BAA]/15 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-[#071952]/15 h-1.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#014BAA] rounded-full transition-all"
+                className="h-full bg-[#071952] rounded-full transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -266,7 +266,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               setModalTab('overview');
               setInternalSelectedShop(shop);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#014BAA]/20 bg-[#F8F3F0] text-black hover:bg-[#014BAA] hover:text-white shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#071952]/20 bg-[#F8F3F0] text-black hover:bg-[#071952] hover:text-white shadow-xs transition-colors cursor-pointer"
             title="View salon overview & team"
           >
             <Eye className="w-3.5 h-3.5" />
@@ -279,7 +279,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               setModalTab('billing');
               setInternalSelectedShop(shop);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#014BAA]/20 bg-[#014BAA]/10 text-black hover:bg-[#014BAA] hover:text-white shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#071952]/20 bg-[#071952]/10 text-black hover:bg-[#071952] hover:text-white shadow-xs transition-colors cursor-pointer"
             title="Inspect all bills and filter by date for this salon"
           >
             <Receipt className="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
               setModalTab('settings');
               setInternalSelectedShop(shop);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#014BAA]/20 bg-[#F8F3F0] text-black hover:bg-[#014BAA] hover:text-white shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#071952]/20 bg-[#F8F3F0] text-black hover:bg-[#071952] hover:text-white shadow-xs transition-colors cursor-pointer"
             title="Increase or reset this salon's free sales limit"
           >
             <Gauge className="w-3.5 h-3.5" />
@@ -334,22 +334,22 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
       </div>
 
       {/* Real Data Integrity Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-[#014BAA]/20 bg-[#014BAA]/10 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-[#071952]/20 bg-[#071952]/10 text-xs">
         <div className="flex items-center gap-2 text-black">
-          <ShieldCheck className="w-4 h-4 text-[#014BAA] shrink-0" />
+          <ShieldCheck className="w-4 h-4 text-[#071952] shrink-0" />
           <span className="font-semibold">Production Data Guarantee:</span>
           <span>Deduplication engine active. Only verified real salons are tracked (Zero duplicates, Zero random/dummy data).</span>
         </div>
-        <div className="flex items-center gap-3 text-[11px] font-mono text-[#014BAA]">
+        <div className="flex items-center gap-3 text-[11px] font-mono text-[#071952]">
           <span>Active Unique Salons: {filteredShops.length}</span>
         </div>
       </div>
 
       {/* Multi-Attribute Filter Toolbar */}
-      <div className="p-4 rounded-2xl border border-[#014BAA]/20 bg-[#F8F3F0] shadow-xs space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#014BAA]/15">
+      <div className="p-4 rounded-2xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#071952]/15">
           <div className="flex items-center gap-2 text-xs font-bold text-black">
-            <Sparkles className="w-4 h-4 text-[#014BAA]" />
+            <Sparkles className="w-4 h-4 text-[#071952]" />
             <span>Salon Filters &amp; Date Targeting</span>
           </div>
 
@@ -362,8 +362,8 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
                 onClick={() => handlePreset(p)}
                 className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors capitalize ${
                   datePreset === p && !exactDate
-                    ? 'bg-[#014BAA] text-white'
-                    : 'bg-[#014BAA]/10 text-black/80 hover:bg-[#014BAA]/20'
+                    ? 'bg-[#071952] text-white'
+                    : 'bg-[#071952]/10 text-black/80 hover:bg-[#071952]/20'
                 }`}
               >
                 {p === '7d' ? 'Last 7 Days' : p === '30d' ? 'Last 30 Days' : p}
@@ -386,7 +386,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
                 setExactDate(e.target.value);
                 setDatePreset('all');
               }}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] transition-all"
+              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] transition-all"
             />
           </div>
 
@@ -399,7 +399,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] transition-all cursor-pointer"
+              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] transition-all cursor-pointer"
             >
               <option value="all">All Cities ({uniqueCities.length})</option>
               {uniqueCities.map((c) => (
@@ -419,7 +419,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
             <select
               value={staffFilter}
               onChange={(e) => setStaffFilter(e.target.value as any)}
-              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] transition-all cursor-pointer"
+              className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] transition-all cursor-pointer"
             >
               <option value="all">All Salons</option>
               <option value="with_staff">Has Staff Members (&gt;0)</option>

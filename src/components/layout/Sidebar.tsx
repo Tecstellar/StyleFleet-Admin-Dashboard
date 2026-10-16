@@ -82,13 +82,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         title={isCollapsed && !isMobileOpen ? label : undefined}
         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-all group relative text-left cursor-pointer ${
           active
-            ? 'bg-white text-[#014BAA] font-bold shadow-xs'
+            ? 'bg-white text-[#071952] font-bold shadow-xs'
             : 'text-white/85 hover:text-white hover:bg-white/10 font-medium'
         }`}
       >
         <Icon
           className={`w-4 h-4 shrink-0 transition-colors ${
-            active ? 'text-[#014BAA]' : 'text-white/70 group-hover:text-white'
+            active ? 'text-[#071952]' : 'text-white/70 group-hover:text-white'
           }`}
         />
 
@@ -98,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {badge !== undefined && badge > 0 && (
               <span
                 className={`ml-2 px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
-                  active ? 'bg-[#014BAA]/10 text-[#014BAA]' : 'bg-white/20 text-white'
+                  active ? 'bg-[#071952]/10 text-[#071952]' : 'bg-white/20 text-white'
                 }`}
               >
                 {badge}
@@ -158,20 +158,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onClick={() => handleItemClick(id)}
         className={`w-full flex items-center gap-2.5 pl-8 pr-3 py-1.5 rounded-lg text-[12px] transition-all group relative text-left cursor-pointer ${
           active
-            ? 'bg-white text-[#014BAA] font-bold shadow-xs'
+            ? 'bg-white text-[#071952] font-bold shadow-xs'
             : 'text-white/85 hover:text-white hover:bg-white/10 font-medium'
         }`}
       >
         <Icon
           className={`w-3.5 h-3.5 shrink-0 ${
-            active ? 'text-[#014BAA]' : 'text-white/70 group-hover:text-white'
+            active ? 'text-[#071952]' : 'text-white/70 group-hover:text-white'
           }`}
         />
         <span className="truncate">{label}</span>
         {badge !== undefined && badge > 0 && (
           <span
             className={`ml-auto px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold ${
-              active ? 'bg-[#014BAA]/10 text-[#014BAA]' : 'bg-white/20 text-white'
+              active ? 'bg-[#071952]/10 text-[#071952]' : 'bg-white/20 text-white'
             }`}
           >
             {badge}
@@ -195,7 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     isItemActive('reports_bi');
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#014BAA] text-white border-r border-white/10 select-none">
+    <div className="flex flex-col h-full bg-[#071952] text-white border-r border-white/10 select-none">
       {/* Brand Header */}
       <div className="p-3.5 border-b border-white/10">
         <div className="flex items-center justify-between">
@@ -314,7 +314,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Footer Utility Bar */}
-      <div className="p-2.5 border-t border-white/10 bg-[#014BAA]">
+      <div className="p-2.5 border-t border-white/10 bg-[#071952]">
         {(!isCollapsed || isMobileOpen) ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1 text-[11px]">

@@ -82,7 +82,7 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-[0.08em] text-[#014BAA] uppercase font-mono">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-[#071952] uppercase font-mono">
               AUTOMATION ENGINE
             </span>
             <span className="text-black/20">•</span>
@@ -158,8 +158,8 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
                   onClick={() => toggleRule(r.id)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                     r.status === 'active'
-                      ? 'bg-[#014BAA]/10 text-black border border-[#014BAA]/20 hover:bg-[#014BAA]/20'
-                      : 'bg-[#014BAA] text-white hover:bg-[#013b86]'
+                      ? 'bg-[#071952]/10 text-black border border-[#071952]/20 hover:bg-[#071952]/20'
+                      : 'bg-[#071952] text-white hover:bg-[#0b2575]'
                   }`}
                 >
                   {r.status === 'active' ? (
@@ -176,7 +176,7 @@ export const ScheduledPushView: React.FC<ScheduledPushViewProps> = ({ shops }) =
                 </button>
               </div>
 
-              <div className="p-3 bg-[#014BAA]/5 rounded-lg border border-[#014BAA]/15 text-xs text-black/80 font-mono mt-3">
+              <div className="p-3 bg-[#071952]/5 rounded-lg border border-[#071952]/15 text-xs text-black/80 font-mono mt-3">
                 "{r.messageTemplate}"
               </div>
             </div>

@@ -358,7 +358,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
 
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export Excel</span>
@@ -369,7 +369,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       {/* 2. SUMMARY KPI CARDS (ROYAL BLUE & LIGHT CREAM PALETTE) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {/* TOTAL ORDERS */}
-        <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-black/60 font-mono">
             TOTAL ORDERS
           </div>
@@ -382,7 +382,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         </div>
 
         {/* CASH PAYMENTS */}
-        <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-black/70 font-mono">
             CASH ORDERS
           </div>
@@ -395,20 +395,20 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         </div>
 
         {/* UPI PAYMENTS */}
-        <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-2xl p-4 shadow-2xs">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-[#014BAA] font-mono">
+        <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#071952] font-mono">
             UPI / ONLINE
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-[#014BAA] mt-1 font-mono">
+          <div className="text-2xl sm:text-3xl font-black text-[#071952] mt-1 font-mono">
             {summary.upiCount.toLocaleString()}
           </div>
-          <div className="text-[11px] text-[#014BAA] font-mono mt-1">
+          <div className="text-[11px] text-[#071952] font-mono mt-1">
             ₹{summary.upiAmount.toLocaleString()} received
           </div>
         </div>
 
         {/* TOTAL REVENUE */}
-        <div className="bg-[#F8F3F0] border border-[#014BAA]/20 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-black/70 font-mono">
             TOTAL REVENUE
           </div>
@@ -443,7 +443,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                 placeholder="Search shop, phone, city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 rounded-lg border border-[#014BAA]/20 text-xs bg-[#F8F3F0] text-black placeholder-black/40 focus:outline-none focus:ring-1 focus:ring-[#014BAA] shadow-2xs"
+                className="pl-8 pr-3 py-1.5 rounded-lg border border-[#071952]/20 text-xs bg-[#F8F3F0] text-black placeholder-black/40 focus:outline-none focus:ring-1 focus:ring-[#071952] shadow-2xs"
               />
             </div>
 
@@ -453,8 +453,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                 onClick={() => setSelectedMonth('all')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                   selectedMonth === 'all'
-                    ? 'bg-[#014BAA] text-white'
-                    : 'bg-[#F8F3F0] text-black/70 border border-[#014BAA]/20 hover:text-black'
+                    ? 'bg-[#071952] text-white'
+                    : 'bg-[#F8F3F0] text-black/70 border border-[#071952]/20 hover:text-black'
                 }`}
               >
                 All dates
@@ -465,8 +465,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                   onClick={() => setSelectedMonth(m)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                     selectedMonth === m
-                      ? 'bg-[#014BAA] text-white'
-                      : 'bg-[#F8F3F0] text-black/70 border border-[#014BAA]/20 hover:text-black'
+                      ? 'bg-[#071952] text-white'
+                      : 'bg-[#F8F3F0] text-black/70 border border-[#071952]/20 hover:text-black'
                   }`}
                 >
                   {m}
@@ -522,7 +522,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                         </div>
                         <button
                           onClick={() => setSelectedPopupDate(row)}
-                          className="mt-0.5 text-[11px] font-bold text-[#014BAA] hover:underline cursor-pointer inline-flex items-center gap-1"
+                          className="mt-0.5 text-[11px] font-bold text-[#071952] hover:underline cursor-pointer inline-flex items-center gap-1"
                         >
                           <span>View shop breakdown</span>
                           <ChevronRight className="w-3 h-3" />
@@ -540,7 +540,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                       </td>
 
                       {/* UPI ORDERS */}
-                      <td className="py-3 px-3 text-center font-semibold text-[#014BAA] font-mono">
+                      <td className="py-3 px-3 text-center font-semibold text-[#071952] font-mono">
                         {row.upiCount}
                       </td>
 
@@ -565,9 +565,9 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       {/* 5. CENTERED POPUP MODAL FOR SALON BREAKDOWN (REQUESTED BY USER) */}
       {selectedPopupDate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-[#F8F3F0] rounded-2xl max-w-4xl w-full p-6 shadow-2xl border border-[#014BAA]/30 max-h-[85vh] flex flex-col">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-4xl w-full p-6 shadow-2xl border border-[#071952]/30 max-h-[85vh] flex flex-col">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#014BAA]/15">
+            <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15">
               <div>
                 <h3 className="text-base font-bold text-black">
                   Salon Order Breakdown — {selectedPopupDate.friendlyDate}
@@ -578,7 +578,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
               </div>
               <button
                 onClick={() => setSelectedPopupDate(null)}
-                className="p-1.5 rounded-lg text-black/60 hover:text-black hover:bg-[#014BAA]/10 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-black/60 hover:text-black hover:bg-[#071952]/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -588,7 +588,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
             <div className="overflow-x-auto flex-1 mt-4">
               <table className="w-full text-xs text-left">
                 <thead>
-                  <tr className="border-b border-[#014BAA]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#014BAA]/5 font-mono">
+                  <tr className="border-b border-[#071952]/20 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#071952]/5 font-mono">
                     <th className="py-3 px-3">SALON NAME</th>
                     <th className="py-3 px-3">PHONE & CITY</th>
                     <th className="py-3 px-3 text-center">TOTAL ORDERS</th>
@@ -599,9 +599,9 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                     <th className="py-3 px-3 text-center">ACTION</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#014BAA]/10 text-black">
+                <tbody className="divide-y divide-[#071952]/10 text-black">
                   {selectedPopupDate.shops.map((s) => (
-                    <tr key={s.shopId} className="hover:bg-[#014BAA]/5 transition-colors">
+                    <tr key={s.shopId} className="hover:bg-[#071952]/5 transition-colors">
                       {/* SALON NAME */}
                       <td className="py-3 px-3 font-bold text-black">
                         {s.shopName}
@@ -624,7 +624,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                       </td>
 
                       {/* UPI */}
-                      <td className="py-3 px-3 text-center font-mono text-[#014BAA] font-semibold">
+                      <td className="py-3 px-3 text-center font-mono text-[#071952] font-semibold">
                         {s.upiCount}
                       </td>
 
@@ -646,7 +646,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                               setSelectedPopupDate(null);
                               onSelectSalon(s.shopObj!);
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#014BAA] hover:bg-[#013b86] text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#071952] hover:bg-[#0b2575] text-white text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             <span>View Salon</span>
                             <ChevronRight className="w-3 h-3" />
@@ -662,10 +662,10 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="pt-3 border-t border-[#014BAA]/15 flex items-center justify-end">
+            <div className="pt-3 border-t border-[#071952]/15 flex items-center justify-end">
               <button
                 onClick={() => setSelectedPopupDate(null)}
-                className="px-4 py-1.5 bg-[#F8F3F0] hover:bg-[#014BAA]/10 text-[#014BAA] border border-[#014BAA]/30 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                className="px-4 py-1.5 bg-[#F8F3F0] hover:bg-[#071952]/10 text-[#071952] border border-[#071952]/30 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 Close
               </button>

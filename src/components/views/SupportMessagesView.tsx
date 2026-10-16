@@ -296,7 +296,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
           {/* New Ticket Button */}
           <button
             onClick={() => setIsNewTicketOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New ticket</span>
@@ -305,9 +305,9 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
       </div>
 
       {/* 2. TABLE CONTAINER & INSTRUCTION BANNER */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#014BAA]/20 shadow-2xs overflow-hidden">
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 shadow-2xs overflow-hidden">
         {/* Instruction Subheader */}
-        <div className="p-4 px-5 border-b border-[#014BAA]/15 bg-[#014BAA]/5 text-xs text-black/70">
+        <div className="p-4 px-5 border-b border-[#071952]/15 bg-[#071952]/5 text-xs text-black/70">
           Showing {filteredMessages.length} of {counts.total}. Tap a message or <span className="font-semibold text-black">View message</span> to read the full text.
         </div>
 
@@ -315,7 +315,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="border-b border-[#014BAA]/15 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#014BAA]/10 font-mono">
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/70 bg-[#071952]/10 font-mono">
                 <th className="py-3 px-4">USER</th>
                 <th className="py-3 px-3">PHONE</th>
                 <th className="py-3 px-3">SHOP</th>
@@ -326,7 +326,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                 <th className="py-3 px-4 text-center">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#014BAA]/15 text-black">
+            <tbody className="divide-y divide-[#071952]/15 text-black">
               {loading ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-xs text-black/50">
@@ -341,8 +341,8 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                 </tr>
               ) : (
                 filteredMessages.map((m) => {
-                  let statusBadgeColor = 'text-[#014BAA] font-semibold';
-                  let selectBorder = 'border-[#014BAA]/30 text-black bg-[#F8F3F0]';
+                  let statusBadgeColor = 'text-[#071952] font-semibold';
+                  let selectBorder = 'border-[#071952]/30 text-black bg-[#F8F3F0]';
 
                   const displayStatus =
                     m.effectiveStatus === 'in_progress'
@@ -472,7 +472,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
               <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
                 CLIENT MESSAGE
               </div>
-              <div className="p-3.5 rounded-xl bg-[#014BAA]/5 border border-[#014BAA]/15 text-xs text-neutral-900 leading-relaxed font-sans whitespace-pre-wrap">
+              <div className="p-3.5 rounded-xl bg-[#071952]/5 border border-[#071952]/15 text-xs text-neutral-900 leading-relaxed font-sans whitespace-pre-wrap">
                 {selectedMessage.message}
               </div>
             </div>
@@ -487,10 +487,10 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                   {selectedMessage.answers.map((ans) => (
                     <div
                       key={ans.id}
-                      className="p-3 rounded-lg bg-[#014BAA]/10 border border-[#014BAA]/20 text-xs"
+                      className="p-3 rounded-lg bg-[#071952]/10 border border-[#071952]/20 text-xs"
                     >
                       <div className="flex items-center justify-between text-[10px] text-black/50 font-mono mb-1">
-                        <span className="font-bold text-[#014BAA]">{ans.admin_name || 'Admin'}</span>
+                        <span className="font-bold text-[#071952]">{ans.admin_name || 'Admin'}</span>
                         <span>{formatTicketDate(ans.created_at)}</span>
                       </div>
                       <div className="text-black">{ans.answer}</div>
@@ -501,7 +501,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
             )}
 
             {/* Add Resolution Update Form */}
-            <form onSubmit={handleSubmitUpdate} className="pt-2 border-t border-[#014BAA]/15 space-y-3">
+            <form onSubmit={handleSubmitUpdate} className="pt-2 border-t border-[#071952]/15 space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-black/70">
                   ADD RESOLUTION UPDATE / RESPONSE
@@ -511,7 +511,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                   <select
                     value={updateStatus}
                     onChange={(e) => setUpdateStatus(e.target.value)}
-                    className="text-xs px-2 py-1 rounded border border-[#014BAA]/30 bg-[#F8F3F0] text-black font-medium focus:outline-none"
+                    className="text-xs px-2 py-1 rounded border border-[#071952]/30 bg-[#F8F3F0] text-black font-medium focus:outline-none"
                   >
                     <option value="resolved">Resolved</option>
                     <option value="in_progress">In progress</option>
@@ -527,21 +527,21 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                 value={updateText}
                 onChange={(e) => setUpdateText(e.target.value)}
                 placeholder="Type resolution update note or agent feedback..."
-                className="w-full text-xs p-3 rounded-xl border border-[#014BAA]/30 focus:outline-none focus:ring-1 focus:ring-[#014BAA] bg-[#F8F3F0] text-black"
+                className="w-full text-xs p-3 rounded-xl border border-[#071952]/30 focus:outline-none focus:ring-1 focus:ring-[#071952] bg-[#F8F3F0] text-black"
               />
 
               <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => setSelectedMessage(null)}
-                  className="px-3 py-1.5 rounded-lg border border-[#014BAA]/30 text-xs font-semibold text-black/70 hover:bg-[#014BAA]/10 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg border border-[#071952]/30 text-xs font-semibold text-black/70 hover:bg-[#071952]/10 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingUpdate}
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{isSubmittingUpdate ? 'Saving...' : 'Save Update'}</span>
@@ -585,7 +585,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                     const s = shops.find((shp) => shp.id === e.target.value);
                     if (s?.phone) setNewTicketPhone(s.phone);
                   }}
-                  className="w-full text-xs p-2.5 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#014BAA] cursor-pointer"
+                  className="w-full text-xs p-2.5 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#071952] cursor-pointer"
                 >
                   <option value="">Select Salon Shop (Optional)</option>
                   {shops.map((s) => (
@@ -605,7 +605,7 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                   placeholder="e.g. 9360396190"
                   value={newTicketPhone}
                   onChange={(e) => setNewTicketPhone(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black font-mono focus:outline-none focus:ring-1 focus:ring-[#014BAA]"
+                  className="w-full text-xs p-2.5 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black font-mono focus:outline-none focus:ring-1 focus:ring-[#071952]"
                 />
               </div>
 
@@ -619,22 +619,22 @@ export const SupportMessagesView: React.FC<SupportMessagesViewProps> = ({
                   placeholder="Describe the issue reported by the client..."
                   value={newTicketMessage}
                   onChange={(e) => setNewTicketMessage(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#014BAA]"
+                  className="w-full text-xs p-2.5 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:ring-1 focus:ring-[#071952]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#014BAA]/15">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#071952]/15">
                 <button
                   type="button"
                   onClick={() => setIsNewTicketOpen(false)}
-                  className="px-3 py-1.5 rounded-lg border border-[#014BAA]/30 text-xs font-semibold text-black/70 hover:bg-[#014BAA]/10 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg border border-[#071952]/30 text-xs font-semibold text-black/70 hover:bg-[#071952]/10 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingNew}
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <span>{isSubmittingNew ? 'Creating...' : 'Create Ticket'}</span>
                 </button>

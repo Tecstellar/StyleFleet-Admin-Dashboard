@@ -473,14 +473,14 @@ export const App: React.FC = () => {
 
         {/* Global Error Banner */}
         {fetchError && (
-          <div className="mx-4 sm:mx-6 mt-4 p-4 rounded-xl border border-[#014BAA]/30 bg-[#F8F3F0] text-[#014BAA] text-xs flex items-center justify-between gap-4 shadow-xs">
+          <div className="mx-4 sm:mx-6 mt-4 p-4 rounded-xl border border-[#071952]/30 bg-[#F8F3F0] text-[#071952] text-xs flex items-center justify-between gap-4 shadow-xs">
             <div>
               <span className="font-semibold text-black">Unable to load salon data: </span>
               {fetchError}
             </div>
             <button
               onClick={handleManualRefresh}
-              className="px-3 py-1 rounded-lg bg-[#014BAA] text-white font-medium hover:bg-[#013b86] transition-colors shrink-0 cursor-pointer"
+              className="px-3 py-1 rounded-lg bg-[#071952] text-white font-medium hover:bg-[#0b2575] transition-colors shrink-0 cursor-pointer"
             >
               Retry
             </button>

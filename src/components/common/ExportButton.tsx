@@ -26,16 +26,16 @@ export const ExportButton = <T extends Record<string, any>>({
       onClick={handleExport}
       disabled={disabled || data.length === 0}
       title={data.length === 0 ? 'No records to export' : `Export ${data.length} real record(s) to CSV`}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-[#014BAA]/30 bg-[#F8F3F0] text-[#014BAA] shadow-xs transition-all cursor-pointer ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-[#071952]/30 bg-[#F8F3F0] text-[#071952] shadow-xs transition-all cursor-pointer ${
         disabled || data.length === 0
           ? 'opacity-40 cursor-not-allowed'
-          : 'hover:border-[#014BAA] hover:bg-[#014BAA] hover:text-white'
+          : 'hover:border-[#071952] hover:bg-[#071952] hover:text-white'
       }`}
     >
       <Download className="w-3.5 h-3.5" />
       <span>{label}</span>
       {data.length > 0 && (
-        <span className="ml-1 px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#014BAA]/10 text-[#014BAA] border border-[#014BAA]/20">
+        <span className="ml-1 px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#071952]/10 text-[#071952] border border-[#071952]/20">
           {data.length}
         </span>
       )}

@@ -109,7 +109,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
         <div className="bg-white rounded-2xl shadow-xs border border-neutral-200 border-l-4 border-l-black w-full max-w-3xl p-6 sm:p-10 md:p-12 text-neutral-800">
           {/* Header Title */}
           <div className="border-b border-neutral-200 pb-6 mb-8">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#014BAA]/10 text-[#014BAA] text-xs font-semibold mb-3 border border-[#014BAA]/20">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#071952]/10 text-[#071952] text-xs font-semibold mb-3 border border-[#071952]/20">
               <Trash2 className="w-3.5 h-3.5" />
               <span>Data Rights &amp; Erasure</span>
             </div>
@@ -201,7 +201,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           {/* Section: Data That Is Deleted */}
           <section className="mb-10">
             <h2 className="text-xl sm:text-2xl font-bold mb-3 text-neutral-900 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#014BAA]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#071952]" />
               <span>Data That Is Deleted</span>
             </h2>
             <p className="text-sm sm:text-base mb-4 text-neutral-600">
@@ -248,7 +248,7 @@ export const DeleteAccountView: React.FC<DeleteAccountViewProps> = ({
           {/* Footer Info */}
           <div className="pt-6 border-t border-neutral-200 text-xs text-neutral-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#014BAA]" />
+              <ShieldCheck className="w-4 h-4 text-[#071952]" />
               <span>StyleFleet • Owned &amp; Operated by <strong>TECSTELLAR SOLUTIONS LLP</strong></span>
             </div>
             {onOpenPrivacyPolicy && (

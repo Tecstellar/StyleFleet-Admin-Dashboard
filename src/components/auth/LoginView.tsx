@@ -41,10 +41,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F3F0] flex items-center justify-center p-4 relative selection:bg-[#014BAA] selection:text-white">
+    <div className="min-h-screen bg-[#F8F3F0] flex items-center justify-center p-4 relative selection:bg-[#071952] selection:text-white">
       <div className="w-full max-w-md relative z-10">
         {/* Card Container */}
-        <div className="rounded-3xl border border-[#014BAA]/25 bg-[#F8F3F0] shadow-xl p-8 sm:p-10 space-y-7">
+        <div className="rounded-3xl border border-[#071952]/25 bg-[#F8F3F0] shadow-xl p-8 sm:p-10 space-y-7">
           {/* Logo & Brand Header */}
           <div className="text-center space-y-3">
             <div className="flex justify-center mb-1">
@@ -56,7 +56,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             </div>
 
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-[#014BAA]/10 text-[#014BAA] border border-[#014BAA]/20 mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-[#071952]/10 text-[#071952] border border-[#071952]/20 mb-2">
                 <span>StyleFleet CRM</span>
               </div>
               <h1 className="text-2xl font-black tracking-tight text-black">
@@ -70,8 +70,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
           {/* Error Message */}
           {error && (
-            <div className="p-3.5 rounded-xl border border-[#014BAA]/30 bg-[#014BAA]/10 text-black text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-[#014BAA]" />
+            <div className="p-3.5 rounded-xl border border-[#071952]/30 bg-[#071952]/10 text-black text-xs flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-[#071952]" />
               <span className="font-semibold">{error}</span>
             </div>
           )}
@@ -92,7 +92,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@stylefleet.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] text-black text-xs font-medium placeholder:text-black/40 focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] text-black text-xs font-medium placeholder:text-black/40 focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] transition-all"
                 />
               </div>
             </div>
@@ -111,7 +111,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] text-black text-xs font-medium placeholder:text-black/40 focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] transition-all"
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[#071952]/20 bg-[#F8F3F0] text-black text-xs font-medium placeholder:text-black/40 focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] transition-all"
                 />
                 <button
                   type="button"
@@ -128,7 +128,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <button
               type="submit"
               disabled={loading || !email.trim() || !password.trim()}
-              className="w-full py-3 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider bg-[#014BAA] text-white hover:bg-[#013b86] shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider bg-[#071952] text-white hover:bg-[#0b2575] shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <>
@@ -146,9 +146,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </form>
 
           {/* Footer Security Badges */}
-          <div className="pt-4 border-t border-[#014BAA]/15 flex flex-col items-center gap-2 text-center text-[11px] text-black/60">
+          <div className="pt-4 border-t border-[#071952]/15 flex flex-col items-center gap-2 text-center text-[11px] text-black/60">
             <div className="flex items-center gap-1.5 text-black font-bold font-mono">
-              <span className="w-2 h-2 rounded-full bg-[#014BAA] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#071952] animate-pulse" />
               <span>Database Connection: Live</span>
             </div>
             <div className="flex items-center justify-center gap-2 text-[11px] text-black/60 flex-wrap">
@@ -157,7 +157,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <button
                 type="button"
                 onClick={onOpenPrivacyPolicy}
-                className="text-[#014BAA] hover:underline cursor-pointer font-bold transition-colors"
+                className="text-[#071952] hover:underline cursor-pointer font-bold transition-colors"
               >
                 Privacy Policy
               </button>
@@ -167,7 +167,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <button
                     type="button"
                     onClick={onOpenDeleteAccount}
-                    className="text-black/70 hover:text-[#014BAA] underline cursor-pointer font-medium transition-colors"
+                    className="text-black/70 hover:text-[#071952] underline cursor-pointer font-medium transition-colors"
                   >
                     Delete Account
                   </button>

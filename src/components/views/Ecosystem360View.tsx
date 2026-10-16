@@ -113,7 +113,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
                 </h3>
               </div>
               {linkedProfile ? (
-                <span className="inline-flex items-center gap-1 text-[11px] text-[#014BAA] font-mono">
+                <span className="inline-flex items-center gap-1 text-[11px] text-[#071952] font-mono">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Owner Profile (ID: {linkedProfile.id.slice(0, 8)}...)
                 </span>
@@ -239,14 +239,14 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
           <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-[#014BAA] text-white border border-[#014BAA]">
+                <div className="p-1.5 rounded-lg bg-[#071952] text-white border border-[#071952]">
                   <Scissors className="w-4 h-4" />
                 </div>
                 <h3 className="text-sm font-semibold text-neutral-900">
                   Step 5: Salon Operational Activity
                 </h3>
               </div>
-              <span className="inline-flex items-center gap-1 text-[11px] text-[#014BAA] font-mono">
+              <span className="inline-flex items-center gap-1 text-[11px] text-[#071952] font-mono">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Linked via shop_id
               </span>
@@ -293,7 +293,7 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
                   <MessageSquare className="w-4 h-4 text-neutral-900" />
                   <span>Step 6: Support Conversations</span>
                 </div>
-                <span className="text-[10px] font-mono text-black bg-[#014BAA]/10 px-2 py-0.5 rounded border border-[#014BAA]/20">
+                <span className="text-[10px] font-mono text-black bg-[#071952]/10 px-2 py-0.5 rounded border border-[#071952]/20">
                   {linkedSupport.length} record(s)
                 </span>
               </div>
@@ -308,15 +308,15 @@ export const Ecosystem360View: React.FC<Ecosystem360ViewProps> = ({
             <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-xs space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-neutral-900 font-semibold">
-                  <UserX className="w-4 h-4 text-[#014BAA]" />
+                  <UserX className="w-4 h-4 text-[#071952]" />
                   <span>Step 7: Account Status / Churn</span>
                 </div>
                 {linkedDeletions.length > 0 ? (
-                  <span className="text-[10px] font-mono text-black bg-[#014BAA]/20 px-2 py-0.5 rounded border border-[#014BAA]/40">
+                  <span className="text-[10px] font-mono text-black bg-[#071952]/20 px-2 py-0.5 rounded border border-[#071952]/40">
                     Deletion Recorded
                   </span>
                 ) : (
-                  <span className="text-[10px] font-mono text-white bg-[#014BAA] px-2 py-0.5 rounded border border-[#014BAA]">
+                  <span className="text-[10px] font-mono text-white bg-[#071952] px-2 py-0.5 rounded border border-[#071952]">
                     Active &amp; In Good Standing
                   </span>
                 )}

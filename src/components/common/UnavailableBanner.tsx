@@ -15,16 +15,16 @@ export const UnavailableBanner: React.FC<UnavailableBannerProps> = ({
   details,
 }) => {
   return (
-    <div className="rounded-xl border border-[#014BAA]/20 bg-[#F8F3F0] p-4 sm:p-5 text-black shadow-xs">
+    <div className="rounded-xl border border-[#071952]/20 bg-[#F8F3F0] p-4 sm:p-5 text-black shadow-xs">
       <div className="flex items-start gap-3.5">
-        <div className="p-2 rounded-lg bg-[#014BAA]/10 text-[#014BAA] shrink-0 mt-0.5">
+        <div className="p-2 rounded-lg bg-[#071952]/10 text-[#071952] shrink-0 mt-0.5">
           <AlertCircle className="w-5 h-5" />
         </div>
         <div className="flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <h4 className="text-sm font-bold text-black">{title}</h4>
             {sourceTable && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono bg-[#014BAA]/10 text-[#014BAA] border border-[#014BAA]/20">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono bg-[#071952]/10 text-[#071952] border border-[#071952]/20">
                 <Database className="w-3 h-3" />
                 {sourceTable}
               </span>
@@ -32,7 +32,7 @@ export const UnavailableBanner: React.FC<UnavailableBannerProps> = ({
           </div>
           <p className="text-xs text-black/70 leading-relaxed">{message}</p>
           {details && (
-            <div className="mt-2 pt-2 border-t border-[#014BAA]/15 flex items-start gap-1.5 text-[11px] text-black/60 font-mono">
+            <div className="mt-2 pt-2 border-t border-[#071952]/15 flex items-start gap-1.5 text-[11px] text-black/60 font-mono">
               <HelpCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
               <span>{details}</span>
             </div>

@@ -410,7 +410,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-[#014BAA] text-white shadow-xs">
+            <div className="p-2 rounded-xl bg-[#071952] text-white shadow-xs">
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
@@ -418,7 +418,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                 <h1 className="text-xl font-bold tracking-tight text-neutral-900">
                   Subscription Payment History
                 </h1>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#014BAA] text-white border border-[#014BAA]">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#071952] text-white border border-[#071952]">
                   Company Revenue
                 </span>
               </div>
@@ -433,7 +433,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
           {/* Record Pro Payment Button */}
           <button
             onClick={() => setIsRecordModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>+ Record Pro Payment</span>
@@ -697,7 +697,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
 
                       {/* Plan Tier */}
                       <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-[#014BAA] text-white border border-[#014BAA]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-[#071952] text-white border border-[#071952]">
                           <Crown className="w-3 h-3 text-white" />
                           {p.planName}
                         </span>
@@ -723,7 +723,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
 
                       {/* Status */}
                       <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#014BAA] text-white border border-[#014BAA]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#071952] text-white border border-[#071952]">
                           <CheckCircle2 className="w-2.5 h-2.5" />
                           Completed
                         </span>
@@ -753,8 +753,8 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
       {/* RECORD PRO SUBSCRIPTION MODAL */}
       {isRecordModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-[#F8F3F0] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#014BAA]/20">
-            <div className="flex items-center justify-between pb-3 border-b border-[#014BAA]/15 mb-4">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#071952]/20">
+            <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15 mb-4">
               <div>
                 <h3 className="text-base font-bold text-neutral-900">
                   Record Pro Subscription Payment
@@ -779,7 +779,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                   required
                   value={modalShopId}
                   onChange={(e) => setModalShopId(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                 >
                   <option value="">-- Choose a salon --</option>
                   {deduplicatedShops.map((s) => (
@@ -800,7 +800,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                     setModalTier(t);
                     setModalCustomAmount(PLAN_PRICING[t].price.toString());
                   }}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                 >
                   <option value="1m">1 Month Pro — ₹499</option>
                   <option value="3m">3 Months Pro — ₹1,499</option>
@@ -818,7 +818,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                   required
                   value={modalCustomAmount}
                   onChange={(e) => setModalCustomAmount(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
                 />
               </div>
 
@@ -828,7 +828,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                 <select
                   value={modalMethod}
                   onChange={(e) => setModalMethod(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                 >
                   <option value="UPI">UPI / GPay / PhonePe</option>
                   <option value="Razorpay">Razorpay Gateway</option>
@@ -846,7 +846,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                   placeholder="e.g. UPI-92817293 or Payment Receipt"
                   value={modalRef}
                   onChange={(e) => setModalRef(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA]"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
                 />
               </div>
 
@@ -857,23 +857,23 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                   type="date"
                   value={modalDate}
                   onChange={(e) => setModalDate(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#014BAA]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#014BAA] focus:ring-1 focus:ring-[#014BAA] cursor-pointer"
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-[#014BAA]/15 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-[#071952]/15 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsRecordModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-lg border border-[#014BAA]/30 hover:bg-[#014BAA]/10 text-black/70 font-medium transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg border border-[#071952]/30 hover:bg-[#071952]/10 text-black/70 font-medium transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-4 py-1.5 rounded-lg bg-[#014BAA] hover:bg-[#013b86] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isSaving ? 'Recording...' : 'Save Payment'}
                 </button>
