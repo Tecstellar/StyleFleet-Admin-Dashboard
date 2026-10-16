@@ -3,10 +3,13 @@ import {
   RotateCcw,
   Download,
   Search,
-  ChevronDown,
-  ChevronUp,
-  Store,
+  X,
   ExternalLink,
+  ChevronRight,
+  Phone,
+  MapPin,
+  CreditCard,
+  Building2,
 } from 'lucide-react';
 import { Bill, Shop, Payment, Customer } from '../../types/database';
 import { exportToCSV } from '../../utils/formatters';
@@ -26,11 +29,13 @@ interface ShopDailyMetrics {
   shopName: string;
   city: string;
   phone: string;
-  total: number;
-  pending: number;
-  completed: number;
-  delivered: number;
-  contacts: number;
+  totalOrders: number;
+  cashCount: number;
+  cashAmountMinor: number;
+  upiCount: number;
+  upiAmountMinor: number;
+  partialCount: number;
+  dueAmountMinor: number;
   revenueMinor: number;
   shopObj?: Shop;
 }
@@ -39,11 +44,13 @@ interface DayMetricsRow {
   rawDate: string; // YYYY-MM-DD
   friendlyDate: string; // e.g. 14 October 2026
   monthKey: string; // e.g. October 2026
-  total: number;
-  pending: number;
-  completed: number;
-  delivered: number;
-  contacts: number;
+  totalOrders: number;
+  cashCount: number;
+  cashAmountMinor: number;
+  upiCount: number;
+  upiAmountMinor: number;
+  partialCount: number;
+  dueAmountMinor: number;
   revenueMinor: number;
   shops: ShopDailyMetrics[];
 }
@@ -51,6 +58,7 @@ interface DayMetricsRow {
 export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
   bills = [],
   shops = [],
+  payments = [],
   customers = [],
   loading = false,
   onRefresh,
@@ -58,7 +66,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
-  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  const [selectedPopupDate, setSelectedPopupDate] = useState<DayMetricsRow | null>(null);
 
   // Shop map for fast lookup
   const shopMap = useMemo(() => {
@@ -67,54 +75,43 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
     return map;
   }, [shops]);
 
-  // Real customers by date and shop
-  const customersByDateAndShop = useMemo(() => {
-    const dateMap = new Map<string, number>();
-    const shopDateMap = new Map<string, number>();
-
-    customers.forEach((c) => {
-      if (!c.created_at) return;
-      const d = c.created_at.slice(0, 10);
-      dateMap.set(d, (dateMap.get(d) || 0) + 1);
-      if (c.shop_id) {
-        const key = `${d}_${c.shop_id}`;
-        shopDateMap.set(key, (shopDateMap.get(key) || 0) + 1);
-      }
+  // Payment mapping by bill id
+  const paymentByBillId = useMemo(() => {
+    const map = new Map<string, Payment>();
+    payments.forEach((p) => {
+      if (p.bill_id) map.set(p.bill_id, p);
     });
+    return map;
+  }, [payments]);
 
-    return { dateMap, shopDateMap };
-  }, [customers]);
-
-  // Classify each real bill into exactly one of three mutually exclusive lifecycle buckets:
-  // Pending -> Completed -> Delivered
-  const classifyBill = (b: Bill): 'Pending' | 'Completed' | 'Delivered' => {
-    if (b.status === 'deleted' || b.status === 'pending') {
-      return 'Pending';
-    }
-    // Deterministic balanced categorization matching real salon lifecycle
-    const hash = (b.id.charCodeAt(0) || 0) + (b.id.charCodeAt(1) || 0) + (b.total_minor || 0);
-    const mod = hash % 10;
-    if (mod < 2) return 'Pending';
-    if (mod < 4) return 'Completed';
-    return 'Delivered';
-  };
-
-  // Build daily breakdown matrix strictly from real Supabase bills & customers
+  // Build daily breakdown matrix strictly from real Supabase bills & payments
   const allDailyRows = useMemo<DayMetricsRow[]>(() => {
-    const map = new Map<string, {
-      total: number;
-      pending: number;
-      completed: number;
-      delivered: number;
-      revenueMinor: number;
-      shopData: Map<string, {
-        total: number;
-        pending: number;
-        completed: number;
-        delivered: number;
+    const map = new Map<
+      string,
+      {
+        totalOrders: number;
+        cashCount: number;
+        cashAmountMinor: number;
+        upiCount: number;
+        upiAmountMinor: number;
+        partialCount: number;
+        dueAmountMinor: number;
         revenueMinor: number;
-      }>;
-    }>();
+        shopData: Map<
+          string,
+          {
+            totalOrders: number;
+            cashCount: number;
+            cashAmountMinor: number;
+            upiCount: number;
+            upiAmountMinor: number;
+            partialCount: number;
+            dueAmountMinor: number;
+            revenueMinor: number;
+          }
+        >;
+      }
+    >();
 
     bills.forEach((b) => {
       const rawD = (b.issued_at || b.created_at || '').slice(0, 10);
@@ -122,22 +119,44 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
 
       if (!map.has(rawD)) {
         map.set(rawD, {
-          total: 0,
-          pending: 0,
-          completed: 0,
-          delivered: 0,
+          totalOrders: 0,
+          cashCount: 0,
+          cashAmountMinor: 0,
+          upiCount: 0,
+          upiAmountMinor: 0,
+          partialCount: 0,
+          dueAmountMinor: 0,
           revenueMinor: 0,
           shopData: new Map(),
         });
       }
 
       const dayEntry = map.get(rawD)!;
-      dayEntry.total += 1;
+      dayEntry.totalOrders += 1;
 
-      const cat = classifyBill(b);
-      if (cat === 'Pending') dayEntry.pending += 1;
-      else if (cat === 'Completed') dayEntry.completed += 1;
-      else dayEntry.delivered += 1;
+      // Determine payment method and partial pay
+      const p = paymentByBillId.get(b.id);
+      let dueMinor = b.due_amount_minor || 0;
+      if (!dueMinor && b.notes && b.notes.includes('due:')) {
+        const match = b.notes.match(/due:(\d+)/);
+        if (match) dueMinor = parseInt(match[1], 10) * 100;
+      }
+      const isPartial = dueMinor > 0;
+      const isCash = (p && p.method === 'Cash') || (b.notes && b.notes.toLowerCase().includes('cash'));
+      const isUPI = !isCash; // In StyleFleet salon app, transactions are either Cash or UPI
+
+      if (isPartial) {
+        dayEntry.partialCount += 1;
+        dayEntry.dueAmountMinor += dueMinor;
+      }
+
+      if (isCash) {
+        dayEntry.cashCount += 1;
+        dayEntry.cashAmountMinor += b.total_minor || 0;
+      } else {
+        dayEntry.upiCount += 1;
+        dayEntry.upiAmountMinor += b.total_minor || 0;
+      }
 
       if (b.status !== 'deleted') {
         dayEntry.revenueMinor += b.total_minor || 0;
@@ -147,19 +166,29 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       const sId = b.shop_id || 'unknown';
       if (!dayEntry.shopData.has(sId)) {
         dayEntry.shopData.set(sId, {
-          total: 0,
-          pending: 0,
-          completed: 0,
-          delivered: 0,
+          totalOrders: 0,
+          cashCount: 0,
+          cashAmountMinor: 0,
+          upiCount: 0,
+          upiAmountMinor: 0,
+          partialCount: 0,
+          dueAmountMinor: 0,
           revenueMinor: 0,
         });
       }
       const sEntry = dayEntry.shopData.get(sId)!;
-      sEntry.total += 1;
-      if (cat === 'Pending') sEntry.pending += 1;
-      else if (cat === 'Completed') sEntry.completed += 1;
-      else sEntry.delivered += 1;
-
+      sEntry.totalOrders += 1;
+      if (isPartial) {
+        sEntry.partialCount += 1;
+        sEntry.dueAmountMinor += dueMinor;
+      }
+      if (isCash) {
+        sEntry.cashCount += 1;
+        sEntry.cashAmountMinor += b.total_minor || 0;
+      } else {
+        sEntry.upiCount += 1;
+        sEntry.upiAmountMinor += b.total_minor || 0;
+      }
       if (b.status !== 'deleted') {
         sEntry.revenueMinor += b.total_minor || 0;
       }
@@ -178,47 +207,48 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         ? 'Other'
         : dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
-      const dayContacts = customersByDateAndShop.dateMap.get(rawDate) || 0;
-
       // Compile per-shop metrics
       const shopMetrics: ShopDailyMetrics[] = [];
       data.shopData.forEach((sVals, sId) => {
         const matchedShop = shopMap.get(sId);
-        const shopContacts = customersByDateAndShop.shopDateMap.get(`${rawDate}_${sId}`) || 0;
         shopMetrics.push({
           shopId: sId,
           shopName: matchedShop?.name || 'Salon Account',
           city: matchedShop?.city || 'Tamil Nadu',
           phone: matchedShop?.phone || '—',
-          total: sVals.total,
-          pending: sVals.pending,
-          completed: sVals.completed,
-          delivered: sVals.delivered,
-          contacts: shopContacts,
+          totalOrders: sVals.totalOrders,
+          cashCount: sVals.cashCount,
+          cashAmountMinor: sVals.cashAmountMinor,
+          upiCount: sVals.upiCount,
+          upiAmountMinor: sVals.upiAmountMinor,
+          partialCount: sVals.partialCount,
+          dueAmountMinor: sVals.dueAmountMinor,
           revenueMinor: sVals.revenueMinor,
           shopObj: matchedShop,
         });
       });
 
       // Sort shops by total orders descending
-      shopMetrics.sort((a, b) => b.total - a.total);
+      shopMetrics.sort((a, b) => b.totalOrders - a.totalOrders);
 
       rows.push({
         rawDate,
         friendlyDate,
         monthKey,
-        total: data.total,
-        pending: data.pending,
-        completed: data.completed,
-        delivered: data.delivered,
-        contacts: dayContacts,
+        totalOrders: data.totalOrders,
+        cashCount: data.cashCount,
+        cashAmountMinor: data.cashAmountMinor,
+        upiCount: data.upiCount,
+        upiAmountMinor: data.upiAmountMinor,
+        partialCount: data.partialCount,
+        dueAmountMinor: data.dueAmountMinor,
         revenueMinor: data.revenueMinor,
         shops: shopMetrics,
       });
     });
 
     return rows;
-  }, [bills, customersByDateAndShop, shopMap]);
+  }, [bills, paymentByBillId, shopMap]);
 
   // Available months for filter pills
   const availableMonths = useMemo(() => {
@@ -236,12 +266,10 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
   // Filter rows based on search query and month filter
   const filteredRows = useMemo(() => {
     return allDailyRows.filter((row) => {
-      // Month Filter
       if (selectedMonth !== 'all' && row.monthKey !== selectedMonth) {
         return false;
       }
 
-      // Search Query (date, shop name, city, phone)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchesDate =
@@ -259,90 +287,62 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
     });
   }, [allDailyRows, selectedMonth, searchQuery]);
 
-  // Aggregate KPI summary for the active filter range
+  // Aggregate KPI summary
   const summary = useMemo(() => {
-    let total = 0;
-    let pending = 0;
-    let completed = 0;
-    let delivered = 0;
-    let contacts = 0;
+    let totalOrders = 0;
+    let cashCount = 0;
+    let cashAmountMinor = 0;
+    let upiCount = 0;
+    let upiAmountMinor = 0;
+    let partialCount = 0;
     let revenueMinor = 0;
 
     filteredRows.forEach((r) => {
-      total += r.total;
-      pending += r.pending;
-      completed += r.completed;
-      delivered += r.delivered;
-      contacts += r.contacts;
+      totalOrders += r.totalOrders;
+      cashCount += r.cashCount;
+      cashAmountMinor += r.cashAmountMinor;
+      upiCount += r.upiCount;
+      upiAmountMinor += r.upiAmountMinor;
+      partialCount += r.partialCount;
       revenueMinor += r.revenueMinor;
     });
 
-    const pendingPct = total > 0 ? Math.round((pending / total) * 100) : 0;
-    const completedPct = total > 0 ? Math.round((completed / total) * 100) : 0;
-    const deliveredPct = total > 0 ? Math.round((delivered / total) * 100) : 0;
-
     return {
-      total,
-      pending,
-      completed,
-      delivered,
-      contacts,
+      totalOrders,
+      cashCount,
+      cashAmount: Math.round(cashAmountMinor / 100),
+      upiCount,
+      upiAmount: Math.round(upiAmountMinor / 100),
+      partialCount,
       revenue: Math.round(revenueMinor / 100),
-      pendingPct,
-      completedPct,
-      deliveredPct,
     };
   }, [filteredRows]);
-
-  // Toggle expanding a single row's shop breakdown
-  const toggleExpand = (dateStr: string) => {
-    setExpandedDates((prev) => {
-      const next = new Set(prev);
-      if (next.has(dateStr)) {
-        next.delete(dateStr);
-      } else {
-        next.add(dateStr);
-      }
-      return next;
-    });
-  };
 
   // CSV Export
   const handleExportCSV = () => {
     const exportData = filteredRows.map((r) => ({
       'Date': r.friendlyDate,
-      'Total Orders': r.total,
-      'Pending': r.pending,
-      'Completed': r.completed,
-      'Delivered': r.delivered,
-      'Contacts Added': r.contacts,
+      'Total Orders': r.totalOrders,
+      'Cash Orders': r.cashCount,
+      'Cash (INR)': Math.round(r.cashAmountMinor / 100),
+      'UPI Orders': r.upiCount,
+      'UPI (INR)': Math.round(r.upiAmountMinor / 100),
+      'Partial / Due Orders': r.partialCount,
       'Revenue (INR)': Math.round(r.revenueMinor / 100),
     }));
     exportToCSV(exportData, `stylefleet_daily_orders_${new Date().toISOString().slice(0, 10)}`);
   };
-
-  // Format current live timestamp for display
-  const nowFormatted = useMemo(() => {
-    const d = new Date();
-    const day = d.getDate();
-    const month = d.toLocaleString('en-US', { month: 'short' });
-    let hours = d.getHours();
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12 || 12;
-    return `${day} ${month}, ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
-  }, []);
 
   return (
     <div className="space-y-6 font-sans select-none">
       {/* 1. TOP PAGE HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
             Daily Order Metrics
           </h1>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Current order status only. Pending → Completed → Delivered. Each order counts in exactly one bucket.
+            Real order metrics across salon shops: Total orders, Cash, UPI, and Partial payments.
           </p>
         </div>
 
@@ -366,134 +366,62 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         </div>
       </div>
 
-      {/* 2. LIVE UPDATED TIMESTAMP & BALANCED STATUS PILL */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-        <div className="text-neutral-500 font-mono text-[11px]">
-          Updated {nowFormatted}
-        </div>
-
-        <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-700 font-mono text-xs font-semibold self-start sm:self-auto shadow-2xs">
-          <span>Balanced · </span>
-          <span>{summary.pending.toLocaleString()}</span>
-          <span> + </span>
-          <span>{summary.completed.toLocaleString()}</span>
-          <span> + </span>
-          <span>{summary.delivered.toLocaleString()}</span>
-          <span> = </span>
-          <span className="font-bold">{summary.total.toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* 3. 6 TOP KPI CARDS (EXACT MATCH TO REFERENCE IMAGE) */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        {/* CARD 1: TOTAL ORDERS */}
+      {/* 2. SUMMARY KPI CARDS (2-COLOR CLEAN PALETTE) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        {/* TOTAL ORDERS */}
         <div className="bg-white border border-neutral-200/90 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 font-mono">
             TOTAL ORDERS
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1 font-mono">
-            {summary.total.toLocaleString()}
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1 font-mono">
+            {summary.totalOrders.toLocaleString()}
           </div>
           <div className="text-[11px] text-neutral-400 mt-1">
-            created in selected range
+            in selected range
           </div>
         </div>
 
-        {/* CARD 2: PENDING */}
+        {/* CASH PAYMENTS */}
         <div className="bg-white border border-neutral-200/90 rounded-2xl p-4 shadow-2xs">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-amber-600 font-mono">
-            PENDING
+          <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-700 font-mono">
+            CASH ORDERS
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1 font-mono">
-            {summary.pending.toLocaleString()}
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1 font-mono">
+            {summary.cashCount.toLocaleString()}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-1">
-            {summary.pendingPct}% of total · not yet completed
+          <div className="text-[11px] text-neutral-500 font-mono mt-1">
+            ₹{summary.cashAmount.toLocaleString()} collected
           </div>
         </div>
 
-        {/* CARD 3: COMPLETED */}
+        {/* UPI PAYMENTS */}
         <div className="bg-white border border-neutral-200/90 rounded-2xl p-4 shadow-2xs">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-blue-600 font-mono">
-            COMPLETED
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#0f766e] font-mono">
+            UPI / ONLINE
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1 font-mono">
-            {summary.completed.toLocaleString()}
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1 font-mono">
+            {summary.upiCount.toLocaleString()}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-1">
-            {summary.completedPct}% of total · not delivered
-          </div>
-        </div>
-
-        {/* CARD 4: DELIVERED */}
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-4 shadow-2xs">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-teal-700 font-mono">
-            DELIVERED
-          </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1 font-mono">
-            {summary.delivered.toLocaleString()}
-          </div>
-          <div className="text-[11px] text-neutral-400 mt-1">
-            {summary.deliveredPct}% of total · final status
+          <div className="text-[11px] text-[#0f766e] font-mono mt-1">
+            ₹{summary.upiAmount.toLocaleString()} received
           </div>
         </div>
 
-        {/* CARD 5: CONTACTS ADDED */}
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-4 shadow-2xs">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-purple-600 font-mono">
-            CONTACTS ADDED
-          </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1 font-mono">
-            {summary.contacts.toLocaleString()}
-          </div>
-          <div className="text-[11px] text-neutral-400 mt-1">
-            new contacts in range
-          </div>
-        </div>
-
-        {/* CARD 6: REVENUE EARNED */}
+        {/* TOTAL REVENUE */}
         <div className="bg-white border border-neutral-200/90 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-800 font-mono">
-            REVENUE EARNED
+            TOTAL REVENUE
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1 font-mono">
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1 font-mono">
             ₹{summary.revenue.toLocaleString()}
           </div>
           <div className="text-[11px] text-neutral-400 mt-1">
-            from currently delivered orders
+            {summary.partialCount} partial / due bills
           </div>
         </div>
       </div>
 
-      {/* 4. WORKFLOW LEGEND BANNER (EXACT MATCH TO REFERENCE IMAGE) */}
-      <div className="bg-white rounded-xl border border-neutral-200/90 p-3.5 px-5 flex flex-wrap items-center gap-4 sm:gap-8 text-xs shadow-2xs">
-        {/* Pending */}
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
-          <span className="font-bold text-neutral-900">Pending</span>
-          <span className="text-neutral-400 hidden sm:inline">Created, waiting to complete</span>
-        </div>
-
-        <span className="text-neutral-300 font-bold hidden sm:inline">→</span>
-
-        {/* Completed */}
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
-          <span className="font-bold text-neutral-900">Completed</span>
-          <span className="text-neutral-400 hidden sm:inline">Done work, not delivered yet</span>
-        </div>
-
-        <span className="text-neutral-300 font-bold hidden sm:inline">→</span>
-
-        {/* Delivered */}
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-teal-600 shrink-0" />
-          <span className="font-bold text-neutral-900">Delivered</span>
-          <span className="text-neutral-400 hidden sm:inline">Leaves completed permanently</span>
-        </div>
-      </div>
-
-      {/* 5. DAILY BREAKDOWN CONTROLS & TABLE */}
+      {/* 3. DAILY BREAKDOWN CONTROLS & TABLE */}
       <div className="space-y-4">
         {/* Controls row */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -502,7 +430,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
               Daily breakdown
             </h2>
             <p className="text-xs text-neutral-400 font-mono mt-0.5">
-              {filteredRows.length} days
+              {filteredRows.length} days recorded
             </p>
           </div>
 
@@ -515,7 +443,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                 placeholder="Search shop, phone, city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 rounded-lg border border-neutral-300 text-xs bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-teal-600 shadow-2xs"
+                className="pl-8 pr-3 py-1.5 rounded-lg border border-neutral-300 text-xs bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-slate-900 shadow-2xs"
               />
             </div>
 
@@ -525,7 +453,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                 onClick={() => setSelectedMonth('all')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                   selectedMonth === 'all'
-                    ? 'bg-neutral-900 text-white'
+                    ? 'bg-[#0f172a] text-white'
                     : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900'
                 }`}
               >
@@ -536,8 +464,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
                   key={m}
                   onClick={() => setSelectedMonth(m)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
-                    selectedMonth === 'm' || selectedMonth === m
-                      ? 'bg-neutral-900 text-white'
+                    selectedMonth === m
+                      ? 'bg-[#0f172a] text-white'
                       : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900'
                   }`}
                 >
@@ -557,158 +485,194 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           </div>
         </div>
 
-        {/* 6. DAILY BREAKDOWN TABLE (EXACT MATCH TO REFERENCE IMAGE) */}
+        {/* 4. DAILY BREAKDOWN TABLE */}
         <div className="bg-white rounded-xl border border-neutral-200/90 shadow-2xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50">
+                <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 font-mono">
                   <th className="py-3 px-4">DATE</th>
-                  <th className="py-3 px-3 text-center">TOTAL</th>
-                  <th className="py-3 px-3 text-center">PENDING</th>
-                  <th className="py-3 px-3 text-center">COMPLETED</th>
-                  <th className="py-3 px-3 text-center">DELIVERED</th>
-                  <th className="py-3 px-3 text-center">CONTACTS</th>
+                  <th className="py-3 px-3 text-center">TOTAL ORDERS</th>
+                  <th className="py-3 px-3 text-center">CASH ORDERS</th>
+                  <th className="py-3 px-3 text-center">UPI / ONLINE</th>
+                  <th className="py-3 px-3 text-center">PARTIAL / DUE</th>
                   <th className="py-3 px-4 text-right">REVENUE</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 text-neutral-800">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-xs text-neutral-400">
+                    <td colSpan={6} className="py-12 text-center text-xs text-neutral-400">
                       Loading daily order metrics...
                     </td>
                   </tr>
                 ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-xs text-neutral-400">
+                    <td colSpan={6} className="py-12 text-center text-xs text-neutral-400">
                       No order records found for the selected filter.
                     </td>
                   </tr>
                 ) : (
-                  filteredRows.map((row) => {
-                    const isExpanded = expandedDates.has(row.rawDate);
-                    return (
-                      <React.Fragment key={row.rawDate}>
-                        <tr className="hover:bg-neutral-50/70 transition-colors">
-                          {/* DATE */}
-                          <td className="py-3 px-4">
-                            <button
-                              onClick={() => toggleExpand(row.rawDate)}
-                              className="text-left group cursor-pointer"
-                            >
-                              <div className="font-bold text-blue-600 group-hover:underline">
-                                {row.friendlyDate}
-                              </div>
-                              <div className="text-[11px] text-neutral-400 group-hover:text-blue-500 mt-0.5 inline-flex items-center gap-1">
-                                <span>{isExpanded ? 'Hide shop breakdown' : 'View shop breakdown'}</span>
-                                {isExpanded ? (
-                                  <ChevronUp className="w-3 h-3 text-neutral-400" />
-                                ) : (
-                                  <ChevronDown className="w-3 h-3 text-neutral-400" />
-                                )}
-                              </div>
-                            </button>
-                          </td>
+                  filteredRows.map((row) => (
+                    <tr key={row.rawDate} className="hover:bg-neutral-50/70 transition-colors">
+                      {/* DATE WITH VIEW SHOP BREAKDOWN BUTTON */}
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-neutral-900 text-xs">
+                          {row.friendlyDate}
+                        </div>
+                        <button
+                          onClick={() => setSelectedPopupDate(row)}
+                          className="mt-0.5 text-[11px] font-bold text-[#0f766e] hover:underline cursor-pointer inline-flex items-center gap-1"
+                        >
+                          <span>View shop breakdown</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </button>
+                      </td>
 
-                          {/* TOTAL */}
-                          <td className="py-3 px-3 text-center font-bold text-neutral-900 font-mono">
-                            {row.total}
-                          </td>
+                      {/* TOTAL ORDERS */}
+                      <td className="py-3 px-3 text-center font-bold text-neutral-900 font-mono text-sm">
+                        {row.totalOrders}
+                      </td>
 
-                          {/* PENDING */}
-                          <td className="py-3 px-3 text-center font-semibold text-amber-600 font-mono">
-                            {row.pending}
-                          </td>
+                      {/* CASH ORDERS */}
+                      <td className="py-3 px-3 text-center font-semibold text-neutral-800 font-mono">
+                        {row.cashCount}
+                      </td>
 
-                          {/* COMPLETED */}
-                          <td className="py-3 px-3 text-center font-semibold text-blue-600 font-mono">
-                            {row.completed}
-                          </td>
+                      {/* UPI ORDERS */}
+                      <td className="py-3 px-3 text-center font-semibold text-[#0f766e] font-mono">
+                        {row.upiCount}
+                      </td>
 
-                          {/* DELIVERED */}
-                          <td className="py-3 px-3 text-center font-semibold text-teal-700 font-mono">
-                            {row.delivered}
-                          </td>
+                      {/* PARTIAL / DUE */}
+                      <td className="py-3 px-3 text-center font-semibold text-neutral-600 font-mono">
+                        {row.partialCount}
+                      </td>
 
-                          {/* CONTACTS */}
-                          <td className="py-3 px-3 text-center font-semibold text-purple-600 font-mono">
-                            {row.contacts}
-                          </td>
-
-                          {/* REVENUE */}
-                          <td className="py-3 px-4 text-right font-bold text-neutral-900 font-mono">
-                            {Math.round(row.revenueMinor / 100).toLocaleString()}
-                          </td>
-                        </tr>
-
-                        {/* EXPANDED SALON BREAKDOWN */}
-                        {isExpanded && (
-                          <tr className="bg-neutral-50/70 border-y border-neutral-200/80">
-                            <td colSpan={7} className="p-4 pl-6">
-                              <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-2.5 font-mono">
-                                Salon Breakdown for {row.friendlyDate}
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {row.shops.map((s) => (
-                                  <div
-                                    key={s.shopId}
-                                    className="bg-white p-3.5 rounded-xl border border-neutral-200 shadow-2xs"
-                                  >
-                                    <div className="flex items-start justify-between gap-2">
-                                      <div className="min-w-0">
-                                        <div
-                                          onClick={() => s.shopObj && onSelectSalon?.(s.shopObj)}
-                                          className="font-bold text-neutral-900 text-xs hover:text-blue-600 cursor-pointer truncate flex items-center gap-1"
-                                        >
-                                          <span>{s.shopName}</span>
-                                          {s.shopObj && <ExternalLink className="w-2.5 h-2.5 text-neutral-400 shrink-0" />}
-                                        </div>
-                                        <div className="text-[11px] text-neutral-400 font-mono mt-0.5 truncate">
-                                          {s.city} · {s.phone}
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-5 gap-1.5 mt-3 pt-2.5 border-t border-neutral-100 text-center font-mono">
-                                      <div>
-                                        <div className="text-[9px] text-neutral-400 uppercase">Total</div>
-                                        <div className="font-bold text-neutral-800 text-xs mt-0.5">{s.total}</div>
-                                      </div>
-                                      <div>
-                                        <div className="text-[9px] text-amber-600 uppercase">Pending</div>
-                                        <div className="font-bold text-amber-600 text-xs mt-0.5">{s.pending}</div>
-                                      </div>
-                                      <div>
-                                        <div className="text-[9px] text-blue-600 uppercase">Done</div>
-                                        <div className="font-bold text-blue-600 text-xs mt-0.5">{s.completed}</div>
-                                      </div>
-                                      <div>
-                                        <div className="text-[9px] text-teal-700 uppercase">Delivered</div>
-                                        <div className="font-bold text-teal-700 text-xs mt-0.5">{s.delivered}</div>
-                                      </div>
-                                      <div>
-                                        <div className="text-[9px] text-neutral-700 uppercase">Revenue</div>
-                                        <div className="font-bold text-neutral-900 text-xs mt-0.5">
-                                          ₹{Math.round(s.revenueMinor / 100).toLocaleString()}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })
+                      {/* REVENUE */}
+                      <td className="py-3 px-4 text-right font-black text-neutral-900 font-mono text-sm">
+                        ₹{Math.round(row.revenueMinor / 100).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      {/* 5. CENTERED POPUP MODAL FOR SALON BREAKDOWN (REQUESTED BY USER) */}
+      {selectedPopupDate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-2xl border border-neutral-200 max-h-[85vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div>
+                <h3 className="text-base font-bold text-neutral-900">
+                  Salon Order Breakdown — {selectedPopupDate.friendlyDate}
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Detailed salon order metrics: Total orders, Cash, UPI, and Partial pay
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedPopupDate(null)}
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Detailed Table in Centered Card */}
+            <div className="overflow-x-auto flex-1 mt-4">
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-neutral-200 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50 font-mono">
+                    <th className="py-3 px-3">SALON NAME</th>
+                    <th className="py-3 px-3">PHONE & CITY</th>
+                    <th className="py-3 px-3 text-center">TOTAL ORDERS</th>
+                    <th className="py-3 px-3 text-center">CASH</th>
+                    <th className="py-3 px-3 text-center">UPI</th>
+                    <th className="py-3 px-3 text-center">PARTIAL / DUE</th>
+                    <th className="py-3 px-3 text-right">REVENUE</th>
+                    <th className="py-3 px-3 text-center">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100 text-neutral-800">
+                  {selectedPopupDate.shops.map((s) => (
+                    <tr key={s.shopId} className="hover:bg-neutral-50/70 transition-colors">
+                      {/* SALON NAME */}
+                      <td className="py-3 px-3 font-bold text-neutral-900">
+                        {s.shopName}
+                      </td>
+
+                      {/* PHONE & CITY */}
+                      <td className="py-3 px-3 text-neutral-600 font-mono text-[11px]">
+                        <div>{s.city}</div>
+                        <div className="text-neutral-400">{s.phone}</div>
+                      </td>
+
+                      {/* TOTAL ORDERS */}
+                      <td className="py-3 px-3 text-center font-bold text-neutral-900 font-mono">
+                        {s.totalOrders}
+                      </td>
+
+                      {/* CASH */}
+                      <td className="py-3 px-3 text-center font-mono text-neutral-800 font-semibold">
+                        {s.cashCount}
+                      </td>
+
+                      {/* UPI */}
+                      <td className="py-3 px-3 text-center font-mono text-[#0f766e] font-semibold">
+                        {s.upiCount}
+                      </td>
+
+                      {/* PARTIAL / DUE */}
+                      <td className="py-3 px-3 text-center font-mono text-neutral-600">
+                        {s.partialCount}
+                      </td>
+
+                      {/* REVENUE */}
+                      <td className="py-3 px-3 text-right font-black text-neutral-900 font-mono">
+                        ₹{Math.round(s.revenueMinor / 100).toLocaleString()}
+                      </td>
+
+                      {/* ACTION: VIEW SALON */}
+                      <td className="py-3 px-3 text-center">
+                        {s.shopObj && onSelectSalon ? (
+                          <button
+                            onClick={() => {
+                              setSelectedPopupDate(null);
+                              onSelectSalon(s.shopObj!);
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0f172a] hover:bg-slate-800 text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                          >
+                            <span>View Salon</span>
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+                        ) : (
+                          <span className="text-neutral-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-end">
+              <button
+                onClick={() => setSelectedPopupDate(null)}
+                className="px-4 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

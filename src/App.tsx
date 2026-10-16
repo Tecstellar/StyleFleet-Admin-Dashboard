@@ -23,6 +23,7 @@ import { UserDetailsView } from './components/views/UserDetailsView';
 import { LoginView } from './components/auth/LoginView';
 import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
 import { DeleteAccountView } from './components/views/DeleteAccountView';
+import { SalonFreshDetailPage } from './components/views/SalonFreshDetailPage';
 import { ResetPasswordModal } from './components/modals/ResetPasswordModal';
 import { useAuth } from './context/AuthContext';
 
@@ -203,6 +204,7 @@ export const App: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [selectedShopForModal, setSelectedShopForModal] = useState<Shop | null>(null);
   const [salonModalInitialTab, setSalonModalInitialTab] = useState<'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry'>('billing');
+  const [viewingShopDetail, setViewingShopDetail] = useState<Shop | null>(null);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [shopForPasswordReset, setShopForPasswordReset] = useState<Shop | null>(null);
 
@@ -337,6 +339,7 @@ export const App: React.FC = () => {
     shop: Shop,
     initialTab: 'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry' = 'billing'
   ) => {
+    setViewingShopDetail(shop);
     setSelectedShopForModal(shop);
     setSalonModalInitialTab(initialTab);
     setSalonsTab('directory');
@@ -345,6 +348,7 @@ export const App: React.FC = () => {
 
   const handleNavigateToStylists = () => {
     setSelectedShopForModal(null);
+    setViewingShopDetail(null);
     setCurrentView('staff_access');
   };
 
@@ -431,6 +435,7 @@ export const App: React.FC = () => {
         onSelectView={(view) => {
           setCurrentView(view);
           setSelectedShopForModal(null);
+          setViewingShopDetail(null);
         }}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -453,7 +458,11 @@ export const App: React.FC = () => {
         {/* Header Bar */}
         <Header
           onToggleMobileNav={() => setIsMobileNavOpen(true)}
-          onSelectView={(v) => setCurrentView(v)}
+          onSelectView={(v) => {
+            setCurrentView(v);
+            setSelectedShopForModal(null);
+            setViewingShopDetail(null);
+          }}
           onRefreshData={handleManualRefresh}
           isRefreshing={isRefreshing}
           onOpenResetPassword={() => {
@@ -480,8 +489,22 @@ export const App: React.FC = () => {
 
         {/* Main Viewport */}
         <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">
-          {/* 1. Founder Dashboard */}
-          {currentView === 'dashboard' && (
+          {viewingShopDetail ? (
+            <SalonFreshDetailPage
+              shop={viewingShopDetail}
+              profiles={profiles}
+              staff={staff}
+              customers={customers}
+              bills={bills}
+              appointments={appointments}
+              payments={payments}
+              onBack={() => setViewingShopDetail(null)}
+              onRefresh={handleManualRefresh}
+            />
+          ) : (
+            <>
+              {/* 1. Founder Dashboard */}
+              {currentView === 'dashboard' && (
             <DashboardView
               shops={shops}
               profiles={profiles}
@@ -724,15 +747,17 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 10. Account Deletions */}
-          {currentView === 'account_deletions' && (
-            <AccountDeletionsView
-              deletions={deletions}
-              shops={shops}
-              loading={loading}
-              onRefresh={handleManualRefresh}
-              onOpenDeleteAccountInstructions={openDeleteAccountPage}
-            />
+              {/* 10. Account Deletions */}
+              {currentView === 'account_deletions' && (
+                <AccountDeletionsView
+                  deletions={deletions}
+                  shops={shops}
+                  loading={loading}
+                  onRefresh={handleManualRefresh}
+                  onOpenDeleteAccountInstructions={openDeleteAccountPage}
+                />
+              )}
+            </>
           )}
         </main>
       </div>

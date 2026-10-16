@@ -824,62 +824,26 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
                 drilldownData.users.map((item, idx) => (
                   <div
                     key={`${item.id}-${idx}`}
-                    className="py-3 px-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-neutral-50/70 rounded-lg transition-colors"
+                    className="py-3 px-3 flex items-center justify-between gap-4 hover:bg-neutral-50 rounded-xl transition-colors border-b border-neutral-100 last:border-0"
                   >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-neutral-900 text-sm">
-                          {item.salonName}
-                        </span>
-                        {item.salonCity && (
-                          <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-neutral-600 bg-neutral-100 px-1.5 py-0.5 rounded">
-                            <MapPin className="w-2.5 h-2.5 text-neutral-400" />
-                            {item.salonCity}
-                          </span>
-                        )}
-                        {item.isSubscriber && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
-                            <Crown className="w-2.5 h-2.5 text-amber-600" />
-                            Subscribed
-                          </span>
-                        )}
+                    <div className="min-w-0">
+                      <div className="font-bold text-neutral-900 text-sm truncate">
+                        {item.salonName || item.name}
                       </div>
-
-                      <div className="text-xs text-neutral-600 flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-neutral-800">
-                          {item.name}
-                        </span>
-                        {item.phone && item.phone !== 'No phone' && (
-                          <a
-                            href={`tel:${item.phone}`}
-                            className="inline-flex items-center gap-1 text-neutral-500 hover:text-neutral-900 font-mono text-[11px]"
-                          >
-                            <Phone className="w-3 h-3 text-neutral-400" />
-                            {item.phone}
-                          </a>
-                        )}
+                      <div className="text-xs font-mono font-semibold text-neutral-700 flex items-center gap-1.5 mt-0.5">
+                        <Phone className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                        <span>{item.phone || 'No phone'}</span>
                       </div>
-
-                      {/* Real Activity on this date */}
-                      {item.activitiesOnDate && item.activitiesOnDate.length > 0 && (
-                        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                          {item.activitiesOnDate.map((act, actIdx) => (
-                            <span
-                              key={actIdx}
-                              className="text-[10px] font-medium text-emerald-800 bg-emerald-50/80 border border-emerald-100 px-2 py-0.5 rounded"
-                            >
-                              • {act}
-                            </span>
-                          ))}
-                        </div>
-                      )}
                     </div>
 
-                    {/* View Salon 360 Action */}
+                    {/* View Salon Action */}
                     {item.shop && onSelectSalon && (
                       <button
-                        onClick={() => handleOpenSalon(item.shop)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer self-start sm:self-center shrink-0"
+                        onClick={() => {
+                          setDrilldownData(null);
+                          onSelectSalon(item.shop!);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
                       >
                         <span>View Salon</span>
                         <ChevronRight className="w-3.5 h-3.5" />

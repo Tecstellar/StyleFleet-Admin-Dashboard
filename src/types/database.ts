@@ -135,6 +135,7 @@ export interface Bill {
   discount_minor: number;
   tax_minor: number;
   total_minor: number;
+  due_amount_minor?: number | null;
   notes: string | null;
   issued_at: string;
   created_by: string | null;

@@ -268,6 +268,14 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
     );
   }, [payments, subscriptions, shops, shopMap, manualSubscriptions]);
 
+  // Subscribers for the selected month (e.g. October with ₹499 pro revenue)
+  const monthSubscribers = useMemo(() => {
+    return allCompanySubscriptions.filter((sub) => {
+      const d = new Date(sub.activatedAt);
+      return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth;
+    });
+  }, [allCompanySubscriptions, selectedYear, selectedMonth]);
+
   // PERIOD BREAKDOWN DATA CALCULATION ACCORDING TO SELECTED GRANULARITY
   const periodData = useMemo(() => {
     interface PeriodItem {
@@ -788,6 +796,95 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
                   </tr>
                 );
               })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 5. SUBSCRIBERS IN SELECTED MONTH (E.G. OCTOBER WITH ₹499 REVENUE) */}
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-5 sm:p-7 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 className="text-base font-bold text-neutral-900 tracking-tight">
+              Pro Subscribers in {MONTH_NAMES_FULL[selectedMonth]} {selectedYear}
+            </h3>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Salons subscribed to paid Pro plans (e.g. ₹499 monthly) during this period
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0f766e]/10 border border-[#0f766e]/20 text-[#0f766e] text-xs font-mono font-bold self-start sm:self-auto">
+            <span>{monthSubscribers.length}</span>
+            <span>{monthSubscribers.length === 1 ? 'Subscriber' : 'Subscribers'}</span>
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-neutral-200 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50 font-mono">
+                <th className="py-3 px-3">SALON SHOP</th>
+                <th className="py-3 px-3">PHONE & CITY</th>
+                <th className="py-3 px-3">PLAN TIER</th>
+                <th className="py-3 px-3 text-right">AMOUNT PAID</th>
+                <th className="py-3 px-3">ACTIVATED ON</th>
+                <th className="py-3 px-3">SOURCE</th>
+                <th className="py-3 px-3 text-center">STATUS</th>
+                <th className="py-3 px-3 text-center">ACTION</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-neutral-800">
+              {monthSubscribers.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-8 text-center text-xs text-neutral-400">
+                    No active subscribers recorded for {MONTH_NAMES_FULL[selectedMonth]} {selectedYear}.
+                  </td>
+                </tr>
+              ) : (
+                monthSubscribers.map((sub) => {
+                  const matchedShop = shopMap.get(sub.shopId);
+                  return (
+                    <tr key={sub.id} className="hover:bg-neutral-50/70 transition-colors">
+                      <td className="py-3 px-3 font-bold text-neutral-900">
+                        {sub.shopName}
+                      </td>
+                      <td className="py-3 px-3 text-neutral-600 font-mono text-[11px]">
+                        <div>{sub.city}</div>
+                        <div className="text-neutral-400">{sub.phone}</div>
+                      </td>
+                      <td className="py-3 px-3 font-medium text-neutral-800">
+                        {sub.planName}
+                      </td>
+                      <td className="py-3 px-3 text-right font-black text-neutral-900 font-mono text-xs">
+                        ₹{formatNumber(sub.amountINR)}
+                      </td>
+                      <td className="py-3 px-3 font-mono text-neutral-600 text-[11px]">
+                        {formatDate(sub.activatedAt)}
+                      </td>
+                      <td className="py-3 px-3 text-neutral-600 font-mono text-[11px]">
+                        {sub.paymentMethod}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          ACTIVE
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        {matchedShop && onSelectSalon ? (
+                          <button
+                            onClick={() => onSelectSalon(matchedShop)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0f172a] hover:bg-slate-800 text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                          >
+                            <span>View Salon</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        ) : (
+                          <span className="text-neutral-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
