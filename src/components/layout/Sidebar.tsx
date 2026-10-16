@@ -317,11 +317,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-2.5 border-t border-white/10 bg-[#071952]">
         {(!isCollapsed || isMobileOpen) ? (
           <div className="space-y-2">
-            <div className="flex items-center justify-between px-1 text-[11px]">
-              <div className="flex items-center gap-1.5 text-white font-bold font-mono">
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                <span className="text-[10px] tracking-wide uppercase text-white">Live Sync</span>
-              </div>
+            <div className="flex items-center justify-end px-1 text-[11px]">
               <button
                 onClick={onToggleCollapse}
                 className="hidden lg:flex p-1 rounded-md hover:bg-white/10 text-white transition-colors cursor-pointer"

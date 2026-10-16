@@ -93,7 +93,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const [responseFollowUp, setResponseFollowUp] = useState('');
   const [isSavingResponse, setIsSavingResponse] = useState(false);
 
-  // Call Responses saved in persistent local storage
+  // Call Responses saved in persistent local storage and synced with database
   const storageKey = `stylefleet_call_responses_${shop.id}`;
   const [callResponses, setCallResponses] = useState<CallResponse[]>(() => {
     try {
@@ -112,6 +112,46 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       console.warn('Failed to save call responses to localStorage:', e);
     }
   }, [callResponses, storageKey]);
+
+  // Load responses from Supabase database (support_messages table)
+  useEffect(() => {
+    async function loadDbResponses() {
+      try {
+        const { data, error } = await supabase
+          .from('support_messages')
+          .select('*')
+          .eq('shop_id', shop.id)
+          .ilike('message', '[Admin Call Note%')
+          .order('created_at', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          const dbItems: CallResponse[] = data.map((msg) => {
+            const raw = msg.message || '';
+            const match = raw.match(/\[Admin Call Note\s*\|\s*(.*?)\s*-\s*(.*?)\]\s*([^|]*)(?:\|\s*Follow-up:\s*(.*))?/);
+            return {
+              id: msg.id,
+              date: msg.created_at,
+              type: match ? match[1].trim() : 'Phone Call',
+              outcome: match ? match[2].trim() : 'Connected',
+              contactPerson: msg.contact_info || ownerProfile?.full_name || shop.name,
+              notes: match ? match[3].trim() : raw.replace(/\[Admin Call Note.*?\]/, '').trim(),
+              followUpDate: match && match[4] ? match[4].trim() : undefined,
+              recordedBy: 'Admin Team (Cloud)',
+            };
+          });
+
+          setCallResponses((prev) => {
+            const seen = new Set(prev.map((p) => `${p.date.slice(0, 10)}_${p.notes.trim()}`));
+            const toAdd = dbItems.filter((d) => !seen.has(`${d.date.slice(0, 10)}_${d.notes.trim()}`));
+            return [...toAdd, ...prev];
+          });
+        }
+      } catch (e) {
+        console.warn('Error loading db responses:', e);
+      }
+    }
+    loadDbResponses();
+  }, [shop.id]);
 
   // Match owner profile
   const ownerProfile = useMemo(() => {
@@ -203,25 +243,26 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const freeOrdersRemaining = Math.max(0, freeSalesLimit - freeOrdersUsed);
   const freeOrdersPercent = Math.min(100, Math.round((freeOrdersUsed / freeSalesLimit) * 100));
 
-  // Strict Subscriber Status (strictly from database subscriptions, payments, or Pro quota override)
+  // Strict Subscriber Status (strictly from database subscriptions or verified subscription payments)
   const { isSubscriber, planExpiry, paymentStatus, planLabel } = useMemo(() => {
     // 1. Check subscriptions table for active pro record
     const subRecord = subscriptions.find(
-      (s: any) => s.shop_id === shop.id && (s.status === 'active' || s.tier === 'pro')
+      (s: any) =>
+        s.shop_id === shop.id &&
+        (s.status === 'active' || s.tier === 'pro') &&
+        (!s.subscription_end_date || new Date(s.subscription_end_date).getTime() > Date.now())
     );
 
     // 2. Check completed payments that indicate paid pro plan
     const proPayment = payments.find(
       (p: any) =>
         p.shop_id === shop.id &&
-        p.status === 'completed' &&
-        ((p as any).plan_tier || (p as any).is_subscription || p.amount_minor >= 49900)
+        (p.status === 'completed' || (p as any).status === 'success') &&
+        ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
+         (p.reference && p.reference.toLowerCase().includes('sub')))
     );
 
-    // 3. Pro override if free_sales_limit is high
-    const hasProLimit = (shop.free_sales_limit || 0) > 100;
-
-    const isSub = Boolean(subRecord || proPayment || hasProLimit);
+    const isSub = Boolean(subRecord || proPayment);
 
     let expiryText = 'N/A (Quota Based)';
     if (subRecord?.expires_at) {
@@ -335,23 +376,19 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     };
 
     try {
-      // Also optionally attempt to log to audit_logs
-      await supabase.from('audit_logs').insert([
+      // Save permanently to database (support_messages table)
+      const formattedNote = `[Admin Call Note | ${responseType} - ${responseOutcome}] ${responseNotes.trim()}${responseFollowUp ? ` | Follow-up: ${responseFollowUp}` : ''}`;
+      await supabase.from('support_messages').insert([
         {
-          action: 'admin_call_response',
-          details: {
-            shop_id: shop.id,
-            shop_name: shop.name,
-            interaction_type: responseType,
-            outcome: responseOutcome,
-            notes: responseNotes.trim(),
-            contact: responseContact || ownerProfile?.full_name || shop.name,
-          },
+          shop_id: shop.id,
+          message: formattedNote,
+          contact_info: responseContact || ownerProfile?.full_name || shop.name,
+          status: 'open',
           created_at: new Date(responseDate).toISOString(),
         },
       ]);
     } catch (err) {
-      console.warn('Audit log write error (fallback to local state):', err);
+      console.warn('Database note write error (persisted to local state):', err);
     }
 
     setCallResponses((prev) => [newEntry, ...prev]);

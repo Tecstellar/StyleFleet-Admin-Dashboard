@@ -100,7 +100,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         partialCount: number;
         dueAmountMinor: number;
         revenueMinor: number;
-        servicesCount: number;
+        dayServicesSet: Set<string>;
         shopData: Map<
           string,
           {
@@ -112,7 +112,6 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
             partialCount: number;
             dueAmountMinor: number;
             revenueMinor: number;
-            servicesCount: number;
             servicesMap: Map<string, number>;
           }
         >;
@@ -133,7 +132,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           partialCount: 0,
           dueAmountMinor: 0,
           revenueMinor: 0,
-          servicesCount: 0,
+          dayServicesSet: new Set(),
           shopData: new Map(),
         });
       }
@@ -141,21 +140,36 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       const dayEntry = map.get(rawD)!;
       dayEntry.totalOrders += 1;
 
-      // Calculate real services used from bill_items
-      let billServicesCount = 0;
-      const billServicesNames: string[] = [];
+      // Shop drill-down
+      const sId = b.shop_id || 'unknown';
+      if (!dayEntry.shopData.has(sId)) {
+        dayEntry.shopData.set(sId, {
+          totalOrders: 0,
+          cashCount: 0,
+          cashAmountMinor: 0,
+          upiCount: 0,
+          upiAmountMinor: 0,
+          partialCount: 0,
+          dueAmountMinor: 0,
+          revenueMinor: 0,
+          servicesMap: new Map(),
+        });
+      }
+      const sEntry = dayEntry.shopData.get(sId)!;
+      sEntry.totalOrders += 1;
+
+      // Extract unique services from bill_items (deduplicated service names)
       if (b.bill_items && b.bill_items.length > 0) {
         b.bill_items.forEach((item) => {
-          const qty = item.quantity && item.quantity > 0 ? item.quantity : 1;
-          billServicesCount += qty;
-          const sName = (item.service_name_snapshot || 'Service').trim();
-          billServicesNames.push(sName);
+          const sName = (item.service_name_snapshot || 'General Service').trim();
+          dayEntry.dayServicesSet.add(sName);
+          sEntry.servicesMap.set(sName, (sEntry.servicesMap.get(sName) || 0) + (item.quantity || 1));
         });
       } else {
-        billServicesCount = 1;
+        const sName = 'General Service';
+        dayEntry.dayServicesSet.add(sName);
+        sEntry.servicesMap.set(sName, (sEntry.servicesMap.get(sName) || 0) + 1);
       }
-
-      dayEntry.servicesCount += billServicesCount;
 
       // Determine payment method and partial pay
       const p = paymentByBillId.get(b.id);
@@ -171,55 +185,24 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       if (isPartial) {
         dayEntry.partialCount += 1;
         dayEntry.dueAmountMinor += dueMinor;
+        sEntry.partialCount += 1;
+        sEntry.dueAmountMinor += dueMinor;
       }
 
       if (isCash) {
         dayEntry.cashCount += 1;
         dayEntry.cashAmountMinor += b.total_minor || 0;
+        sEntry.cashCount += 1;
+        sEntry.cashAmountMinor += b.total_minor || 0;
       } else {
         dayEntry.upiCount += 1;
         dayEntry.upiAmountMinor += b.total_minor || 0;
+        sEntry.upiCount += 1;
+        sEntry.upiAmountMinor += b.total_minor || 0;
       }
 
       if (b.status !== 'deleted') {
         dayEntry.revenueMinor += b.total_minor || 0;
-      }
-
-      // Shop drill-down
-      const sId = b.shop_id || 'unknown';
-      if (!dayEntry.shopData.has(sId)) {
-        dayEntry.shopData.set(sId, {
-          totalOrders: 0,
-          cashCount: 0,
-          cashAmountMinor: 0,
-          upiCount: 0,
-          upiAmountMinor: 0,
-          partialCount: 0,
-          dueAmountMinor: 0,
-          revenueMinor: 0,
-          servicesCount: 0,
-          servicesMap: new Map(),
-        });
-      }
-      const sEntry = dayEntry.shopData.get(sId)!;
-      sEntry.totalOrders += 1;
-      sEntry.servicesCount += billServicesCount;
-      billServicesNames.forEach((name) => {
-        sEntry.servicesMap.set(name, (sEntry.servicesMap.get(name) || 0) + 1);
-      });
-
-      if (isPartial) {
-        sEntry.partialCount += 1;
-        sEntry.dueAmountMinor += dueMinor;
-      }
-      if (isCash) {
-        sEntry.cashCount += 1;
-        sEntry.cashAmountMinor += b.total_minor || 0;
-      } else {
-        sEntry.upiCount += 1;
-        sEntry.upiAmountMinor += b.total_minor || 0;
-      }
-      if (b.status !== 'deleted') {
         sEntry.revenueMinor += b.total_minor || 0;
       }
     });
@@ -237,7 +220,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         ? 'Other'
         : dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
-      // Compile per-shop metrics
+      // Compile per-shop metrics with unique services count (without duplicates)
       const shopMetrics: ShopDailyMetrics[] = [];
       data.shopData.forEach((sVals, sId) => {
         const matchedShop = shopMap.get(sId);
@@ -258,7 +241,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           partialCount: sVals.partialCount,
           dueAmountMinor: sVals.dueAmountMinor,
           revenueMinor: sVals.revenueMinor,
-          servicesCount: sVals.servicesCount,
+          servicesCount: sVals.servicesMap.size, // Unique services count without duplicates
           servicesList,
           shopObj: matchedShop,
         });
@@ -279,7 +262,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         partialCount: data.partialCount,
         dueAmountMinor: data.dueAmountMinor,
         revenueMinor: data.revenueMinor,
-        servicesCount: data.servicesCount,
+        servicesCount: data.dayServicesSet.size, // Unique services count across day without duplicates
         shops: shopMetrics,
       });
     });
@@ -333,8 +316,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
     let upiAmountMinor = 0;
     let partialCount = 0;
     let dueAmountMinor = 0;
-    let servicesCount = 0;
     let revenueMinor = 0;
+    const uniqueServicesSet = new Set<string>();
 
     filteredRows.forEach((r) => {
       totalOrders += r.totalOrders;
@@ -344,8 +327,16 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       upiAmountMinor += r.upiAmountMinor;
       partialCount += r.partialCount;
       dueAmountMinor += r.dueAmountMinor;
-      servicesCount += r.servicesCount;
       revenueMinor += r.revenueMinor;
+
+      // Extract unique services across the selected period without duplicates
+      r.shops.forEach((s) => {
+        s.servicesList.forEach((it) => {
+          if (it.name && it.name.trim()) {
+            uniqueServicesSet.add(it.name.trim().toLowerCase());
+          }
+        });
+      });
     });
 
     return {
@@ -356,7 +347,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       upiAmount: Math.round(upiAmountMinor / 100),
       partialCount,
       dueAmount: Math.round(dueAmountMinor / 100),
-      servicesCount,
+      uniqueServicesCount: uniqueServicesSet.size,
       revenue: Math.round(revenueMinor / 100),
     };
   }, [filteredRows]);
@@ -372,7 +363,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       'UPI (INR)': Math.round(r.upiAmountMinor / 100),
       'Partial / Due Orders': r.partialCount,
       'Due Amount (INR)': Math.round(r.dueAmountMinor / 100),
-      'Services Used': r.servicesCount,
+      'Unique Services Used': r.servicesCount,
       'Revenue (INR)': Math.round(r.revenueMinor / 100),
     }));
     exportToCSV(exportData, `stylefleet_daily_orders_${new Date().toISOString().slice(0, 10)}`);
@@ -412,7 +403,7 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       </div>
 
       {/* 2. SUMMARY KPI CARDS (ROYAL BLUE & LIGHT CREAM PALETTE) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {/* TOTAL ORDERS */}
         <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-black/60 font-mono">
@@ -452,16 +443,42 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
           </div>
         </div>
 
-        {/* TOTAL REVENUE */}
+        {/* PARTIAL / DUE */}
         <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
           <div className="text-[11px] font-bold uppercase tracking-wider text-black/70 font-mono">
-            TOTAL REVENUE
+            PARTIAL / DUE
           </div>
           <div className="text-2xl sm:text-3xl font-black text-black mt-1 font-mono">
+            {summary.partialCount.toLocaleString()}
+          </div>
+          <div className="text-[11px] text-black/60 font-mono mt-1">
+            ₹{summary.dueAmount.toLocaleString()} pending due
+          </div>
+        </div>
+
+        {/* SERVICES USED (WITHOUT DUPLICATES) */}
+        <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-black/70 font-mono">
+            SERVICES USED
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-black mt-1 font-mono">
+            {summary.uniqueServicesCount.toLocaleString()}
+          </div>
+          <div className="text-[11px] text-black/50 mt-1">
+            unique (no duplicates)
+          </div>
+        </div>
+
+        {/* TOTAL REVENUE */}
+        <div className="bg-[#F8F3F0] border border-[#071952]/20 rounded-2xl p-4 shadow-2xs">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#071952] font-mono">
+            TOTAL REVENUE
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-[#071952] mt-1 font-mono">
             ₹{summary.revenue.toLocaleString()}
           </div>
           <div className="text-[11px] text-black/50 mt-1">
-            {summary.partialCount} partial / due bills
+            across salon orders
           </div>
         </div>
       </div>

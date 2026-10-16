@@ -82,6 +82,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   appointments,
   deletions,
   supportMessages,
+  subscriptions = [],
   loading = false,
   onNavigate,
   onSelectSalon,
@@ -152,6 +153,22 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       if (lifetimeSalesCount >= freeLimit) quotaStatus = 'limit';
       else if (lifetimeSalesCount >= freeLimit * 0.5) quotaStatus = 'warning';
 
+      // Check real subscriber status strictly from database subscriptions & verified subscription payments
+      const hasDbSub = (subscriptions || []).some(
+        (sub: any) =>
+          allowedIds.includes(sub.shop_id) &&
+          (sub.status === 'active' || sub.plan_id) &&
+          (!sub.subscription_end_date || new Date(sub.subscription_end_date).getTime() > Date.now())
+      );
+      const hasSubPayment = payments.some(
+        (p) =>
+          allowedIds.includes(p.shop_id) &&
+          (p.status === 'completed' || (p as any).status === 'success') &&
+          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
+           (p.reference && p.reference.toLowerCase().includes('sub')))
+      );
+      const isPro = hasDbSub || hasSubPayment;
+
       // Match owner profile from profiles list or phone
       const sPhone = cleanDigits(s.phone);
       const owner =
@@ -175,6 +192,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         quotaRemaining,
         quotaPercent,
         quotaStatus,
+        isPro,
         staffCount: salonStaff.length,
         customerCount: salonCustomers.length,
         totalCustomerCount: totalSalonCustomers.length,
@@ -182,15 +200,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         ownerPhone,
       };
     });
-  }, [shops, scopedBills, scopedPayments, staff, scopedCustomers, customers, bills, profiles]);
+  }, [shops, scopedBills, scopedPayments, staff, scopedCustomers, customers, bills, profiles, subscriptions, payments]);
 
-  // Derived Pill Counts for all buttons
+  // Derived Pill Counts for all buttons (strictly database-driven)
   const pillCounts = useMemo(() => {
     const total = salonPerformance.length;
     const active = salonPerformance.filter((s) => s.lifetimeSalesCount > 0).length;
     const inactive = salonPerformance.filter((s) => s.lifetimeSalesCount === 0).length;
-    const freePlan = salonPerformance.filter((s) => s.quotaStatus !== 'limit').length;
-    const proPlan = salonPerformance.filter((s) => s.quotaStatus === 'limit').length;
+    const freePlan = salonPerformance.filter((s) => !s.isPro).length;
+    const proPlan = salonPerformance.filter((s) => s.isPro).length;
     const withBills = salonPerformance.filter((s) => s.lifetimeSalesCount > 0).length;
     const zeroBills = salonPerformance.filter((s) => s.lifetimeSalesCount === 0).length;
     const withCustomers = salonPerformance.filter((s) => s.totalCustomerCount > 0).length;
@@ -241,8 +259,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       let matchesPill = true;
       if (activePillFilter === 'active') matchesPill = s.lifetimeSalesCount > 0;
       else if (activePillFilter === 'inactive') matchesPill = s.lifetimeSalesCount === 0;
-      else if (activePillFilter === 'free_plan') matchesPill = s.quotaStatus !== 'limit';
-      else if (activePillFilter === 'pro_plan') matchesPill = s.quotaStatus === 'limit';
+      else if (activePillFilter === 'free_plan') matchesPill = !s.isPro;
+      else if (activePillFilter === 'pro_plan') matchesPill = s.isPro;
       else if (activePillFilter === 'with_bills') matchesPill = s.lifetimeSalesCount > 0;
       else if (activePillFilter === 'zero_bills') matchesPill = s.lifetimeSalesCount === 0;
       else if (activePillFilter === 'with_customers') matchesPill = s.totalCustomerCount > 0;
@@ -333,12 +351,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
         {/* Top Action Controls */}
         <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto">
-          {/* Live Sync Badge (Clean #071952 & #F8F3F0) */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F8F3F0] text-[#071952] border border-[#071952]/25">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#071952] animate-pulse" />
-            <span>Live Sync</span>
-          </div>
-
           {/* Date Range Selector Pill */}
           <div className="relative">
             <select
@@ -365,7 +377,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               'Location': `${s.city || 'Kalugumalai'}, Tamil Nadu`,
               'Registered Date': s.created_at ? formatDate(s.created_at) : '—',
               'Activity': s.lifetimeSalesCount > 0 ? 'Live' : 'Inactive',
-              'Plan': s.quotaStatus === 'limit' ? 'PRO' : 'FREE',
+              'Plan': s.isPro ? 'PRO' : 'FREE',
               '100 Sales Quota': `${s.lifetimeSalesCount} / ${s.freeLimit} Sales (${s.quotaPercent}%)`,
               'Completed Bills': s.lifetimeSalesCount,
               'Total Sales (INR)': Number((s.billed / 100).toFixed(2)),
@@ -813,7 +825,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
                       {/* 8. PLAN (FREE / PRO - with crisp border) */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
-                        {s.quotaStatus === 'limit' ? (
+                        {s.isPro ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#071952] text-white border border-[#071952] shadow-2xs font-mono">
                             PRO
                           </span>
