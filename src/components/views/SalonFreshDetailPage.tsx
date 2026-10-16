@@ -113,36 +113,66 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     }
   }, [callResponses, storageKey]);
 
-  // Load responses from Supabase database (support_messages table)
+  // Load responses from Supabase database (admin_responses dedicated table, with fallback to support_messages)
   useEffect(() => {
     async function loadDbResponses() {
       try {
-        const { data, error } = await supabase
+        const loadedItems: CallResponse[] = [];
+
+        // 1. Try dedicated admin_responses table
+        const { data: adminData, error: adminErr } = await supabase
+          .from('admin_responses')
+          .select('*')
+          .eq('shop_id', shop.id)
+          .order('date', { ascending: false });
+
+        if (!adminErr && adminData && adminData.length > 0) {
+          adminData.forEach((row: any) => {
+            loadedItems.push({
+              id: row.id,
+              date: row.date || row.created_at,
+              type: row.type || 'Phone Call',
+              outcome: row.outcome || 'Connected & Discussed',
+              contactPerson: row.contact_person || ownerProfile?.full_name || shop.name,
+              notes: row.notes || '',
+              followUpDate: row.follow_up_date || undefined,
+              recordedBy: row.recorded_by || 'Admin Team',
+            });
+          });
+        }
+
+        // 2. Also check support_messages for legacy responses
+        const { data: msgData, error: msgErr } = await supabase
           .from('support_messages')
           .select('*')
           .eq('shop_id', shop.id)
           .ilike('message', '[Admin Call Note%')
           .order('created_at', { ascending: false });
 
-        if (!error && data && data.length > 0) {
-          const dbItems: CallResponse[] = data.map((msg) => {
+        if (!msgErr && msgData && msgData.length > 0) {
+          msgData.forEach((msg) => {
             const raw = msg.message || '';
             const match = raw.match(/\[Admin Call Note\s*\|\s*(.*?)\s*-\s*(.*?)\]\s*([^|]*)(?:\|\s*Follow-up:\s*(.*))?/);
-            return {
-              id: msg.id,
-              date: msg.created_at,
-              type: match ? match[1].trim() : 'Phone Call',
-              outcome: match ? match[2].trim() : 'Connected',
-              contactPerson: msg.contact_info || ownerProfile?.full_name || shop.name,
-              notes: match ? match[3].trim() : raw.replace(/\[Admin Call Note.*?\]/, '').trim(),
-              followUpDate: match && match[4] ? match[4].trim() : undefined,
-              recordedBy: 'Admin Team (Cloud)',
-            };
+            const legacyId = msg.id;
+            if (!loadedItems.some((x) => x.id === legacyId)) {
+              loadedItems.push({
+                id: legacyId,
+                date: msg.created_at,
+                type: match ? match[1].trim() : 'Phone Call',
+                outcome: match ? match[2].trim() : 'Connected',
+                contactPerson: msg.contact_info || ownerProfile?.full_name || shop.name,
+                notes: match ? match[3].trim() : raw.replace(/\[Admin Call Note.*?\]/, '').trim(),
+                followUpDate: match && match[4] ? match[4].trim() : undefined,
+                recordedBy: 'Admin Team (Cloud)',
+              });
+            }
           });
+        }
 
+        if (loadedItems.length > 0) {
           setCallResponses((prev) => {
             const seen = new Set(prev.map((p) => `${p.date.slice(0, 10)}_${p.notes.trim()}`));
-            const toAdd = dbItems.filter((d) => !seen.has(`${d.date.slice(0, 10)}_${d.notes.trim()}`));
+            const toAdd = loadedItems.filter((d) => !seen.has(`${d.date.slice(0, 10)}_${d.notes.trim()}`));
             return [...toAdd, ...prev];
           });
         }
@@ -376,7 +406,29 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     };
 
     try {
-      // Save permanently to database (support_messages table)
+      // 1. Primary write to dedicated admin_responses table
+      const { data: insertedRow, error: adminErr } = await supabase
+        .from('admin_responses')
+        .insert([
+          {
+            shop_id: shop.id,
+            date: new Date(responseDate).toISOString(),
+            type: responseType,
+            outcome: responseOutcome,
+            contact_person: responseContact || ownerProfile?.full_name || shop.name,
+            notes: responseNotes.trim(),
+            follow_up_date: responseFollowUp || null,
+            recorded_by: 'Admin Team',
+          },
+        ])
+        .select()
+        .single();
+
+      if (!adminErr && insertedRow?.id) {
+        newEntry.id = insertedRow.id;
+      }
+
+      // 2. Also write to support_messages as fail-safe fallback
       const formattedNote = `[Admin Call Note | ${responseType} - ${responseOutcome}] ${responseNotes.trim()}${responseFollowUp ? ` | Follow-up: ${responseFollowUp}` : ''}`;
       await supabase.from('support_messages').insert([
         {
@@ -399,7 +451,13 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   };
 
   // Delete Call Response
-  const handleDeleteResponse = (id: string) => {
+  const handleDeleteResponse = async (id: string) => {
+    try {
+      await supabase.from('admin_responses').delete().eq('id', id);
+      await supabase.from('support_messages').delete().eq('id', id);
+    } catch (err) {
+      console.warn('Error deleting response from DB:', err);
+    }
     setCallResponses((prev) => prev.filter((r) => r.id !== id));
   };
 

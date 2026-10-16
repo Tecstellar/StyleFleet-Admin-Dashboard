@@ -310,11 +310,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   };
 
   const handleViewSalon = (shop: Shop) => {
-    if (onSelectSalon) {
-      onSelectSalon(shop);
-    } else {
-      setViewingFreshSalon(shop);
-    }
+    // Open fresh detail directly in Overview so "Back to list" returns straight to Overview
+    setViewingFreshSalon(shop);
   };
 
   // IF SALON IS CLICKED, RENDER FRESH FULL PAGE WITH CLEAN 2-COLOR DESIGN
@@ -328,6 +325,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         bills={bills}
         appointments={appointments}
         payments={payments}
+        subscriptions={subscriptions}
         onBack={() => setViewingFreshSalon(null)}
       />
     );

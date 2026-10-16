@@ -53,6 +53,7 @@ interface SubscriptionPlansViewProps {
   shops: Shop[];
   bills: Bill[];
   payments: Payment[];
+  subscriptions?: any[];
   loading?: boolean;
   onSelectSalon?: (shop: Shop) => void;
 }
@@ -61,6 +62,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   shops,
   bills,
   payments,
+  subscriptions = [],
   loading = false,
   onSelectSalon,
 }) => {
@@ -166,9 +168,25 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       const regDate = item.earliestCreated ? new Date(item.earliestCreated) : new Date();
       const daysActive = Math.max(0, Math.floor((now - regDate.getTime()) / (1000 * 60 * 60 * 24)));
 
-      const assignedPlan = upgradedShopPlans[key] || null;
+      // Check real subscription from database
+      const hasDbSub = (subscriptions || []).some(
+        (sub: any) =>
+          item.associatedShopIds.includes(sub.shop_id) &&
+          (sub.status === 'active' || sub.plan_id) &&
+          (!sub.subscription_end_date || new Date(sub.subscription_end_date).getTime() > Date.now())
+      );
+      const hasSubPayment = payments.some(
+        (p) =>
+          item.associatedShopIds.includes(p.shop_id) &&
+          (p.status === 'completed' || (p as any).status === 'success') &&
+          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
+           (p.reference && p.reference.toLowerCase().includes('sub')))
+      );
+      const isRealPro = hasDbSub || hasSubPayment;
+
+      const assignedPlan = isRealPro ? (upgradedShopPlans[key] || '3m') : null;
       let status: SalonQuotaSummary['status'] = 'free_active';
-      if (assignedPlan) {
+      if (isRealPro) {
         status = 'upgraded';
       } else if (salesDone >= 100) {
         status = 'pro_required';
@@ -198,7 +216,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
     });
 
     return list;
-  }, [shops, bills, payments, upgradedShopPlans]);
+  }, [shops, bills, payments, subscriptions, upgradedShopPlans]);
 
   // Unique Cities
   const uniqueCities = useMemo(() => {
@@ -324,45 +342,39 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Banner / Header */}
-      <div className="bg-[#071952] text-white p-6 sm:p-7 rounded-2xl border border-[#071952] shadow-sm relative overflow-hidden">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-xs font-semibold border border-white/20">
-              <Crown className="w-3.5 h-3.5 text-white fill-white" />
-              <span>Free Tier Quota: 100 Sales per Registered Salon</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-              Subscription &amp; Free Sales Quota Hub
-            </h1>
-            <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
-              Every salon gets <strong>100 free sales from their registration date</strong>. Monitor completed sales, quota consumption, and manage Pro Plan upgrades in real time.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <ExportButton
-              data={filteredSummaries.map((s) => ({
-                'Salon Name': s.name,
-                'City': s.city,
-                'Phone': s.phone,
-                'Registered Date': s.registeredDateFormatted,
-                'Days on Platform': s.daysActive,
-                'Sales Completed': s.salesDone,
-                'Free Sales Left': s.salesRemaining,
-                'Quota Used %': `${s.quotaPercentage}%`,
-                'Total Invoiced (₹)': Math.round(s.totalBilledMinor / 100),
-                'Total Collected (₹)': Math.round(s.totalCollectedMinor / 100),
-                'Plan Status': s.status.replace('_', ' ').toUpperCase(),
-              }))}
-              filename={`stylefleet_100_sales_quota_${new Date().toISOString().split('T')[0]}`}
-              label="Export Quota Audit (CSV)"
-            />
-          </div>
+      {/* Header & Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#071952] block">
+            SALON BILLING LIMITS
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-black mt-0.5">
+            Subscription &amp; Free Sales Quota
+          </h1>
+          <p className="text-xs text-neutral-600 mt-0.5">
+            Track salon sales quota usage (100 free sales limit) and verified subscription status
+          </p>
         </div>
 
-        {/* Decorative Watermark */}
-        <Crown className="absolute -right-8 -bottom-10 w-56 h-56 text-white/5 pointer-events-none" />
+        <div className="flex items-center gap-2">
+          <ExportButton
+            data={filteredSummaries.map((s) => ({
+              'Salon Name': s.name,
+              'City': s.city,
+              'Phone': s.phone,
+              'Registered Date': s.registeredDateFormatted,
+              'Days on Platform': s.daysActive,
+              'Sales Completed': s.salesDone,
+              'Free Sales Left': s.salesRemaining,
+              'Quota Used %': `${s.quotaPercentage}%`,
+              'Total Invoiced (₹)': Math.round(s.totalBilledMinor / 100),
+              'Total Collected (₹)': Math.round(s.totalCollectedMinor / 100),
+              'Plan Status': s.status.replace('_', ' ').toUpperCase(),
+            }))}
+            filename={`stylefleet_100_sales_quota_${new Date().toISOString().split('T')[0]}`}
+            label="Export Quota (CSV)"
+          />
+        </div>
       </div>
 
       {/* KPI Cards */}

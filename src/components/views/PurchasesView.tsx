@@ -207,36 +207,6 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
       }
     });
 
-    // 3. Salons with active Pro quotas in shops table (e.g. Brave & Cave with free_sales_limit: 200)
-    shops.forEach((s) => {
-      if ((s.free_sales_limit || 0) > 100) {
-        const uniqueKey = `quota:${s.id}`;
-        if (!seenKeys.has(uniqueKey)) {
-          seenKeys.add(uniqueKey);
-
-          const actDate = s.created_at || new Date().toISOString();
-          const exp = new Date(actDate);
-          exp.setMonth(exp.getMonth() + 1);
-
-          list.push({
-            id: `PRO-${s.id.slice(0, 8).toUpperCase()}`,
-            shopId: s.id,
-            shopName: s.name,
-            city: s.city || 'Tamil Nadu',
-            phone: s.phone || '—',
-            tier: '1m',
-            planName: '1 Month Pro (₹499)',
-            amountINR: 499,
-            paymentMethod: 'UPI / Direct Activation',
-            reference: 'PRO-ACTIVATION-LIMIT-EXTENDED',
-            status: 'completed',
-            activatedAt: actDate,
-            expiresAt: exp.toISOString(),
-            source: 'quota_override',
-          });
-        }
-      }
-    });
 
     // 4. Manually recorded subscriptions in localStorage
     manualSubscriptions.forEach((m) => {

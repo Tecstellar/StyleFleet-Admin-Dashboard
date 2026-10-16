@@ -119,6 +119,9 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
     >();
 
     bills.forEach((b) => {
+      // Strictly skip deleted bills so all orders, cash, UPI, due, and revenue match verified active database records
+      if (b.status === 'deleted') return;
+
       const rawD = (b.issued_at || b.created_at || '').slice(0, 10);
       if (!rawD || rawD.length < 10) return;
 
@@ -175,8 +178,11 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
       const p = paymentByBillId.get(b.id);
       let dueMinor = b.due_amount_minor || 0;
       if (!dueMinor && b.notes && b.notes.includes('due:')) {
-        const match = b.notes.match(/due:(\d+)/);
-        if (match) dueMinor = parseInt(match[1], 10) * 100;
+        const matches = Array.from(b.notes.matchAll(/due:(\d+)/g));
+        if (matches.length > 0) {
+          // In StyleFleet database, due in notes is already recorded in minor paise (e.g. due:90000 = ₹900)
+          dueMinor = parseInt(matches[matches.length - 1][1], 10);
+        }
       }
       const isPartial = dueMinor > 0;
       const isCash = (p && p.method === 'Cash') || (b.notes && b.notes.toLowerCase().includes('cash'));
@@ -201,10 +207,8 @@ export const DailyBillsView: React.FC<DailyBillsViewProps> = ({
         sEntry.upiAmountMinor += b.total_minor || 0;
       }
 
-      if (b.status !== 'deleted') {
-        dayEntry.revenueMinor += b.total_minor || 0;
-        sEntry.revenueMinor += b.total_minor || 0;
-      }
+      dayEntry.revenueMinor += b.total_minor || 0;
+      sEntry.revenueMinor += b.total_minor || 0;
     });
 
     const rows: DayMetricsRow[] = [];

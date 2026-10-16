@@ -199,12 +199,13 @@ export const App: React.FC = () => {
 
   // Navigation State — matches 9 options from reference dashboard
   const [currentView, setCurrentView] = useState<NavView>('dashboard');
-  const [salonsTab, setSalonsTab] = useState<'directory' | 'stylists' | 'ecosystem_360'>('directory');
+  const [salonsTab, setSalonsTab] = useState<'directory' | 'stylists'>('directory');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [selectedShopForModal, setSelectedShopForModal] = useState<Shop | null>(null);
   const [salonModalInitialTab, setSalonModalInitialTab] = useState<'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry'>('billing');
   const [viewingShopDetail, setViewingShopDetail] = useState<Shop | null>(null);
+  const [originViewBeforeDetail, setOriginViewBeforeDetail] = useState<NavView | null>(null);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [shopForPasswordReset, setShopForPasswordReset] = useState<Shop | null>(null);
 
@@ -339,11 +340,10 @@ export const App: React.FC = () => {
     shop: Shop,
     initialTab: 'overview' | 'staff' | 'services' | 'billing' | 'settings' | 'telemetry' = 'billing'
   ) => {
+    setOriginViewBeforeDetail(currentView);
     setViewingShopDetail(shop);
     setSelectedShopForModal(shop);
     setSalonModalInitialTab(initialTab);
-    setSalonsTab('directory');
-    setCurrentView('salons_360');
   };
 
   const handleNavigateToStylists = () => {
@@ -499,7 +499,13 @@ export const App: React.FC = () => {
               appointments={appointments}
               payments={payments}
               subscriptions={subscriptions}
-              onBack={() => setViewingShopDetail(null)}
+              onBack={() => {
+                setViewingShopDetail(null);
+                if (originViewBeforeDetail) {
+                  setCurrentView(originViewBeforeDetail);
+                  setOriginViewBeforeDetail(null);
+                }
+              }}
               onRefresh={handleManualRefresh}
             />
           ) : (
@@ -608,6 +614,7 @@ export const App: React.FC = () => {
               shops={shops}
               bills={bills}
               payments={payments}
+              subscriptions={subscriptions}
               loading={loading}
               onSelectSalon={handleSelectSalonDrilldown}
             />

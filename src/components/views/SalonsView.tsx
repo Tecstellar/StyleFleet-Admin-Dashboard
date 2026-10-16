@@ -131,11 +131,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
                 >
                   Deduplicated ({shop.duplicate_count} merged)
                 </span>
-              ) : (
-                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#071952] text-white border border-[#071952] rounded">
-                  Verified Real
-                </span>
-              )}
+              ) : null}
             </div>
             <div className="text-[11px] text-neutral-500 font-mono truncate max-w-[140px]">
               ID: {shop.id.slice(0, 8)}...
@@ -333,17 +329,6 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
         </div>
       </div>
 
-      {/* Real Data Integrity Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-[#071952]/20 bg-[#071952]/10 text-xs">
-        <div className="flex items-center gap-2 text-black">
-          <ShieldCheck className="w-4 h-4 text-[#071952] shrink-0" />
-          <span className="font-semibold">Production Data Guarantee:</span>
-          <span>Deduplication engine active. Only verified real salons are tracked (Zero duplicates, Zero random/dummy data).</span>
-        </div>
-        <div className="flex items-center gap-3 text-[11px] font-mono text-[#071952]">
-          <span>Active Unique Salons: {filteredShops.length}</span>
-        </div>
-      </div>
 
       {/* Multi-Attribute Filter Toolbar */}
       <div className="p-4 rounded-2xl border border-[#071952]/20 bg-[#F8F3F0] shadow-xs space-y-3">
