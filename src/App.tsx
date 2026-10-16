@@ -498,6 +498,7 @@ export const App: React.FC = () => {
               bills={bills}
               appointments={appointments}
               payments={payments}
+              subscriptions={subscriptions}
               onBack={() => setViewingShopDetail(null)}
               onRefresh={handleManualRefresh}
             />

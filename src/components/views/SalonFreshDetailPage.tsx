@@ -15,6 +15,18 @@ import {
   Building2,
   FileText,
   RotateCcw,
+  PhoneCall,
+  PlusCircle,
+  FileSpreadsheet,
+  X,
+  MessageSquare,
+  Users,
+  CalendarClock,
+  ShieldCheck,
+  TrendingUp,
+  Tag,
+  ChevronRight,
+  Trash2,
 } from 'lucide-react';
 import { Shop, Profile, Staff, Customer, Bill, Payment, Appointment } from '../../types/database';
 import { supabase } from '../../services/supabase';
@@ -28,6 +40,7 @@ interface SalonFreshDetailPageProps {
   bills: Bill[];
   appointments: Appointment[];
   payments: Payment[];
+  subscriptions?: any[];
   onBack: () => void;
   onRefresh?: () => void;
 }
@@ -41,6 +54,17 @@ interface SalonService {
   category_id?: string | null;
 }
 
+interface CallResponse {
+  id: string;
+  date: string;
+  type: string;
+  outcome: string;
+  contactPerson: string;
+  notes: string;
+  followUpDate?: string;
+  recordedBy: string;
+}
+
 export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   shop,
   profiles,
@@ -49,12 +73,45 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   bills,
   appointments,
   payments,
+  subscriptions = [],
   onBack,
   onRefresh,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'staff' | 'services' | 'bills' | 'appointments'>('overview');
   const [services, setServices] = useState<SalonService[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
+
+  // Add Response / Call Notes Modal State
+  const [isAddResponseOpen, setIsAddResponseOpen] = useState(false);
+  const [responseDate, setResponseDate] = useState(() => {
+    const now = new Date();
+    return now.toISOString().slice(0, 16);
+  });
+  const [responseType, setResponseType] = useState('Phone Call');
+  const [responseOutcome, setResponseOutcome] = useState('Connected & Discussed');
+  const [responseContact, setResponseContact] = useState('');
+  const [responseNotes, setResponseNotes] = useState('');
+  const [responseFollowUp, setResponseFollowUp] = useState('');
+  const [isSavingResponse, setIsSavingResponse] = useState(false);
+
+  // Call Responses saved in persistent local storage
+  const storageKey = `stylefleet_call_responses_${shop.id}`;
+  const [callResponses, setCallResponses] = useState<CallResponse[]>(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Save call responses to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(callResponses));
+    } catch (e) {
+      console.warn('Failed to save call responses to localStorage:', e);
+    }
+  }, [callResponses, storageKey]);
 
   // Match owner profile
   const ownerProfile = useMemo(() => {
@@ -85,15 +142,140 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     return appointments.filter((a) => a.shop_id === shop.id);
   }, [appointments, shop.id]);
 
+  // Associated customers for this shop
+  const salonCustomers = useMemo(() => {
+    const list = customers.filter((c) => c.shop_id === shop.id);
+    if (list.length > 0) return list;
+    // Fallback: Extract from bills
+    const uniqueFromBills = new Set<string>();
+    salonBills.forEach((b) => {
+      const name = b.customer?.name || (b as any).customer_name;
+      if (name) uniqueFromBills.add(name);
+    });
+    return Array.from(uniqueFromBills).map((name, i) => ({
+      id: `c-bill-${i}`,
+      shop_id: shop.id,
+      name,
+      phone: '—',
+      notes: null,
+      preferred_staff_id: null,
+      is_starred: false,
+      created_at: shop.created_at,
+      updated_at: shop.created_at,
+    }));
+  }, [customers, shop.id, salonBills, shop.created_at]);
+
   // Total revenue calculated strictly from bills
   const totalRevenue = useMemo(() => {
     return salonBills.reduce((acc, b) => {
-      if (b.status !== 'deleted') {
+      if (b.status !== 'deleted' && b.status !== 'cancelled') {
         return acc + (b.total_minor || 0);
       }
       return acc;
     }, 0);
   }, [salonBills]);
+
+  // Order breakdown metrics
+  const pendingOrdersCount = useMemo(() => {
+    return salonBills.filter((b) => b.status === 'pending' || b.status === 'draft').length;
+  }, [salonBills]);
+
+  const completedOrdersCount = useMemo(() => {
+    return salonBills.filter((b) => b.status === 'completed' || b.status === 'paid').length;
+  }, [salonBills]);
+
+  const cancelledOrdersCount = useMemo(() => {
+    return salonBills.filter((b) => b.status === 'cancelled' || b.status === 'deleted').length;
+  }, [salonBills]);
+
+  // Days active calculation
+  const daysActive = useMemo(() => {
+    if (!shop.created_at) return 1;
+    const createdTime = new Date(shop.created_at).getTime();
+    if (isNaN(createdTime)) return 1;
+    const diffDays = Math.floor((Date.now() - createdTime) / (1000 * 60 * 60 * 24));
+    return Math.max(1, diffDays);
+  }, [shop.created_at]);
+
+  // Free quota metrics
+  const freeSalesLimit = shop.free_sales_limit || 100;
+  const freeOrdersUsed = salonBills.length;
+  const freeOrdersRemaining = Math.max(0, freeSalesLimit - freeOrdersUsed);
+  const freeOrdersPercent = Math.min(100, Math.round((freeOrdersUsed / freeSalesLimit) * 100));
+
+  // Strict Subscriber Status (strictly from database subscriptions, payments, or Pro quota override)
+  const { isSubscriber, planExpiry, paymentStatus, planLabel } = useMemo(() => {
+    // 1. Check subscriptions table for active pro record
+    const subRecord = subscriptions.find(
+      (s: any) => s.shop_id === shop.id && (s.status === 'active' || s.tier === 'pro')
+    );
+
+    // 2. Check completed payments that indicate paid pro plan
+    const proPayment = payments.find(
+      (p: any) =>
+        p.shop_id === shop.id &&
+        p.status === 'completed' &&
+        ((p as any).plan_tier || (p as any).is_subscription || p.amount_minor >= 49900)
+    );
+
+    // 3. Pro override if free_sales_limit is high
+    const hasProLimit = (shop.free_sales_limit || 0) > 100;
+
+    const isSub = Boolean(subRecord || proPayment || hasProLimit);
+
+    let expiryText = 'N/A (Quota Based)';
+    if (subRecord?.expires_at) {
+      expiryText = new Date(subRecord.expires_at).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } else if (subRecord?.current_period_end) {
+      expiryText = new Date(subRecord.current_period_end).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } else if (proPayment?.paid_at) {
+      const d = new Date(proPayment.paid_at);
+      d.setDate(d.getDate() + 30);
+      expiryText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    } else if (isSub) {
+      expiryText = 'Active (Auto-Renews)';
+    }
+
+    const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
+    const pLabel = isSub ? 'Pro Plan (Subscriber)' : 'Free Plan (100 Quota)';
+
+    return { isSubscriber: isSub, planExpiry: expiryText, paymentStatus: payStatus, planLabel: pLabel };
+  }, [shop, subscriptions, payments]);
+
+  // Last Login / Activity Time
+  const lastLoginFormatted = useMemo(() => {
+    const dates: number[] = [];
+    if (ownerProfile?.updated_at) dates.push(new Date(ownerProfile.updated_at).getTime());
+    if (shop.updated_at) dates.push(new Date(shop.updated_at).getTime());
+    if (salonBills[0]?.issued_at) dates.push(new Date(salonBills[0].issued_at).getTime());
+    if (salonAppointments[0]?.starts_at) dates.push(new Date(salonAppointments[0].starts_at).getTime());
+
+    if (dates.length === 0) {
+      return shop.created_at
+        ? new Date(shop.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+        : 'Recently active';
+    }
+
+    const validDates = dates.filter((d) => !isNaN(d));
+    if (validDates.length === 0) return 'Recently active';
+
+    const latest = new Date(Math.max(...validDates));
+    return latest.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }, [ownerProfile, shop, salonBills, salonAppointments]);
 
   // Fetch real services configured for this salon
   useEffect(() => {
@@ -135,36 +317,170 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     }
   };
 
+  // Handle Saving New Call Response / Notes
+  const handleSaveResponse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!responseNotes.trim()) return;
+
+    setIsSavingResponse(true);
+    const newEntry: CallResponse = {
+      id: `resp-${Date.now()}`,
+      date: responseDate,
+      type: responseType,
+      outcome: responseOutcome,
+      contactPerson: responseContact || ownerProfile?.full_name || shop.name,
+      notes: responseNotes.trim(),
+      followUpDate: responseFollowUp || undefined,
+      recordedBy: 'Admin Team',
+    };
+
+    try {
+      // Also optionally attempt to log to audit_logs
+      await supabase.from('audit_logs').insert([
+        {
+          action: 'admin_call_response',
+          details: {
+            shop_id: shop.id,
+            shop_name: shop.name,
+            interaction_type: responseType,
+            outcome: responseOutcome,
+            notes: responseNotes.trim(),
+            contact: responseContact || ownerProfile?.full_name || shop.name,
+          },
+          created_at: new Date(responseDate).toISOString(),
+        },
+      ]);
+    } catch (err) {
+      console.warn('Audit log write error (fallback to local state):', err);
+    }
+
+    setCallResponses((prev) => [newEntry, ...prev]);
+    setIsSavingResponse(false);
+    setIsAddResponseOpen(false);
+    setResponseNotes('');
+    setResponseFollowUp('');
+  };
+
+  // Delete Call Response
+  const handleDeleteResponse = (id: string) => {
+    setCallResponses((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  // Report Builder: Generates Comprehensive Salon CSV
+  const handleGenerateReport = () => {
+    const lines: string[] = [];
+    lines.push(`"STYLEFLEET SALON COMPREHENSIVE DOSSIER"`);
+    lines.push(`"Report Generated","${new Date().toLocaleString('en-IN')}"`);
+    lines.push('');
+    lines.push(`"SALON INFORMATION"`);
+    lines.push(`"Salon Name","${shop.name}"`);
+    lines.push(`"City","${shop.city || 'Tamil Nadu'}"`);
+    lines.push(`"Phone","${shop.phone || '—'}"`);
+    lines.push(`"Owner Name","${ownerProfile?.full_name || shop.name}"`);
+    lines.push(`"Owner Phone","${ownerProfile?.phone || shop.phone || '—'}"`);
+    lines.push(`"GSTIN","${shop.gstin || 'None'}"`);
+    lines.push(`"Registered Date","${formatDate(shop.created_at)}"`);
+    lines.push(`"Days Active","${daysActive} days"`);
+    lines.push(`"Current Plan","${planLabel}"`);
+    lines.push(`"Plan Expiry","${planExpiry}"`);
+    lines.push(`"Payment Status","${paymentStatus}"`);
+    lines.push(`"Last Activity","${lastLoginFormatted}"`);
+    lines.push('');
+    lines.push(`"PERFORMANCE METRICS"`);
+    lines.push(`"Total Revenue (INR)","₹${Math.round(totalRevenue / 100).toLocaleString('en-IN')}"`);
+    lines.push(`"Total Customers","${salonCustomers.length}"`);
+    lines.push(`"Total Orders","${salonBills.length}"`);
+    lines.push(`"Completed Orders","${completedOrdersCount}"`);
+    lines.push(`"Pending Orders","${pendingOrdersCount}"`);
+    lines.push(`"Cancelled Orders","${cancelledOrdersCount}"`);
+    lines.push(`"Free Quota Used","${freeOrdersUsed} / ${freeSalesLimit}"`);
+    lines.push(`"Free Quota Remaining","${freeOrdersRemaining}"`);
+    lines.push('');
+
+    // Call responses
+    if (callResponses.length > 0) {
+      lines.push(`"CALL RESPONSES & ADMIN NOTES"`);
+      lines.push(`"Date","Type","Outcome","Contact Person","Notes","Follow-Up Date"`);
+      callResponses.forEach((cr) => {
+        lines.push(
+          `"${cr.date}","${cr.type}","${cr.outcome}","${cr.contactPerson}","${cr.notes.replace(/"/g, '""')}","${cr.followUpDate || '—'}"`
+        );
+      });
+      lines.push('');
+    }
+
+    // Bills & orders
+    lines.push(`"ORDERS & INVOICES"`);
+    lines.push(`"Invoice #","Date","Customer","Amount (INR)","Status"`);
+    salonBills.forEach((b) => {
+      lines.push(
+        `"${b.invoice_number}","${formatDate(b.issued_at || b.created_at)}","${b.customer?.name || 'Walk-in'}","₹${(b.total_minor / 100).toFixed(2)}","${b.status}"`
+      );
+    });
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(lines.join('\n'));
+    const link = document.createElement('a');
+    link.setAttribute('href', csvContent);
+    const cleanName = (shop.name || 'salon').replace(/[^a-zA-Z0-9]/g, '_');
+    link.setAttribute('download', `stylefleet_${cleanName}_report_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="space-y-6 font-sans text-neutral-900 pb-12">
+    <div className="space-y-6 font-sans text-black pb-16">
       {/* 1. TOP NAVIGATION & ACTIONS BAR */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F8F3F0] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#071952]/15 pb-4">
         <button
           onClick={onBack}
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer self-start"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
+          <span>Back to List</span>
         </button>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Add Response Button */}
+          <button
+            onClick={() => {
+              setResponseContact(ownerProfile?.full_name || shop.name);
+              setIsAddResponseOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+          >
+            <PhoneCall className="w-3.5 h-3.5 text-white" />
+            <span>+ Add Response</span>
+          </button>
+
+          {/* Report Builder Button */}
+          <button
+            onClick={handleGenerateReport}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] hover:bg-[#071952]/10 text-black text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-[#071952]" />
+            <span>Report Builder</span>
+          </button>
+
+          {/* Refresh Button */}
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#F8F3F0] bg-white hover:bg-neutral-50 text-[#071952] text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#071952]/30 bg-[#F8F3F0] hover:bg-[#071952]/10 text-black text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 text-[#071952]" />
               <span>Refresh</span>
             </button>
           )}
-          <span className="text-xs font-mono text-[#071952] bg-[#F8F3F0] px-2.5 py-1 rounded border border-[#071952]/20">
+
+          <span className="text-xs font-mono text-black/70 bg-[#F8F3F0] px-2.5 py-1 rounded border border-[#071952]/20">
             ID: {shop.id.slice(0, 8)}...
           </span>
         </div>
       </div>
 
       {/* 2. SALON PROFILE HERO BANNER */}
-      <div className="bg-white rounded-2xl border border-[#F8F3F0] p-6 shadow-2xs">
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-6 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
@@ -172,497 +488,676 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 {shop.name ? shop.name.charAt(0).toUpperCase() : 'S'}
               </div>
               <div>
-                <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
-                  {shop.name}
-                </h1>
-                <div className="flex items-center gap-2 text-xs text-neutral-600 mt-0.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl font-black text-black tracking-tight">{shop.name}</h1>
+                  {isSubscriber ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#071952] text-white border border-[#071952]">
+                      ★ Pro Subscriber
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#071952]/10 text-black border border-[#071952]/30">
+                      Free Plan
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-black/70 mt-1 flex-wrap">
                   <span className="inline-flex items-center gap-1 font-medium">
                     <MapPin className="w-3.5 h-3.5 text-[#071952]" />
                     {shop.city || 'Tamil Nadu'}
                   </span>
                   <span>•</span>
-                  <span className="inline-flex items-center gap-1 font-mono font-bold text-neutral-800">
+                  <span className="inline-flex items-center gap-1 font-mono font-bold text-black">
                     <Phone className="w-3.5 h-3.5 text-[#071952]" />
                     {shop.phone || 'No phone'}
                   </span>
                   <span>•</span>
-                  <span className="text-neutral-500 font-mono">
-                    Joined {formatDate(shop.created_at)}
+                  <span className="text-black/60 font-mono">
+                    Owner: <strong>{ownerProfile?.full_name || shop.name}</strong>
                   </span>
                 </div>
               </div>
             </div>
 
             {shop.address && (
-              <p className="text-xs text-neutral-600 pt-1">
-                <span className="font-semibold text-neutral-800">Address: </span>
-                {shop.address}{shop.pin_code ? ` - ${shop.pin_code}` : ''}
+              <p className="text-xs text-black/80 pt-1">
+                <span className="font-semibold text-black">Address: </span>
+                {shop.address}
+                {shop.pin_code ? ` - ${shop.pin_code}` : ''}
               </p>
             )}
           </div>
 
-          {/* Plan Limit / Status badge */}
-          <div className="flex flex-col items-start md:items-end gap-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F8F3F0] border border-[#071952]/30 text-[#071952] text-xs font-bold font-mono">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>
-                {shop.free_sales_limit && shop.free_sales_limit > 100
-                  ? 'PRO PLAN (UNLIMITED)'
-                  : 'FREE PLAN (100 LIMIT)'}
-              </span>
+          {/* Quick Plan & GST Pill */}
+          <div className="flex flex-col items-start md:items-end gap-1.5 shrink-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#071952] text-white text-xs font-bold font-mono shadow-xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+              <span>{isSubscriber ? 'PRO SUBSCRIBER' : 'FREE TIER (100 LIMIT)'}</span>
             </div>
-            <span className="text-[11px] font-mono text-neutral-500">
+            <span className="text-[11px] font-mono text-black/70">
               GST: {shop.gstin ? shop.gstin : 'Not Registered'}
             </span>
           </div>
         </div>
+      </div>
 
-        {/* 4 Primary KPI Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#F8F3F0]">
-          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
-            <div className="text-[11px] font-bold text-[#071952] uppercase font-mono">
-              Total Revenue
-            </div>
-            <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
-              ₹{Math.round(totalRevenue / 100).toLocaleString()}
+      {/* 3. COMPREHENSIVE PERFORMANCE & ACCOUNT METRICS (ALL USER-REQUESTED FIELDS) */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
+          <h2 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-[#071952]" />
+            <span>Account Status & Operational Metrics</span>
+          </h2>
+          <span className="text-[11px] font-mono text-black/60">Real-Time Data Verified</span>
+        </div>
+
+        {/* 12-Card Metrics Matrix */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {/* 1. Registered Date */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Registered Date</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{formatDate(shop.created_at)}</div>
+          </div>
+
+          {/* 2. Days Active */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Days Active</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{daysActive} days active</div>
+          </div>
+
+          {/* 3. Current Plan */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Current Plan</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">
+              {isSubscriber ? 'Pro Plan' : 'Free Trial'}
             </div>
           </div>
 
-          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
-            <div className="text-[11px] font-bold text-[#071952] uppercase font-mono">
-              Bills Issued
-            </div>
-            <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
-              {salonBills.length}
+          {/* 4. Plan Expiry */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Plan Expiry</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{planExpiry}</div>
+          </div>
+
+          {/* 5. Payment Status */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Payment Status</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{paymentStatus}</div>
+          </div>
+
+          {/* 6. Total Revenue */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Total Revenue</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">
+              ₹{Math.round(totalRevenue / 100).toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
-            <div className="text-[11px] font-bold text-[#071952] uppercase font-mono">
-              Stylists & Staff
-            </div>
-            <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
-              {salonStaff.length}
-            </div>
+          {/* 7. Total Customers */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Total Customers</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{salonCustomers.length} clients</div>
           </div>
 
-          <div className="bg-[#F8F3F0]/30 rounded-xl p-3.5 border border-[#F8F3F0]">
-            <div className="text-[11px] font-bold text-[#071952] uppercase font-mono">
-              Services Offered
-            </div>
-            <div className="text-2xl font-black text-neutral-900 mt-1 font-mono">
-              {services.length}
-            </div>
+          {/* 8. Total Orders */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Total Orders</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{salonBills.length} orders</div>
+          </div>
+
+          {/* 9. Completed Orders */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Completed Orders</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{completedOrdersCount}</div>
+          </div>
+
+          {/* 10. Pending Orders */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Pending Orders</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{pendingOrdersCount}</div>
+          </div>
+
+          {/* 11. Cancelled Orders */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Cancelled Orders</div>
+            <div className="text-sm font-black text-black mt-1 font-mono">{cancelledOrdersCount}</div>
+          </div>
+
+          {/* 12. Last Login */}
+          <div className="bg-[#F8F3F0] rounded-xl p-3 border border-[#071952]/15">
+            <div className="text-[10px] font-bold text-black/60 uppercase font-mono">Last Login / Active</div>
+            <div className="text-xs font-black text-black mt-1 font-mono truncate">{lastLoginFormatted}</div>
+          </div>
+        </div>
+
+        {/* Free Orders Quota Progress Bar */}
+        <div className="pt-3 border-t border-[#071952]/15">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-black mb-1.5">
+            <span>Free Orders Quota Status:</span>
+            <span>
+              {freeOrdersUsed} / {freeSalesLimit} Used ({freeOrdersRemaining} Orders Left)
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-black/10 overflow-hidden">
+            <div className="h-full bg-[#071952] transition-all" style={{ width: `${freeOrdersPercent}%` }} />
           </div>
         </div>
       </div>
 
-      {/* 3. SECTION TABS (Two-color scheme: #071952 & #F8F3F0) */}
-      <div className="flex items-center gap-1.5 border-b border-[#F8F3F0] pb-2 overflow-x-auto text-xs">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
-            activeTab === 'overview'
-              ? 'bg-[#071952] text-white shadow-xs'
-              : 'bg-[#F8F3F0] text-[#071952] hover:bg-[#d0d8dd]'
-          }`}
-        >
-          Owner & Business Info
-        </button>
+      {/* 4. DOWN BY DOWN SECTIONS (NO SIDE-BY-SIDE) */}
 
-        <button
-          onClick={() => setActiveTab('staff')}
-          className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
-            activeTab === 'staff'
-              ? 'bg-[#071952] text-white shadow-xs'
-              : 'bg-[#F8F3F0] text-[#071952] hover:bg-[#d0d8dd]'
-          }`}
-        >
-          Staff & Stylists ({salonStaff.length})
-        </button>
+      {/* SECTION 1: OWNER AND BUSINESS INFO */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
+          <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider flex items-center gap-2">
+            <User className="w-4 h-4 text-[#071952]" />
+            <span>Owner and Business Information</span>
+          </h3>
+          <span className="text-[11px] font-mono text-black/60">Verified Credentials</span>
+        </div>
 
-        <button
-          onClick={() => setActiveTab('services')}
-          className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
-            activeTab === 'services'
-              ? 'bg-[#071952] text-white shadow-xs'
-              : 'bg-[#F8F3F0] text-[#071952] hover:bg-[#d0d8dd]'
-          }`}
-        >
-          Services ({services.length})
-        </button>
+        <div className="space-y-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Owner Full Name</span>
+              <span className="text-sm font-bold text-black mt-0.5 block">
+                {ownerProfile?.full_name || shop.name}
+              </span>
+            </div>
 
-        <button
-          onClick={() => setActiveTab('bills')}
-          className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
-            activeTab === 'bills'
-              ? 'bg-[#071952] text-white shadow-xs'
-              : 'bg-[#F8F3F0] text-[#071952] hover:bg-[#d0d8dd]'
-          }`}
-        >
-          Bills & Orders ({salonBills.length})
-        </button>
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Owner Phone</span>
+              <span className="text-sm font-mono font-bold text-black mt-0.5 block">
+                {ownerProfile?.phone || shop.phone || '—'}
+              </span>
+            </div>
 
-        <button
-          onClick={() => setActiveTab('appointments')}
-          className={`px-4 py-2 rounded-lg font-bold transition-all cursor-pointer ${
-            activeTab === 'appointments'
-              ? 'bg-[#071952] text-white shadow-xs'
-              : 'bg-[#F8F3F0] text-[#071952] hover:bg-[#d0d8dd]'
-          }`}
-        >
-          Appointments ({salonAppointments.length})
-        </button>
-      </div>
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Owner Profile ID</span>
+              <span className="text-xs font-mono text-black/80 bg-black/5 px-2 py-1 rounded inline-block mt-0.5">
+                {shop.owner_profile_id || ownerProfile?.id || '—'}
+              </span>
+            </div>
 
-      {/* 4. TAB CONTENT */}
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Profile Registration</span>
+              <span className="text-xs font-mono text-black mt-0.5 block">
+                {formatDate(ownerProfile?.created_at || shop.created_at)}
+              </span>
+            </div>
+          </div>
 
-      {/* TAB 1: OWNER & BUSINESS DETAILS */}
-      {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Owner Profile Card */}
-          <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-2xs space-y-4">
-            <h3 className="text-sm font-bold text-neutral-900 uppercase font-mono tracking-wider border-b border-neutral-100 pb-2">
-              Salon Owner Profile
-            </h3>
+          <div className="pt-3 border-t border-[#071952]/15 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">GSTIN Number</span>
+              <span className="text-sm font-mono font-bold text-black mt-0.5 block">
+                {shop.gstin || 'None Registered'}
+              </span>
+            </div>
 
-            <div className="space-y-3 text-xs">
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Owner Full Name
-                </span>
-                <span className="text-sm font-bold text-neutral-900">
-                  {ownerProfile?.full_name || shop.name}
-                </span>
-              </div>
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">GST Rate</span>
+              <span className="text-sm font-mono font-bold text-black mt-0.5 block">
+                {shop.gst_rate !== undefined ? `${shop.gst_rate}%` : '0%'}
+              </span>
+            </div>
 
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Owner Phone Number
-                </span>
-                <span className="text-sm font-mono font-bold text-neutral-900">
-                  {ownerProfile?.phone || shop.phone || '—'}
-                </span>
-              </div>
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Invoice Prefix</span>
+              <span className="text-sm font-mono font-bold text-[#071952] mt-0.5 block">
+                {shop.invoice_prefix || 'INV'}
+              </span>
+            </div>
 
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Owner Profile ID
-                </span>
-                <span className="text-xs font-mono text-neutral-700 bg-neutral-100 px-2 py-1 rounded inline-block">
-                  {shop.owner_profile_id || ownerProfile?.id || '—'}
-                </span>
-              </div>
-
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Profile Registration Date
-                </span>
-                <span className="text-xs font-mono text-neutral-700">
-                  {formatDate(ownerProfile?.created_at || shop.created_at)}
+            <div>
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Brand Theme Accent</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span
+                  className="w-4 h-4 rounded-full border border-black/20 shrink-0"
+                  style={{ backgroundColor: shop.accent_color || '#071952' }}
+                />
+                <span className="font-mono text-xs font-bold text-black">
+                  {shop.accent_color || '#071952'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Business & Tax Configuration Card */}
-          <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-2xs space-y-4">
-            <h3 className="text-sm font-bold text-neutral-900 uppercase font-mono tracking-wider border-b border-neutral-100 pb-2">
-              Tax & Invoicing Settings
+          {shop.address && (
+            <div className="pt-3 border-t border-[#071952]/15">
+              <span className="text-[10px] font-bold text-black/60 uppercase block font-mono">Full Physical Address</span>
+              <span className="text-xs text-black font-medium mt-0.5 block">
+                {shop.address}
+                {shop.city ? `, ${shop.city}` : ''}
+                {shop.pin_code ? ` - ${shop.pin_code}` : ''}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SECTION 2: CALL RESPONSES & ADMIN NOTES */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
+          <div className="flex items-center gap-2">
+            <PhoneCall className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Call Responses & Admin Notes ({callResponses.length})
             </h3>
+          </div>
+          <button
+            onClick={() => {
+              setResponseContact(ownerProfile?.full_name || shop.name);
+              setIsAddResponseOpen(true);
+            }}
+            className="inline-flex items-center gap-1 px-3 py-1 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>Add Response</span>
+          </button>
+        </div>
 
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  GSTIN Number
-                </span>
-                <span className="text-sm font-mono font-bold text-neutral-900">
-                  {shop.gstin || 'None'}
-                </span>
+        {callResponses.length === 0 ? (
+          <div className="py-8 text-center bg-[#F8F3F0] rounded-xl border border-dashed border-[#071952]/25 p-4">
+            <MessageSquare className="w-8 h-8 text-[#071952]/40 mx-auto mb-2" />
+            <p className="text-xs text-black/70 font-medium">No calls or responses logged yet for this salon.</p>
+            <p className="text-[11px] text-black/50 mt-0.5">
+              Click <strong>&ldquo;+ Add Response&rdquo;</strong> to record a call note with date, discussion points, and follow-up.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {callResponses.map((cr) => (
+              <div
+                key={cr.id}
+                className="bg-[#F8F3F0] rounded-xl p-4 border border-[#071952]/20 hover:border-[#071952]/40 transition-colors space-y-2"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#071952]/10 pb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-[#071952] text-white">
+                      {cr.outcome}
+                    </span>
+                    <span className="text-xs font-bold text-black font-mono">
+                      {cr.type} with {cr.contactPerson}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-[11px] font-mono text-black/70 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-[#071952]" />
+                      <span>{cr.date.replace('T', ' ')}</span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteResponse(cr.id)}
+                      className="text-black/40 hover:text-black p-1 transition-colors cursor-pointer"
+                      title="Delete log"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-black/90 leading-relaxed whitespace-pre-wrap">{cr.notes}</p>
+
+                {cr.followUpDate && (
+                  <div className="text-[11px] font-mono text-[#071952] font-semibold pt-1">
+                    Scheduled Follow-Up: {cr.followUpDate}
+                  </div>
+                )}
               </div>
+            ))}
+          </div>
+        )}
+      </div>
 
+      {/* SECTION 3: STAFF AND STYLIST */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
+        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Scissors className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Staff and Stylists Roster ({salonStaff.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-black/60">Full salon team list</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                <th className="py-3 px-4">Name</th>
+                <th className="py-3 px-3">Role</th>
+                <th className="py-3 px-3">Phone</th>
+                <th className="py-3 px-3 text-center">Status</th>
+                <th className="py-3 px-4">Joined Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#071952]/10 text-black">
+              {salonStaff.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
+                    No staff members configured for this salon.
+                  </td>
+                </tr>
+              ) : (
+                salonStaff.map((s) => (
+                  <tr key={s.id} className="hover:bg-[#071952]/5 transition-colors">
+                    <td className="py-3 px-4 font-bold text-black">{s.name}</td>
+                    <td className="py-3 px-3">
+                      <span className="font-mono text-xs font-semibold text-black/80">{s.role || 'Stylist'}</span>
+                    </td>
+                    <td className="py-3 px-3 font-mono text-black/80">{s.phone || '—'}</td>
+                    <td className="py-3 px-3 text-center">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                          s.is_active
+                            ? 'bg-[#071952] text-white border border-[#071952]'
+                            : 'bg-black/10 text-black/60'
+                        }`}
+                      >
+                        {s.is_active ? 'ACTIVE' : 'INACTIVE'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-mono text-black/70 text-[11px]">{formatDate(s.created_at)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 4: SERVICES */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
+        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Services Catalog ({services.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-black/60">Active pricing & duration</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                <th className="py-3 px-4">Service Name</th>
+                <th className="py-3 px-3 text-right">Price</th>
+                <th className="py-3 px-3 text-center">Duration</th>
+                <th className="py-3 px-3 text-center">Catalog Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#071952]/10 text-black">
+              {servicesLoading ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
+                    Loading services catalog...
+                  </td>
+                </tr>
+              ) : services.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
+                    No services entered for this salon.
+                  </td>
+                </tr>
+              ) : (
+                services.map((srv) => (
+                  <tr key={srv.id} className="hover:bg-[#071952]/5 transition-colors">
+                    <td className="py-3 px-4 font-bold text-black">{srv.name}</td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-black">
+                      ₹{(srv.price_minor / 100).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-black/80">{srv.duration_minutes} mins</td>
+                    <td className="py-3 px-3 text-center">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                          srv.is_active
+                            ? 'bg-[#071952] text-white border border-[#071952]'
+                            : 'bg-black/10 text-black/60'
+                        }`}
+                      >
+                        {srv.is_active ? 'ACTIVE' : 'DISABLED'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 5: BILLS AND ORDERS */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
+        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Receipt className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Bills and Orders History ({salonBills.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-black/60">
+            Total Revenue: ₹{Math.round(totalRevenue / 100).toLocaleString('en-IN')}
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                <th className="py-3 px-4">Invoice #</th>
+                <th className="py-3 px-3">Date</th>
+                <th className="py-3 px-3">Customer</th>
+                <th className="py-3 px-3 text-right">Amount</th>
+                <th className="py-3 px-3 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#071952]/10 text-black">
+              {salonBills.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
+                    No bills issued yet by this salon.
+                  </td>
+                </tr>
+              ) : (
+                salonBills.map((b) => (
+                  <tr key={b.id} className="hover:bg-[#071952]/5 transition-colors">
+                    <td className="py-3 px-4 font-mono font-bold text-[#071952]">{b.invoice_number}</td>
+                    <td className="py-3 px-3 font-mono text-black/70 text-[11px]">
+                      {formatDate(b.issued_at || b.created_at)}
+                    </td>
+                    <td className="py-3 px-3 text-black font-medium">{b.customer?.name || 'Walk-in Client'}</td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-black">
+                      ₹{(b.total_minor / 100).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#071952]/10 text-black border border-[#071952]/20">
+                        {b.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 6: APPOINTMENTS */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
+        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CalendarClock className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Appointments Schedule ({salonAppointments.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-black/60">Booking and calendar log</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                <th className="py-3 px-4">Schedule Time</th>
+                <th className="py-3 px-3">Client</th>
+                <th className="py-3 px-3">Assigned Stylist</th>
+                <th className="py-3 px-3 text-center">Duration</th>
+                <th className="py-3 px-3 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#071952]/10 text-black">
+              {salonAppointments.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
+                    No appointments recorded for this salon.
+                  </td>
+                </tr>
+              ) : (
+                salonAppointments.map((a) => (
+                  <tr key={a.id} className="hover:bg-[#071952]/5 transition-colors">
+                    <td className="py-3 px-4 font-mono font-bold text-black">{formatDate(a.starts_at)}</td>
+                    <td className="py-3 px-3 text-black font-medium">{a.customer?.name || 'Client'}</td>
+                    <td className="py-3 px-3 text-black/80">{a.staff?.name || 'Any Staff'}</td>
+                    <td className="py-3 px-3 text-center font-mono text-black/80">{a.duration_minutes}m</td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#071952]/10 text-black border border-[#071952]/20">
+                        {a.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 5. ADD RESPONSE / CALL NOTE MODAL */}
+      {isAddResponseOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-[#F8F3F0] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#071952]/20">
+            <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15 mb-4">
               <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  GST Rate
-                </span>
-                <span className="text-sm font-mono font-bold text-neutral-900">
-                  {shop.gst_rate !== undefined ? `${shop.gst_rate}%` : '0%'}
-                </span>
+                <h3 className="text-base font-bold text-black">Record Call Response / Note</h3>
+                <p className="text-xs text-black/60">
+                  Log your conversation with {shop.name} owner ({ownerProfile?.phone || shop.phone || 'No phone'})
+                </p>
               </div>
+              <button
+                onClick={() => setIsAddResponseOpen(false)}
+                className="p-1 rounded-lg text-black/40 hover:text-black transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Invoice Prefix
-                </span>
-                <span className="text-sm font-mono font-bold text-[#071952]">
-                  {shop.invoice_prefix || 'INV'}
-                </span>
-              </div>
-
-              <div>
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Free Quota Limit
-                </span>
-                <span className="text-sm font-mono font-bold text-neutral-900">
-                  {shop.free_sales_limit || 100} Sales
-                </span>
-              </div>
-
-              <div className="col-span-2 pt-2 border-t border-neutral-100">
-                <span className="text-[11px] font-bold text-neutral-500 uppercase block font-mono">
-                  Brand Theme Color
-                </span>
-                <div className="flex items-center gap-2 mt-1">
-                  <span
-                    className="w-4 h-4 rounded-full border border-neutral-300"
-                    style={{ backgroundColor: shop.accent_color || '#000000' }}
+            <form onSubmit={handleSaveResponse} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Date & Time */}
+                <div className="space-y-1">
+                  <label className="font-semibold text-black/80 font-mono">Date &amp; Time *</label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={responseDate}
+                    onChange={(e) => setResponseDate(e.target.value)}
+                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] font-mono"
                   />
-                  <span className="font-mono text-xs font-bold text-neutral-800">
-                    {shop.accent_color || '#000000'}
-                  </span>
+                </div>
+
+                {/* Interaction Type */}
+                <div className="space-y-1">
+                  <label className="font-semibold text-black/80 font-mono">Interaction Type *</label>
+                  <select
+                    value={responseType}
+                    onChange={(e) => setResponseType(e.target.value)}
+                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
+                  >
+                    <option value="Phone Call">Phone Call</option>
+                    <option value="WhatsApp Chat">WhatsApp Chat</option>
+                    <option value="In-Person Visit">In-Person Visit</option>
+                    <option value="Follow-Up Call">Follow-Up Call</option>
+                    <option value="Email">Email</option>
+                  </select>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* TAB 2: STAFF & STYLISTS */}
-      {activeTab === 'staff' && (
-        <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-2xs">
-          <div className="p-4 border-b border-neutral-100 bg-neutral-50">
-            <h3 className="text-xs font-bold text-neutral-900 uppercase font-mono tracking-wider">
-              Registered Staff Members ({salonStaff.length})
-            </h3>
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Call Outcome */}
+                <div className="space-y-1">
+                  <label className="font-semibold text-black/80 font-mono">Call Outcome *</label>
+                  <select
+                    value={responseOutcome}
+                    onChange={(e) => setResponseOutcome(e.target.value)}
+                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
+                  >
+                    <option value="Connected & Discussed">Connected &amp; Discussed</option>
+                    <option value="Interested in Pro Plan">Interested in Pro Plan</option>
+                    <option value="Requested Follow-Up">Requested Follow-Up</option>
+                    <option value="Support / Help Requested">Support / Help Requested</option>
+                    <option value="Feature Request">Feature Request</option>
+                    <option value="Did Not Answer">Did Not Answer / Busy</option>
+                    <option value="General Check-In">General Check-In</option>
+                  </select>
+                </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead>
-                <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 font-mono">
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-3">Role</th>
-                  <th className="py-3 px-3">Phone</th>
-                  <th className="py-3 px-3 text-center">Status</th>
-                  <th className="py-3 px-4">Joined</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 text-neutral-800">
-                {salonStaff.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-10 text-center text-xs text-neutral-400">
-                      No staff members configured for this salon.
-                    </td>
-                  </tr>
-                ) : (
-                  salonStaff.map((s) => (
-                    <tr key={s.id} className="hover:bg-neutral-50/70 transition-colors">
-                      <td className="py-3 px-4 font-bold text-neutral-900">
-                        {s.name}
-                      </td>
-                      <td className="py-3 px-3">
-                        <span className="font-mono text-xs font-semibold text-[#0f172a]">
-                          {s.role || 'Stylist'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 font-mono text-neutral-700">
-                        {s.phone || '—'}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                            s.is_active
-                              ? 'bg-neutral-100 text-neutral-900 border border-neutral-300'
-                              : 'bg-neutral-100 text-neutral-500'
-                          }`}
-                        >
-                          {s.is_active ? 'ACTIVE' : 'INACTIVE'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 font-mono text-neutral-600 text-[11px]">
-                        {formatDate(s.created_at)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                {/* Contact Person */}
+                <div className="space-y-1">
+                  <label className="font-semibold text-black/80 font-mono">Spoke With</label>
+                  <input
+                    type="text"
+                    value={responseContact}
+                    onChange={(e) => setResponseContact(e.target.value)}
+                    placeholder="Owner / Manager name"
+                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
+                  />
+                </div>
+              </div>
 
-      {/* TAB 3: SERVICES CATALOG */}
-      {activeTab === 'services' && (
-        <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-2xs">
-          <div className="p-4 border-b border-neutral-100 bg-neutral-50">
-            <h3 className="text-xs font-bold text-neutral-900 uppercase font-mono tracking-wider">
-              Services Menu ({services.length})
-            </h3>
-          </div>
+              {/* Discussion Notes */}
+              <div className="space-y-1">
+                <label className="font-semibold text-black/80 font-mono">Discussion Notes &amp; Feedback *</label>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="Summarize what was discussed during the call with the owner..."
+                  value={responseNotes}
+                  onChange={(e) => setResponseNotes(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
+                />
+              </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead>
-                <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 font-mono">
-                  <th className="py-3 px-4">Service Name</th>
-                  <th className="py-3 px-3 text-right">Price</th>
-                  <th className="py-3 px-3 text-center">Duration</th>
-                  <th className="py-3 px-3 text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 text-neutral-800">
-                {servicesLoading ? (
-                  <tr>
-                    <td colSpan={4} className="py-10 text-center text-xs text-neutral-400">
-                      Loading services catalog...
-                    </td>
-                  </tr>
-                ) : services.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="py-10 text-center text-xs text-neutral-400">
-                      No services entered for this salon.
-                    </td>
-                  </tr>
-                ) : (
-                  services.map((srv) => (
-                    <tr key={srv.id} className="hover:bg-neutral-50/70 transition-colors">
-                      <td className="py-3 px-4 font-bold text-neutral-900">
-                        {srv.name}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono font-bold text-neutral-900">
-                        ₹{(srv.price_minor / 100).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 text-center font-mono text-neutral-700">
-                        {srv.duration_minutes} mins
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                            srv.is_active
-                              ? 'bg-neutral-100 text-neutral-900 border border-neutral-300'
-                              : 'bg-neutral-100 text-neutral-500'
-                          }`}
-                        >
-                          {srv.is_active ? 'ACTIVE' : 'DISABLED'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+              {/* Optional Next Follow-Up Date */}
+              <div className="space-y-1">
+                <label className="font-semibold text-black/80 font-mono">Next Follow-Up Date (Optional)</label>
+                <input
+                  type="date"
+                  value={responseFollowUp}
+                  onChange={(e) => setResponseFollowUp(e.target.value)}
+                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] font-mono cursor-pointer"
+                />
+              </div>
 
-      {/* TAB 4: BILLS & ORDERS */}
-      {activeTab === 'bills' && (
-        <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-2xs">
-          <div className="p-4 border-b border-neutral-100 bg-neutral-50">
-            <h3 className="text-xs font-bold text-neutral-900 uppercase font-mono tracking-wider">
-              Invoices & Orders History ({salonBills.length})
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead>
-                <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 font-mono">
-                  <th className="py-3 px-4">Invoice #</th>
-                  <th className="py-3 px-3">Date</th>
-                  <th className="py-3 px-3">Customer</th>
-                  <th className="py-3 px-3 text-right">Amount</th>
-                  <th className="py-3 px-3 text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 text-neutral-800">
-                {salonBills.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-10 text-center text-xs text-neutral-400">
-                      No bills issued yet by this salon.
-                    </td>
-                  </tr>
-                ) : (
-                  salonBills.map((b) => (
-                    <tr key={b.id} className="hover:bg-neutral-50/70 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-[#071952]">
-                        {b.invoice_number}
-                      </td>
-                      <td className="py-3 px-3 font-mono text-neutral-700 text-[11px]">
-                        {formatDate(b.issued_at || b.created_at)}
-                      </td>
-                      <td className="py-3 px-3 text-neutral-900 font-medium">
-                        {b.customer?.name || 'Walk-in Client'}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono font-bold text-neutral-900">
-                        ₹{(b.total_minor / 100).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-neutral-100 text-neutral-900 border border-neutral-200">
-                          {b.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: APPOINTMENTS */}
-      {activeTab === 'appointments' && (
-        <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-2xs">
-          <div className="p-4 border-b border-neutral-100 bg-neutral-50">
-            <h3 className="text-xs font-bold text-neutral-900 uppercase font-mono tracking-wider">
-              Appointments ({salonAppointments.length})
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead>
-                <tr className="border-b border-neutral-100 text-[10px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 font-mono">
-                  <th className="py-3 px-4">Schedule Time</th>
-                  <th className="py-3 px-3">Client</th>
-                  <th className="py-3 px-3">Stylist</th>
-                  <th className="py-3 px-3 text-center">Duration</th>
-                  <th className="py-3 px-3 text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 text-neutral-800">
-                {salonAppointments.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-10 text-center text-xs text-neutral-400">
-                      No appointments recorded for this salon.
-                    </td>
-                  </tr>
-                ) : (
-                  salonAppointments.map((a) => (
-                    <tr key={a.id} className="hover:bg-neutral-50/70 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-neutral-900">
-                        {formatDate(a.starts_at)}
-                      </td>
-                      <td className="py-3 px-3 text-neutral-800 font-medium">
-                        {a.customer?.name || 'Client'}
-                      </td>
-                      <td className="py-3 px-3 text-neutral-700">
-                        {a.staff?.name || 'Any Staff'}
-                      </td>
-                      <td className="py-3 px-3 text-center font-mono text-neutral-700">
-                        {a.duration_minutes}m
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-neutral-100 text-neutral-900 border border-neutral-200">
-                          {a.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+              {/* Action Buttons */}
+              <div className="pt-3 border-t border-[#071952]/15 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddResponseOpen(false)}
+                  className="px-3.5 py-1.5 rounded-lg border border-[#071952]/30 hover:bg-[#071952]/10 text-black/70 font-medium transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingResponse}
+                  className="px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingResponse ? 'Saving...' : 'Save Response'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
