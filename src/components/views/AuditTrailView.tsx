@@ -272,12 +272,12 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
     if (salonFilter !== 'all') {
       const s = shopMap.get(salonFilter);
       const safeName = (s?.name || 'salon').toLowerCase().replace(/[^a-z0-9]/g, '_');
-      return `stylefleet_audit_${safeName}`;
+      return `stylefleet_activity_${safeName}`;
     }
     if (cityFilter !== 'all') {
-      return `stylefleet_audit_${cityFilter.toLowerCase()}`;
+      return `stylefleet_activity_${cityFilter.toLowerCase()}`;
     }
-    return 'stylefleet_audit_trail';
+    return 'stylefleet_activity_logs';
   }, [salonFilter, cityFilter, shopMap]);
 
   const exportLabel = useMemo(() => {
@@ -288,7 +288,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
     if (cityFilter !== 'all') {
       return `Download ${cityFilter} Report`;
     }
-    return 'Download Audit Report';
+    return 'Download Activity Report';
   }, [salonFilter, cityFilter, shopMap]);
 
   const columns: Column<AuditTrailItem>[] = [
@@ -326,7 +326,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
     },
     {
       key: 'description',
-      header: 'Audit Description',
+      header: 'Activity Description',
       render: (item) => (
         <span className="text-neutral-700 text-xs">{item.description}</span>
       ),
@@ -374,7 +374,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
             { key: 'type', label: 'Operation Type' },
             { key: 'entity', label: 'Entity / Salon' },
             { key: 'cityName', label: 'City' },
-            { key: 'description', label: 'Audit Description' },
+            { key: 'description', label: 'Activity Description' },
             { key: 'status', label: 'Status' },
             { key: 'timestamp', label: 'Timestamp' },
           ]}
@@ -384,7 +384,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
       {/* Snapshot Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <KPICard
-          title="Audit Records"
+          title="Activity Records"
           value={filteredItems.length}
           subtitle="Events in filter"
           icon={History}
@@ -424,7 +424,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100">
           <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
             <Sparkles className="w-4 h-4 text-black" />
-            <span>Multi-Attribute Audit Filters (Single Salon &amp; City Targeting)</span>
+            <span>Multi-Attribute Activity Filters (Single Salon &amp; City Targeting)</span>
           </div>
 
           {/* Quick Date Presets */}
@@ -550,7 +550,7 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
         {isAnyFilterActive && (
           <div className="flex items-center justify-between pt-2 text-xs border-t border-neutral-100">
             <span className="text-neutral-500 font-medium">
-              Showing <span className="font-bold text-black">{filteredItems.length}</span> audit events
+              Showing <span className="font-bold text-black">{filteredItems.length}</span> activity events
               {cityFilter !== 'all' && ` in ${cityFilter}`}
               {salonFilter !== 'all' && ` for ${shopMap.get(salonFilter)?.name}`}
             </span>
@@ -565,14 +565,14 @@ export const AuditTrailView: React.FC<AuditTrailViewProps> = ({
         )}
       </div>
 
-      {/* Audit Table */}
+      {/* Activity Table */}
       <DataTable
         columns={columns}
         data={filteredItems}
         loading={loading}
-        emptyTitle="No audit records found"
+        emptyTitle="No activity logs found"
         emptyDescription="No database events found matching the active single salon, city, or date criteria."
-        searchPlaceholder="Filter listed audit records..."
+        searchPlaceholder="Filter activity logs..."
         searchFields={['type', 'entity', 'description']}
         defaultSortField="timestamp"
         defaultSortOrder="desc"

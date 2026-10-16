@@ -738,7 +738,7 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* 8. Activity Logs & Platform Audit */}
+          {/* 8. Activity Logs */}
           {currentView === 'platform_audit' && (
             <AuditTrailView
               payments={payments}

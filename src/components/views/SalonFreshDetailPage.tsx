@@ -529,7 +529,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   // Report Builder: Generates Comprehensive Salon CSV
   const handleGenerateReport = () => {
     const lines: string[] = [];
-    lines.push(`"STYLEFLEET SALON COMPREHENSIVE DOSSIER"`);
+    lines.push(`"STYLEFLEET SALON ACTIVITY LOGS & REPORT"`);
     lines.push(`"Report Generated","${new Date().toLocaleString('en-IN')}"`);
     lines.push('');
     lines.push(`"SALON INFORMATION"`);
