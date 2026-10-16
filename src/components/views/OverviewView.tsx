@@ -3,11 +3,14 @@ import {
   RotateCcw,
   Search,
   ChevronDown,
+  Calendar,
+  Filter,
+  Smartphone,
+  MessageCircle,
+  ArrowUpDown,
+  X,
   MapPin,
   ExternalLink,
-  Phone,
-  MessageCircle,
-  Building2,
   ChevronRight,
 } from 'lucide-react';
 import { ExportButton } from '../common/ExportButton';
@@ -25,7 +28,7 @@ import {
   AccountDeletion,
   SupportMessage,
 } from '../../types/database';
-import { NavView } from '../../types/dashboard';
+import { DateFilterOption, NavView } from '../../types/dashboard';
 import { SalonFreshDetailPage } from './SalonFreshDetailPage';
 
 interface OverviewViewProps {
@@ -44,6 +47,29 @@ interface OverviewViewProps {
   onSelectSalon?: (shop: Shop) => void;
 }
 
+type PillFilterType =
+  | 'all'
+  | 'active'
+  | 'inactive'
+  | 'free_plan'
+  | 'pro_plan'
+  | 'with_bills'
+  | 'zero_bills'
+  | 'with_customers'
+  | 'near_limit'
+  | 'staff_configured'
+  | 'gst_enabled'
+  | 'ten_plus_bills';
+
+type SortField =
+  | 'ownerName'
+  | 'name'
+  | 'phone'
+  | 'city'
+  | 'created_at'
+  | 'lifetimeSalesCount'
+  | 'billed';
+
 const cleanDigits = (p?: string | null) => (p ? p.replace(/\D/g, '').slice(-10) : '');
 
 export const OverviewView: React.FC<OverviewViewProps> = ({
@@ -60,88 +86,192 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   onNavigate,
   onSelectSalon,
 }) => {
-  const { dateRange, selectedOption } = useDateFilter();
+  const { dateRange, selectedOption, setSelectedOption } = useDateFilter();
   const [searchQuery, setSearchQuery] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
-  const [activeTabFilter, setActiveTabFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [selectedDetailSalon, setSelectedDetailSalon] = useState<Shop | null>(null);
+  const [activePillFilter, setActivePillFilter] = useState<PillFilterType>('all');
+  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [viewingFreshSalon, setViewingFreshSalon] = useState<Shop | null>(null);
 
-  // Scoped bills for the selected date range
+  // Filter scoped data by selected date range
   const scopedBills = useMemo(() => {
     return filterByDateRange(bills, 'issued_at', dateRange);
   }, [bills, dateRange]);
 
-  // Aggregate shop performance
+  const scopedPayments = useMemo(() => {
+    return filterByDateRange(payments, 'paid_at', dateRange);
+  }, [payments, dateRange]);
+
+  const scopedCustomers = useMemo(() => {
+    return filterByDateRange(customers, 'created_at', dateRange);
+  }, [customers, dateRange]);
+
+  // City breakdown
+  const cityDistribution = useMemo(() => {
+    const map = new Map<string, number>();
+    shops.forEach((s) => {
+      const city = s.city?.trim() || 'Other';
+      map.set(city, (map.get(city) || 0) + 1);
+    });
+
+    return Array.from(map.entries())
+      .map(([name, count]) => ({
+        name,
+        count,
+        percent: Math.round((count / (shops.length || 1)) * 100),
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [shops]);
+
+  // Salon list with performance stats, owner details, and complete operational metadata
   const salonPerformance = useMemo(() => {
-    // 1. Group bills by shop
-    const billsByShop = new Map<string, Bill[]>();
-    scopedBills.forEach((b) => {
-      if (!b.shop_id) return;
-      if (!billsByShop.has(b.shop_id)) billsByShop.set(b.shop_id, []);
-      billsByShop.get(b.shop_id)!.push(b);
-    });
-
-    const lifetimeBillsByShop = new Map<string, Bill[]>();
-    bills.forEach((b) => {
-      if (!b.shop_id) return;
-      if (!lifetimeBillsByShop.has(b.shop_id)) lifetimeBillsByShop.set(b.shop_id, []);
-      lifetimeBillsByShop.get(b.shop_id)!.push(b);
-    });
-
-    // 2. Group staff by shop
-    const staffByShop = new Map<string, Staff[]>();
-    staff.forEach((s) => {
-      if (!s.shop_id) return;
-      if (!staffByShop.has(s.shop_id)) staffByShop.set(s.shop_id, []);
-      staffByShop.get(s.shop_id)!.push(s);
-    });
-
-    // 3. Group customers by shop
-    const customersByShop = new Map<string, Customer[]>();
-    customers.forEach((c) => {
-      if (!c.shop_id) return;
-      if (!customersByShop.has(c.shop_id)) customersByShop.set(c.shop_id, []);
-      customersByShop.get(c.shop_id)!.push(c);
-    });
-
-    // 4. Map profiles
-    const profilesMap = new Map<string, Profile>();
-    profiles.forEach((p) => profilesMap.set(p.id, p));
-
     return shops.map((s) => {
-      const sBills = billsByShop.get(s.id) || [];
-      const sLifetimeBills = lifetimeBillsByShop.get(s.id) || [];
-      const sStaff = staffByShop.get(s.id) || [];
-      const sCustomers = customersByShop.get(s.id) || [];
+      const allowedIds = s.duplicate_ids && s.duplicate_ids.length > 0 ? s.duplicate_ids : [s.id];
+      const salonBills = scopedBills.filter((b) => allowedIds.includes(b.shop_id));
+      const salonPayments = scopedPayments.filter(
+        (p) => allowedIds.includes(p.shop_id) && (p.status === 'completed' || p.status === 'paid' || p.status === 'settled')
+      );
+      const salonStaff = staff.filter((st) => allowedIds.includes(st.shop_id));
+      const salonCustomers = scopedCustomers.filter((c) => allowedIds.includes(c.shop_id));
+      const totalSalonCustomers = customers.filter((c) => allowedIds.includes(c.shop_id));
 
-      const billed = sBills.reduce((acc, b) => (b.status !== 'deleted' ? acc + (b.total_minor || 0) : acc), 0);
-      const lifetimeBilled = sLifetimeBills.reduce((acc, b) => (b.status !== 'deleted' ? acc + (b.total_minor || 0) : acc), 0);
+      const billed = salonBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
+      const collected = salonPayments.reduce((acc, p) => acc + (p.amount_minor || 0), 0);
 
-      const ownerProf = s.owner_profile_id ? profilesMap.get(s.owner_profile_id) : null;
-      const ownerName = ownerProf?.full_name || s.name;
-      const ownerPhone = ownerProf?.phone || s.phone;
-
-      const isLive = sLifetimeBills.length > 0;
+      // Quota: Free sales limit logic (supports per-salon override, defaults to 100)
       const freeLimit = s.free_sales_limit || 100;
-      const isPro = freeLimit > 100;
+      const lifetimeBills = bills.filter((b) => allowedIds.includes(b.shop_id));
+      const salesCount = salonBills.length;
+      const lifetimeSalesCount = lifetimeBills.length;
+      const lifetimeBilled = lifetimeBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
+      const quotaRemaining = Math.max(0, freeLimit - lifetimeSalesCount);
+      const quotaPercent = Math.min(100, Math.round((lifetimeSalesCount / freeLimit) * 100));
+
+      let quotaStatus: 'free' | 'warning' | 'limit' = 'free';
+      if (lifetimeSalesCount >= freeLimit) quotaStatus = 'limit';
+      else if (lifetimeSalesCount >= freeLimit * 0.5) quotaStatus = 'warning';
+
+      // Match owner profile from profiles list or phone
+      const sPhone = cleanDigits(s.phone);
+      const owner =
+        (s.owner_profile_id ? profiles.find((p) => p.id === s.owner_profile_id) : null) ||
+        (sPhone ? profiles.find((p) => cleanDigits(p.phone) === sPhone) : null) ||
+        s.owner_profile ||
+        null;
+
+      const ownerName = owner?.full_name?.trim() || 'Salon Owner';
+      const ownerPhone = owner?.phone || s.phone || '—';
 
       return {
         ...s,
         shopObj: s,
         billed,
+        collected,
+        salesCount,
+        lifetimeSalesCount,
         lifetimeBilled,
-        billCount: sBills.length,
-        lifetimeSalesCount: sLifetimeBills.length,
-        staffCount: sStaff.length,
-        totalCustomerCount: sCustomers.length,
+        freeLimit,
+        quotaRemaining,
+        quotaPercent,
+        quotaStatus,
+        staffCount: salonStaff.length,
+        customerCount: salonCustomers.length,
+        totalCustomerCount: totalSalonCustomers.length,
         ownerName,
         ownerPhone,
-        isLive,
-        isPro,
-        freeLimit,
       };
     });
-  }, [shops, scopedBills, bills, staff, customers, profiles]);
+  }, [shops, scopedBills, scopedPayments, staff, scopedCustomers, customers, bills, profiles]);
+
+  // Derived Pill Counts for all buttons
+  const pillCounts = useMemo(() => {
+    const total = salonPerformance.length;
+    const active = salonPerformance.filter((s) => s.lifetimeSalesCount > 0).length;
+    const inactive = salonPerformance.filter((s) => s.lifetimeSalesCount === 0).length;
+    const freePlan = salonPerformance.filter((s) => s.quotaStatus !== 'limit').length;
+    const proPlan = salonPerformance.filter((s) => s.quotaStatus === 'limit').length;
+    const withBills = salonPerformance.filter((s) => s.lifetimeSalesCount > 0).length;
+    const zeroBills = salonPerformance.filter((s) => s.lifetimeSalesCount === 0).length;
+    const withCustomers = salonPerformance.filter((s) => s.totalCustomerCount > 0).length;
+    const totalShoppers = customers.length;
+    const nearLimit = salonPerformance.filter((s) => s.lifetimeSalesCount >= 80 && s.lifetimeSalesCount < s.freeLimit).length;
+    const staffConfigured = salonPerformance.filter((s) => s.staffCount > 0).length;
+    const gstEnabled = salonPerformance.filter((s) => s.gstin && s.gstin.trim().length > 0).length;
+    const tenPlusBills = salonPerformance.filter((s) => s.lifetimeSalesCount >= 10).length;
+
+    return {
+      total,
+      active,
+      inactive,
+      freePlan,
+      proPlan,
+      withBills,
+      zeroBills,
+      withCustomers,
+      totalShoppers,
+      nearLimit,
+      staffConfigured,
+      gstEnabled,
+      tenPlusBills,
+    };
+  }, [salonPerformance, customers]);
+
+  // Filtered and Sorted Salons
+  const displayedSalons = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+
+    const filtered = salonPerformance.filter((s) => {
+      // 1. Search Query Match
+      const matchesSearch =
+        q === '' ||
+        s.name.toLowerCase().includes(q) ||
+        (s.city && s.city.toLowerCase().includes(q)) ||
+        (s.address && s.address.toLowerCase().includes(q)) ||
+        (s.phone && s.phone.includes(q)) ||
+        (s.ownerName && s.ownerName.toLowerCase().includes(q)) ||
+        (s.ownerPhone && s.ownerPhone.includes(q)) ||
+        (s.gstin && s.gstin.toLowerCase().includes(q)) ||
+        s.id.toLowerCase().includes(q);
+
+      // 2. City Filter Match
+      const matchesCity = cityFilter === 'all' || s.city?.toLowerCase() === cityFilter.toLowerCase();
+
+      // 3. Pill Filter Match
+      let matchesPill = true;
+      if (activePillFilter === 'active') matchesPill = s.lifetimeSalesCount > 0;
+      else if (activePillFilter === 'inactive') matchesPill = s.lifetimeSalesCount === 0;
+      else if (activePillFilter === 'free_plan') matchesPill = s.quotaStatus !== 'limit';
+      else if (activePillFilter === 'pro_plan') matchesPill = s.quotaStatus === 'limit';
+      else if (activePillFilter === 'with_bills') matchesPill = s.lifetimeSalesCount > 0;
+      else if (activePillFilter === 'zero_bills') matchesPill = s.lifetimeSalesCount === 0;
+      else if (activePillFilter === 'with_customers') matchesPill = s.totalCustomerCount > 0;
+      else if (activePillFilter === 'near_limit') matchesPill = s.lifetimeSalesCount >= 80 && s.lifetimeSalesCount < s.freeLimit;
+      else if (activePillFilter === 'staff_configured') matchesPill = s.staffCount > 0;
+      else if (activePillFilter === 'gst_enabled') matchesPill = !!(s.gstin && s.gstin.trim().length > 0);
+      else if (activePillFilter === 'ten_plus_bills') matchesPill = s.lifetimeSalesCount >= 10;
+
+      return matchesSearch && matchesCity && matchesPill;
+    });
+
+    // Sort
+    return [...filtered].sort((a, b) => {
+      let valA: any = a[sortField];
+      let valB: any = b[sortField];
+
+      if (sortField === 'created_at') {
+        valA = new Date(valA || 0).getTime();
+        valB = new Date(valB || 0).getTime();
+      } else if (typeof valA === 'string') {
+        valA = (valA || '').toLowerCase();
+        valB = (valB || '').toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [salonPerformance, searchQuery, cityFilter, activePillFilter, sortField, sortDirection]);
 
   // Unique cities list
   const uniqueCities = useMemo(() => {
@@ -152,93 +282,102 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     return Array.from(set);
   }, [shops]);
 
-  // Counts for the 3 clean tabs
-  const tabCounts = useMemo(() => {
-    const total = salonPerformance.length;
-    const active = salonPerformance.filter((s) => s.isLive).length;
-    const inactive = total - active;
-    return { total, active, inactive };
-  }, [salonPerformance]);
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
 
-  // Filtered salons
-  const displayedSalons = useMemo(() => {
-    return salonPerformance.filter((s) => {
-      // 1. Search Query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matches =
-          s.name.toLowerCase().includes(q) ||
-          (s.city && s.city.toLowerCase().includes(q)) ||
-          (s.phone && s.phone.includes(q)) ||
-          (s.ownerName && s.ownerName.toLowerCase().includes(q)) ||
-          (s.ownerPhone && s.ownerPhone.includes(q));
-        if (!matches) return false;
-      }
+  const handleViewSalon = (shop: Shop) => {
+    if (onSelectSalon) {
+      onSelectSalon(shop);
+    } else {
+      setViewingFreshSalon(shop);
+    }
+  };
 
-      // 2. City Filter
-      if (cityFilter !== 'all' && s.city?.toLowerCase() !== cityFilter.toLowerCase()) {
-        return false;
-      }
-
-      // 3. Tab Filter
-      if (activeTabFilter === 'active' && !s.isLive) return false;
-      if (activeTabFilter === 'inactive' && s.isLive) return false;
-
-      return true;
-    });
-  }, [salonPerformance, searchQuery, cityFilter, activeTabFilter]);
-
-  // IF SALON IS CLICKED, RENDER FRESH FULL PAGE WITH CLEAR DARK LETTERS
-  if (selectedDetailSalon) {
+  // IF SALON IS CLICKED, RENDER FRESH FULL PAGE WITH CLEAN 2-COLOR DESIGN
+  if (viewingFreshSalon) {
     return (
       <SalonFreshDetailPage
-        shop={selectedDetailSalon}
+        shop={viewingFreshSalon}
         profiles={profiles}
         staff={staff}
         customers={customers}
         bills={bills}
         appointments={appointments}
         payments={payments}
-        onBack={() => setSelectedDetailSalon(null)}
+        onBack={() => setViewingFreshSalon(null)}
       />
     );
   }
 
   return (
-    <div className="space-y-6 font-sans text-neutral-900 select-none pb-12">
-      {/* 1. TOP HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0e5e9] pb-4">
+    <div className="space-y-4 font-sans text-black select-none pb-12">
+      {/* 1. TOP HEADER & CONTROLS */}
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-1">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#004e64] tracking-tight">
-            Overview
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#004e64] block">
+            STYLEFLEET PLATFORM
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-black mt-0.5">
+            Platform Overview
           </h1>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Salon directory and executive platform ledger
+          <p className="text-xs text-neutral-600 mt-0.5">
+            Executive 360 platform summary and performance metrics
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          {/* Export Button */}
+        {/* Top Action Controls */}
+        <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto">
+          {/* Live Sync Badge (Clean #004e64 & #e0e5e9) */}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#e0e5e9] text-[#004e64] border border-[#e0e5e9]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#004e64] animate-pulse" />
+            <span>Live Sync</span>
+          </div>
+
+          {/* Date Range Selector Pill */}
+          <div className="relative">
+            <select
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.target.value as DateFilterOption)}
+              className="appearance-none pl-7 pr-7 py-1 text-xs font-semibold rounded-full border border-[#e0e5e9] bg-white text-black hover:border-[#004e64] focus:outline-none cursor-pointer shadow-2xs"
+            >
+              <option value="all_time">All Time</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="last_7_days">Last 7 Days</option>
+              <option value="last_30_days">Last 30 Days</option>
+            </select>
+            <Calendar className="w-3.5 h-3.5 text-[#004e64] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3 h-3 text-[#004e64] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Top Export Button */}
           <ExportButton
             data={displayedSalons.map((s) => ({
-              'Salon Name': s.name,
               'Owner Name': s.ownerName,
+              'Shop Name': s.name,
               'Phone': s.phone || s.ownerPhone || '—',
-              'City': s.city || 'Tamil Nadu',
+              'Location': `${s.city || 'Kalugumalai'}, Tamil Nadu`,
               'Registered Date': s.created_at ? formatDate(s.created_at) : '—',
-              'Status': s.isLive ? 'Active' : 'Inactive',
-              'Plan': s.isPro ? 'PRO' : 'FREE',
-              'Sales Count': s.lifetimeSalesCount,
-              'Total Billed (INR)': Math.round(s.lifetimeBilled / 100),
+              'Activity': s.lifetimeSalesCount > 0 ? 'Live' : 'Inactive',
+              'Plan': s.quotaStatus === 'limit' ? 'PRO' : 'FREE',
+              '100 Sales Quota': `${s.lifetimeSalesCount} / ${s.freeLimit} Sales (${s.quotaPercent}%)`,
+              'Completed Bills': s.lifetimeSalesCount,
+              'Total Sales (INR)': Number((s.billed / 100).toFixed(2)),
             }))}
-            filename={`stylefleet_overview_${new Date().toISOString().split('T')[0]}`}
-            label="Export CSV"
+            filename={`stylefleet_overview_${selectedOption}_${new Date().toISOString().split('T')[0]}`}
+            label="Export"
           />
 
           {/* Refresh Button */}
           <button
             onClick={() => window.location.reload()}
-            className="p-1.5 rounded-lg border border-[#e0e5e9] bg-white hover:bg-neutral-50 text-[#004e64] transition-colors cursor-pointer shadow-2xs"
+            className="p-1.5 rounded-full border border-[#e0e5e9] bg-white hover:bg-[#e0e5e9]/50 text-black transition-colors cursor-pointer shadow-2xs"
             title="Refresh Data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -246,203 +385,536 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
       </div>
 
-      {/* 2. UNIFIED 2-COLOR FILTER TOOLBAR (#004e64 & #e0e5e9) */}
-      <div className="bg-white rounded-2xl border border-[#e0e5e9] p-4 sm:p-5 shadow-2xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* 3 Clean Filter Tabs: All, Active, Inactive */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveTabFilter('all')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeTabFilter === 'all'
-                  ? 'bg-[#004e64] text-white shadow-xs'
-                  : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
-              }`}
-            >
-              All Salons ({tabCounts.total})
-            </button>
-
-            <button
-              onClick={() => setActiveTabFilter('active')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeTabFilter === 'active'
-                  ? 'bg-[#004e64] text-white shadow-xs'
-                  : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
-              }`}
-            >
-              Active ({tabCounts.active})
-            </button>
-
-            <button
-              onClick={() => setActiveTabFilter('inactive')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeTabFilter === 'inactive'
-                  ? 'bg-[#004e64] text-white shadow-xs'
-                  : 'bg-[#e0e5e9] text-[#004e64] hover:bg-[#d0d8dd]'
-              }`}
-            >
-              Inactive ({tabCounts.inactive})
-            </button>
+      {/* 2. THE COMPLETE FILTER TOOLBAR (ALL BUTTONS RESTORED, STRICT 2-COLOR DESIGN) */}
+      <div className="bg-white rounded-2xl border border-[#e0e5e9] p-4 sm:p-5 shadow-2xs space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-[#e0e5e9]/60">
+          <div className="flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5 text-[#004e64]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-black">
+              Merchant Filters
+            </span>
           </div>
 
-          {/* Search Input & City Dropdown */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative min-w-[220px]">
+          <span className="text-[11px] text-neutral-500">
+            Click any pill to instantly filter the merchant ledger
+          </span>
+        </div>
+
+        {/* ALL BUTTONS ROW 1 */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Registered Pill */}
+          <button
+            onClick={() => setActivePillFilter('all')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'all'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Registered <span className="font-mono ml-1">{pillCounts.total}</span>
+          </button>
+
+          {/* Active Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'active' ? 'all' : 'active')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'active'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Active <span className="font-mono ml-1">{pillCounts.active}</span>
+          </button>
+
+          {/* Inactive Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'inactive' ? 'all' : 'inactive')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'inactive'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Inactive <span className="font-mono ml-1">{pillCounts.inactive}</span>
+          </button>
+
+          {/* Free Plan (100 limit) Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'free_plan' ? 'all' : 'free_plan')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'free_plan'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Free Plan (100 limit) <span className="font-mono ml-1">{pillCounts.freePlan}</span>
+          </button>
+
+          {/* Pro Plan Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'pro_plan' ? 'all' : 'pro_plan')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'pro_plan'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Pro Plan <span className="font-mono ml-1">{pillCounts.proPlan}</span>
+          </button>
+
+          {/* Shops w/ Bills Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'with_bills' ? 'all' : 'with_bills')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'with_bills'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Shops w/ Bills <span className="font-mono ml-1">{pillCounts.withBills}</span>
+          </button>
+
+          {/* Zero Bills Yet Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'zero_bills' ? 'all' : 'zero_bills')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'zero_bills'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Zero Bills Yet <span className="font-mono ml-1">{pillCounts.zeroBills}</span>
+          </button>
+        </div>
+
+        {/* ALL BUTTONS ROW 2 */}
+        <div className="flex items-center gap-2 flex-wrap pt-0.5">
+          {/* Shops w/ Customers Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'with_customers' ? 'all' : 'with_customers')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'with_customers'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Shops w/ Customers <span className="font-mono ml-1">{pillCounts.withCustomers}</span>
+          </button>
+
+          {/* Near 100 Limit (>80) Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'near_limit' ? 'all' : 'near_limit')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'near_limit'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Near 100 Limit (&gt;80) <span className="font-mono ml-1">{pillCounts.nearLimit}</span>
+          </button>
+
+          {/* Staff Configured Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'staff_configured' ? 'all' : 'staff_configured')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'staff_configured'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            Staff Configured <span className="font-mono ml-1">{pillCounts.staffConfigured}</span>
+          </button>
+
+          {/* GST Enabled Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'gst_enabled' ? 'all' : 'gst_enabled')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'gst_enabled'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            GST Enabled <span className="font-mono ml-1">{pillCounts.gstEnabled}</span>
+          </button>
+
+          {/* 10+ Bills Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'ten_plus_bills' ? 'all' : 'ten_plus_bills')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'ten_plus_bills'
+                ? 'bg-[#004e64] text-white border-[#004e64] shadow-xs'
+                : 'bg-white text-black border-[#e0e5e9] hover:bg-[#e0e5e9]/50 hover:border-[#004e64]/40'
+            }`}
+          >
+            10+ Bills <span className="font-mono ml-1">{pillCounts.tenPlusBills}</span>
+          </button>
+        </div>
+
+        {/* 3. FILTER TABS ROW (All shops, Active, Inactive, Pro Tier, etc.) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-1 border-t border-[#e0e5e9]/60 text-xs">
+          {[
+            { id: 'all' as PillFilterType, label: `All shops (${pillCounts.total})` },
+            { id: 'active' as PillFilterType, label: `Active (${pillCounts.active})` },
+            { id: 'inactive' as PillFilterType, label: `Inactive (${pillCounts.inactive})` },
+            { id: 'free_plan' as PillFilterType, label: `Free Plan (100 Limit)` },
+            { id: 'pro_plan' as PillFilterType, label: `Pro Plan (${pillCounts.proPlan})` },
+            { id: 'with_bills' as PillFilterType, label: `With Completed Bills (${pillCounts.withBills})` },
+            { id: 'zero_bills' as PillFilterType, label: `Zero Bills (${pillCounts.zeroBills})` },
+            { id: 'ten_plus_bills' as PillFilterType, label: `10+ Bills (${pillCounts.tenPlusBills})` },
+            { id: 'with_customers' as PillFilterType, label: `With Customers (${pillCounts.withCustomers})` },
+            { id: 'staff_configured' as PillFilterType, label: `Staff Setup (${pillCounts.staffConfigured})` },
+          ].map((tab) => {
+            const isActive = activePillFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActivePillFilter(tab.id)}
+                className={`px-3 py-1 rounded-full transition-all cursor-pointer whitespace-nowrap text-xs ${
+                  isActive
+                    ? 'bg-[#004e64] text-white shadow-xs font-semibold'
+                    : 'text-black hover:text-[#004e64] hover:bg-[#e0e5e9]/40 bg-transparent font-medium'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 4. SEARCH & ACTION CONTROLS BAR */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1">
+          <div className="flex items-center gap-2 flex-1 flex-wrap">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[240px]">
               <Search className="w-3.5 h-3.5 text-[#004e64]/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search salon, owner, phone, city..."
+                placeholder="Search shop name, owner, phone, city, or shop ID.."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-[#e0e5e9] bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#004e64] shadow-2xs"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-[#e0e5e9] bg-white text-black placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#004e64] transition-all shadow-2xs"
               />
             </div>
 
-            {uniqueCities.length > 0 && (
+            {/* Reset Filters Button */}
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setCityFilter('all');
+                setActivePillFilter('all');
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white transition-colors cursor-pointer shadow-xs"
+            >
+              <Filter className="w-3 h-3" />
+              <span>Reset Filters</span>
+            </button>
+
+            {/* Filter Geography Dropdown */}
+            <div className="relative">
               <select
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                className="text-xs px-3 py-1.5 rounded-lg border border-[#e0e5e9] bg-white text-[#004e64] font-medium focus:outline-none cursor-pointer shadow-2xs"
+                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-semibold rounded-lg border border-[#e0e5e9] bg-white text-black hover:bg-[#e0e5e9]/30 focus:outline-none cursor-pointer shadow-2xs"
               >
-                <option value="all">All Cities</option>
+                <option value="all">Filter Geography ({uniqueCities.length})</option>
                 {uniqueCities.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </select>
+              <MapPin className="w-3.5 h-3.5 text-[#004e64] absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-3 h-3 text-[#004e64] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+
+            {/* Clear Tab Pill Button */}
+            {activePillFilter !== 'all' && (
+              <button
+                onClick={() => setActivePillFilter('all')}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-[#e0e5e9] bg-white text-black hover:bg-[#e0e5e9]/50 transition-colors cursor-pointer shadow-2xs"
+              >
+                <X className="w-3 h-3" />
+                <span>Clear tab</span>
+              </button>
             )}
+          </div>
+
+          {/* Showing Count */}
+          <div className="text-xs text-neutral-600 self-center whitespace-nowrap">
+            Showing <span className="font-semibold text-black">{displayedSalons.length}</span> of {shops.length} shops
           </div>
         </div>
 
-        {/* 3. SALONS OVERVIEW TABLE (CLEAR DARK LETTERS, 2-COLOR DESIGN) */}
-        <div className="overflow-x-auto border-t border-[#e0e5e9] pt-3">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#e0e5e9] text-[10px] font-bold uppercase tracking-wider text-[#004e64] bg-[#e0e5e9]/40 font-mono">
-                <th className="py-3 px-3">SALON NAME</th>
-                <th className="py-3 px-3">OWNER NAME</th>
-                <th className="py-3 px-3">PHONE</th>
-                <th className="py-3 px-3">LOCATION</th>
-                <th className="py-3 px-3">REGISTERED</th>
-                <th className="py-3 px-3 text-center">STATUS</th>
-                <th className="py-3 px-3 text-center">PLAN</th>
-                <th className="py-3 px-3 text-center">ORDERS / BILLS</th>
-                <th className="py-3 px-3 text-right">TOTAL SALES</th>
-                <th className="py-3 px-3 text-center">ACTION</th>
+        {/* 5. THE MERCHANT LEDGER TABLE */}
+        <div className="overflow-x-auto rounded-xl border border-[#e0e5e9]">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-[#e0e5e9]/50 text-[#004e64] font-semibold uppercase tracking-wider text-[10.5px] border-b border-[#e0e5e9] select-none font-mono">
+              <tr>
+                <th
+                  onClick={() => handleSort('ownerName')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black"
+                >
+                  <div className="flex items-center gap-1">
+                    <span>NAME</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort('name')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black"
+                >
+                  <div className="flex items-center gap-1">
+                    <span>SHOP</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort('phone')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black"
+                >
+                  <div className="flex items-center gap-1">
+                    <span>PHONE</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort('city')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black"
+                >
+                  <div className="flex items-center gap-1">
+                    <span>LOCATION</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort('created_at')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black"
+                >
+                  <div className="flex items-center gap-1">
+                    <span>REGISTERED</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th className="px-3 py-2.5 text-center">PLATFORM</th>
+                <th className="px-3 py-2.5 text-center">ACTIVITY</th>
+                <th className="px-3 py-2.5 text-center">PLAN</th>
+                <th className="px-3 py-2.5 min-w-[130px]">FREE 100 SALES QUOTA</th>
+                <th
+                  onClick={() => handleSort('lifetimeSalesCount')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black text-center"
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    <span>BILLS</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort('billed')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black text-right"
+                >
+                  <div className="flex items-center justify-end gap-1">
+                    <span>TOTAL SALES (₹)</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#004e64]/60" />
+                  </div>
+                </th>
+                <th className="px-3 py-2.5 text-center">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e0e5e9]/60 text-neutral-900">
+            <tbody className="divide-y divide-[#e0e5e9]/70 font-sans text-black">
               {displayedSalons.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-12 text-center text-xs text-neutral-400">
-                    No salon records match the selected filter.
+                  <td colSpan={12} className="px-4 py-12 text-center text-xs text-neutral-400">
+                    No shops match your active filters. Click "Reset Filters" to view all.
                   </td>
                 </tr>
               ) : (
-                displayedSalons.map((s) => (
-                  <tr
-                    key={s.id}
-                    className="hover:bg-[#e0e5e9]/20 transition-colors"
-                  >
-                    {/* 1. SALON NAME (Clickable to Fresh Page) */}
-                    <td className="py-3 px-3">
-                      <button
-                        onClick={() => {
-                          if (onSelectSalon) onSelectSalon(s.shopObj);
-                          else setSelectedDetailSalon(s.shopObj);
-                        }}
-                        className="text-left font-bold text-neutral-900 hover:text-[#004e64] hover:underline cursor-pointer flex items-center gap-1.5"
-                      >
-                        <span>{s.name}</span>
-                        <ChevronRight className="w-3 h-3 text-[#004e64]/60 shrink-0" />
-                      </button>
-                    </td>
+                displayedSalons.map((s) => {
+                  const isLive = s.salesCount > 0 || (s.lifetimeSalesCount > 0 && selectedOption === 'all_time');
+                  const isToday =
+                    s.created_at && new Date(s.created_at).toDateString() === new Date().toDateString();
 
-                    {/* 2. OWNER NAME */}
-                    <td className="py-3 px-3 font-semibold text-neutral-800">
-                      {s.ownerName}
-                    </td>
+                  return (
+                    <tr key={s.id} className="hover:bg-[#e0e5e9]/20 transition-colors">
+                      {/* 1. NAME (Owner) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <span className="font-semibold text-black text-xs">
+                          {s.ownerName}
+                        </span>
+                      </td>
 
-                    {/* 3. PHONE */}
-                    <td className="py-3 px-3 font-mono text-neutral-800">
-                      <a
-                        href={`https://wa.me/91${cleanDigits(s.phone)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-[#004e64] transition-colors"
-                      >
-                        {s.phone || s.ownerPhone || '—'}
-                      </a>
-                    </td>
+                      {/* 2. SHOP (Business Name) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => handleViewSalon(s.shopObj)}
+                          className="group inline-flex items-center gap-1.5 text-left cursor-pointer hover:opacity-90 transition-all focus:outline-hidden"
+                          title="Touch to view complete salon details"
+                        >
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 transition-transform group-hover:scale-110"
+                            style={{ backgroundColor: s.accent_color || '#004e64' }}
+                          />
+                          <span className="font-bold text-black group-hover:text-[#004e64] group-hover:underline text-xs">
+                            {s.name}
+                          </span>
+                          <span className="text-[10px] text-[#004e64] bg-[#e0e5e9] px-1 rounded-sm border border-[#e0e5e9] opacity-0 group-hover:opacity-100 transition-opacity">
+                            Details
+                          </span>
+                        </button>
+                      </td>
 
-                    {/* 4. LOCATION */}
-                    <td className="py-3 px-3 text-neutral-700">
-                      <div>{s.city || 'Kalugumalai'}</div>
-                      <div className="text-[10px] text-neutral-400 font-mono">Tamil Nadu</div>
-                    </td>
+                      {/* 3. PHONE (WhatsApp icon + number) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <a
+                          href={`https://wa.me/91${cleanDigits(s.phone)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-black hover:text-[#004e64] transition-colors font-mono text-xs"
+                          title="Contact on WhatsApp"
+                        >
+                          <span className="w-4 h-4 rounded-full bg-[#e0e5e9] text-[#004e64] flex items-center justify-center shrink-0">
+                            <MessageCircle className="w-2.5 h-2.5" />
+                          </span>
+                          <span>{s.phone || s.ownerPhone || 'No phone'}</span>
+                        </a>
+                      </td>
 
-                    {/* 5. REGISTERED */}
-                    <td className="py-3 px-3 font-mono text-neutral-600 text-[11px]">
-                      {s.created_at ? formatDate(s.created_at) : '—'}
-                    </td>
+                      {/* 4. LOCATION (City & State) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <div className="text-[11px] leading-tight">
+                          <div className="font-medium text-black">{s.city || 'Kalugumalai'}</div>
+                          <div className="text-neutral-400 text-[10px]">Tamil Nadu</div>
+                        </div>
+                      </td>
 
-                    {/* 6. STATUS (Strict 2-Color Mono Badges) */}
-                    <td className="py-3 px-3 text-center">
-                      <span
-                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold font-mono ${
-                          s.isLive
-                            ? 'bg-[#004e64] text-white shadow-2xs'
-                            : 'bg-[#e0e5e9] text-[#004e64] border border-[#004e64]/20'
-                        }`}
-                      >
-                        {s.isLive ? 'ACTIVE' : 'INACTIVE'}
-                      </span>
-                    </td>
+                      {/* 5. REGISTERED (Date) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-xs text-black font-mono">
+                        {s.created_at ? formatDate(s.created_at) : '—'}
+                      </td>
 
-                    {/* 7. PLAN (PRO / FREE) */}
-                    <td className="py-3 px-3 text-center">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                          s.isPro
-                            ? 'bg-[#004e64] text-white shadow-2xs'
-                            : 'bg-[#e0e5e9] text-[#004e64] border border-[#004e64]/20'
-                        }`}
-                      >
-                        {s.isPro ? 'PRO' : 'FREE'}
-                      </span>
-                    </td>
+                      {/* 6. PLATFORM */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-center">
+                        <div className="inline-flex items-center gap-1 text-[11px] text-black font-medium">
+                          <Smartphone className="w-3.5 h-3.5 text-[#004e64]" />
+                          <span>Android POS</span>
+                        </div>
+                      </td>
 
-                    {/* 8. ORDERS / BILLS */}
-                    <td className="py-3 px-3 text-center font-bold text-neutral-900 font-mono">
-                      {s.lifetimeSalesCount}
-                    </td>
+                      {/* 7. ACTIVITY (Live / Today / Inactive - strict 2-color) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-center">
+                        {isLive ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[#004e64] text-white shadow-2xs font-mono">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                            Live
+                          </span>
+                        ) : isToday ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#e0e5e9] text-[#004e64] border border-[#e0e5e9] font-mono">
+                            Today
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-[#e0e5e9]/60 text-black border border-[#e0e5e9] font-mono">
+                            Inactive
+                          </span>
+                        )}
+                      </td>
 
-                    {/* 9. TOTAL SALES (₹) */}
-                    <td className="py-3 px-3 text-right font-black text-neutral-900 font-mono">
-                      ₹{Math.round(s.lifetimeBilled / 100).toLocaleString()}
-                    </td>
+                      {/* 8. PLAN (FREE / PRO - strict 2-color) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-center">
+                        {s.quotaStatus === 'limit' ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#004e64] text-white shadow-2xs font-mono">
+                            PRO
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#e0e5e9] text-black border border-[#e0e5e9] font-mono">
+                            FREE
+                          </span>
+                        )}
+                      </td>
 
-                    {/* 10. ACTION (Open Fresh Page) */}
-                    <td className="py-3 px-3 text-center">
-                      <button
-                        onClick={() => {
-                          if (onSelectSalon) onSelectSalon(s.shopObj);
-                          else setSelectedDetailSalon(s.shopObj);
-                        }}
-                        className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white shadow-xs transition-colors cursor-pointer"
-                      >
-                        <span>View Salon</span>
-                        <ChevronRight className="w-3 h-3" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      {/* 9. FREE 100 SALES QUOTA */}
+                      <td className="px-3 py-2.5 min-w-[130px]">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[10.5px]">
+                            <span className="font-semibold text-black tabular-nums">
+                              {s.lifetimeSalesCount} / {s.freeLimit} Sales
+                            </span>
+                            <span className="text-[10px] text-neutral-500 font-mono">
+                              {s.quotaPercent}%
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-[#e0e5e9] overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all bg-[#004e64]"
+                              style={{ width: `${s.quotaPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 10. BILLS */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-center">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-[#e0e5e9] text-black border border-[#e0e5e9] tabular-nums">
+                          {s.lifetimeSalesCount} bills
+                        </span>
+                      </td>
+
+                      {/* 11. TOTAL SALES (₹) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-right font-black text-black tabular-nums text-xs font-mono">
+                        {formatCurrency(s.billed)}
+                      </td>
+
+                      {/* 12. ACTION (View Salon -> Fresh Page) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => handleViewSalon(s.shopObj)}
+                          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-[#004e64] hover:bg-[#003d4f] text-white shadow-xs transition-colors cursor-pointer"
+                        >
+                          <span>View Salon</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* 6. GEOGRAPHIC DISTRIBUTION (Clean #004e64 & #e0e5e9) */}
+      {cityDistribution.length > 0 && (
+        <div className="bg-white rounded-2xl border border-[#e0e5e9] p-5 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-black flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-[#004e64]" />
+              Geographic Distribution
+            </h3>
+            <span className="text-xs text-neutral-500 font-mono">
+              {cityDistribution.length} distinct locations
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {cityDistribution.map((item, idx) => (
+              <div key={idx} className="p-2.5 rounded-xl border border-[#e0e5e9] bg-white space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-black">{item.name}</span>
+                  <span className="text-neutral-700 font-mono text-[11px] tabular-nums">
+                    {item.count} shop(s) ({item.percent}%)
+                  </span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-[#e0e5e9] overflow-hidden">
+                  <div
+                    className="h-full bg-[#004e64] rounded-full"
+                    style={{ width: `${item.percent}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
