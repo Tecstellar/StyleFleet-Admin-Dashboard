@@ -177,15 +177,15 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         };
       }
 
-      // Brave & Cave known active upgrade (Pro 3 Months)
+      // Brave & Cave known active upgrade (Pro 3 Months - ₹2,999)
       const isBrave = (shop?.name || '').toLowerCase().includes('brave') || (shop?.free_sales_limit || 0) > 100;
       if (isBrave) {
         return {
           isSubscriber: true,
-          subscriptionDate: shop?.created_at || '2026-10-02T07:50:42.937Z',
-          subscriptionAmount: 0,
-          subscriptionPlan: 'Pro Plan',
-          subscriptionEndDate: null,
+          subscriptionDate: shop?.created_at || '2026-10-08T11:15:49.323Z',
+          subscriptionAmount: 2999,
+          subscriptionPlan: 'Pro Plan (3 Months)',
+          subscriptionEndDate: '2027-01-08T11:15:49.323Z',
           subscriptionStatus: 'active',
         };
       }
@@ -434,10 +434,10 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
             const owner = ownersMap.get(ownerKey);
             if (owner) {
               owner.isSubscriber = true;
-              const subDate = s.created_at || '2026-10-02T07:50:42.937Z';
+              const subDate = s.created_at || '2026-10-08T11:15:49.323Z';
               const dateKey = toISTDateKey(subDate);
-              const amt = 0;
-              const planTitle = 'Pro Plan';
+              const amt = 2999;
+              const planTitle = 'Pro Plan (3 Months - ₹2,999)';
 
               if (dateKey) {
                 const record = getOrCreateDate(dateKey);

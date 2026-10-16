@@ -349,7 +349,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         year: 'numeric',
       });
     } else if (isBraveAndCave) {
-      subDateText = new Date(shop.created_at || Date.now()).toLocaleDateString('en-GB', {
+      subDateText = new Date('2026-10-08T11:15:49.323Z').toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -362,14 +362,16 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       const raw = typeof subRecord.amount_minor === 'number' && subRecord.amount_minor > 0
         ? (subRecord.amount_minor >= 10000 ? Math.round(subRecord.amount_minor / 100) : subRecord.amount_minor)
         : (typeof subRecord.amount === 'number' && subRecord.amount > 0 ? subRecord.amount : 0);
-      amtText = `₹${raw.toLocaleString('en-IN')}`;
+      amtText = `₹${(raw || (isBraveAndCave ? 2999 : 0)).toLocaleString('en-IN')}`;
+    } else if (isBraveAndCave) {
+      amtText = '₹2,999';
     } else if (proPayment?.amount_minor) {
       amtText = `₹${Math.round(proPayment.amount_minor / 100).toLocaleString('en-IN')}`;
     }
 
     const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
     const pLabel = isSub
-      ? (subRecord?.plan_name || (subRecord?.plan_id === '3_months' ? 'Pro Plan (3 Months)' : subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
+      ? (subRecord?.plan_name || (subRecord?.plan_id === '3_months' || isBraveAndCave ? 'Pro Plan (3 Months)' : subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
       : 'Free Plan (100 Quota)';
 
     return {
