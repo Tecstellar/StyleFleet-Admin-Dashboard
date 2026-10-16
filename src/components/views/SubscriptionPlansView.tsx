@@ -77,7 +77,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   const [billModalDateFilter, setBillModalDateFilter] = useState<string>('');
   const [copiedShopName, setCopiedShopName] = useState<string | null>(null);
 
-  // Manual Pro Upgrades tracker with selected tier ('3m' = ₹1,499, '6m' = ₹2,799, '1y' = ₹4,999)
+  // Manual Pro Upgrades tracker with selected tier ('3m' = ₹2,999, '6m' = ₹2,799, '1y' = ₹4,999)
   const [upgradedShopPlans, setUpgradedShopPlans] = useState<Record<string, ProPlanTier>>(() => {
     try {
       const saved = localStorage.getItem('stylefleet_pro_upgraded_plans');
@@ -169,23 +169,32 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       const daysActive = Math.max(0, Math.floor((now - regDate.getTime()) / (1000 * 60 * 60 * 24)));
 
       // Check real subscription from database
-      const hasDbSub = (subscriptions || []).some(
+      const dbSub = (subscriptions || []).find(
         (sub: any) =>
           item.associatedShopIds.includes(sub.shop_id) &&
           (sub.status === 'active' || sub.plan_id) &&
           (!sub.subscription_end_date || new Date(sub.subscription_end_date).getTime() > Date.now())
       );
+      const hasDbSub = !!dbSub;
       const hasSubPayment = payments.some(
         (p) =>
           item.associatedShopIds.includes(p.shop_id) &&
           (p.status === 'completed' || (p as any).status === 'success') &&
-          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
+          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 2999 || p.amount_minor === 299900) ||
            (p.reference && p.reference.toLowerCase().includes('sub')))
       );
       const isBraveAndCave = item.name.toLowerCase().includes('brave');
       const isRealPro = hasDbSub || hasSubPayment || isBraveAndCave;
 
-      const assignedPlan = isRealPro ? (upgradedShopPlans[key] || '3m') : null;
+      let dbTier: ProPlanTier = '3m';
+      if (dbSub?.plan_id) {
+        const pid = String(dbSub.plan_id).toLowerCase();
+        if (pid.includes('1y') || pid.includes('12') || pid.includes('year')) dbTier = '1y';
+        else if (pid.includes('6m') || pid.includes('6') || pid.includes('half')) dbTier = '6m';
+        else dbTier = '3m';
+      }
+
+      const assignedPlan = isRealPro ? (upgradedShopPlans[key] || dbTier) : null;
       let status: SalonQuotaSummary['status'] = 'free_active';
       if (isRealPro) {
         status = 'upgraded';
@@ -295,7 +304,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   }, [selectedSalonBills, bills, billModalDateFilter]);
 
   const handleCopyReminder = (salon: SalonQuotaSummary) => {
-    const text = `Hi ${salon.name},\n\nYou have completed ${salon.salesDone} out of your 100 free sales on StyleFleet (${salon.salesRemaining} free sales remaining).\n\nTo ensure your checkout and billing continue uninterrupted, upgrade to StyleFleet Pro:\n• 3 Months: ₹1,499\n• 6 Months: ₹2,799\n• 1 Year: ₹4,999\n\n👉 Contact: support@tecstellar.com\n\nThank you for choosing StyleFleet!`;
+    const text = `Hi ${salon.name},\n\nYou have completed ${salon.salesDone} out of your 100 free sales on StyleFleet (${salon.salesRemaining} free sales remaining).\n\nTo ensure your checkout and billing continue uninterrupted, upgrade to StyleFleet Pro:\n• 3 Months: ₹2,999\n• 6 Months: ₹2,799\n• 1 Year: ₹4,999\n\n👉 Contact: support@tecstellar.com\n\nThank you for choosing StyleFleet!`;
     navigator.clipboard.writeText(text);
     setCopiedShopName(salon.name);
     setTimeout(() => setCopiedShopName(null), 3000);
@@ -320,7 +329,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       case 'upgraded':
         const planName =
           salon.upgradedPlan === '3m'
-            ? 'PRO 3M (₹2,199)'
+            ? 'PRO 3M (₹2,999)'
             : salon.upgradedPlan === '6m'
             ? 'PRO 6M (₹2,799)'
             : 'PRO 1Y (₹4,999)';
@@ -737,7 +746,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                               {salon.status === 'pro_required' ? '⚠️ Upgrade to Pro...' : 'Free (100 Limit)'}
                             </option>
                             <option value="3m" className="bg-white text-black font-semibold">
-                              Pro 3M (₹1,499)
+                              Pro 3M (₹2,999)
                             </option>
                             <option value="6m" className="bg-white text-black font-semibold">
                               Pro 6M (₹2,799)
@@ -817,11 +826,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               </div>
               <h4 className="text-lg font-black text-black">Pro (3 Months)</h4>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl sm:text-3xl font-black text-black">₹1,499</span>
+                <span className="text-2xl sm:text-3xl font-black text-black">₹2,999</span>
                 <span className="text-xs text-neutral-500">/ 3 months</span>
               </div>
               <p className="text-xs text-neutral-600 leading-relaxed">
-                ₹500 / month approx. Perfect for quarterly budgeting.
+                ₹1,000 / month approx. Perfect for quarterly budgeting.
               </p>
               <ul className="space-y-2 text-xs text-neutral-700 pt-2 border-t border-neutral-200">
                 <li className="flex items-center gap-2 font-bold text-black">

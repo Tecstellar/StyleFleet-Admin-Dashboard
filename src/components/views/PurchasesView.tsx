@@ -32,7 +32,7 @@ export const PLAN_PRICING: Record<
   { name: string; price: number; durationMonths: number }
 > = {
   '1m': { name: '1 Month Pro', price: 499, durationMonths: 1 },
-  '3m': { name: '3 Months Pro', price: 1499, durationMonths: 3 },
+  '3m': { name: '3 Months Pro', price: 2999, durationMonths: 3 },
   '6m': { name: '6 Months Pro', price: 2799, durationMonths: 6 },
   '1y': { name: '1 Year Pro', price: 4999, durationMonths: 12 },
   'custom': { name: 'Custom Pro Plan', price: 1000, durationMonths: 1 },
@@ -135,7 +135,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
         (p.status === 'completed' || (p as any).status === 'success') &&
         (amt >= 499 || (p.reference && p.reference.toLowerCase().includes('sub')) || !p.bill_id);
 
-      if (isSub && (amt === 499 || amt === 1499 || amt === 2799 || amt === 4999 || (p.reference && p.reference.toLowerCase().includes('sub')))) {
+      if (isSub && (amt === 499 || amt === 2999 || amt === 1499 || amt === 2799 || amt === 4999 || (p.reference && p.reference.toLowerCase().includes('sub')))) {
         const shop = shopMap.get(p.shop_id);
         const uniqueKey = `pay:${p.id}`;
         if (!seenKeys.has(uniqueKey)) {
@@ -143,6 +143,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
 
           let tier: SubscriptionTier = '1m';
           if (amt >= 4999) tier = '1y';
+          else if (amt === 2999) tier = '3m';
           else if (amt >= 2799) tier = '6m';
           else if (amt >= 1499) tier = '3m';
 
@@ -583,7 +584,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
             >
               <option value="all">All Plan Tiers</option>
               <option value="1m">1 Month Pro (₹499)</option>
-              <option value="3m">3 Months Pro (₹1,499)</option>
+              <option value="3m">3 Months Pro (₹2,999)</option>
               <option value="6m">6 Months Pro (₹2,799)</option>
               <option value="1y">1 Year Pro (₹4,999)</option>
               <option value="custom">Custom Pro Plan</option>
@@ -805,7 +806,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
                   className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                 >
                   <option value="1m">1 Month Pro — ₹499</option>
-                  <option value="3m">3 Months Pro — ₹1,499</option>
+                  <option value="3m">3 Months Pro — ₹2,999</option>
                   <option value="6m">6 Months Pro — ₹2,799</option>
                   <option value="1y">1 Year Pro — ₹4,999</option>
                   <option value="custom">Custom Pro Plan</option>

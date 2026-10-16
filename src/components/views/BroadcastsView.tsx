@@ -34,7 +34,7 @@ export const BroadcastsView: React.FC<BroadcastsViewProps> = ({ shops }) => {
     {
       id: 'b-1',
       title: 'Upgrade Reminder: 100 Free Sales Quota',
-      message: 'Attention Salon Partners: Free tier covers up to 100 sales invoices. Upgrade to Pro (₹1,499 / 3M) for unlimited billing.',
+      message: 'Attention Salon Partners: Free tier covers up to 100 sales invoices. Upgrade to Pro (₹2,999 / 3M) for unlimited billing.',
       target: 'Salons with >80 sales',
       recipientsCount: shops.length,
       sentAt: '2026-10-05 10:30 AM',

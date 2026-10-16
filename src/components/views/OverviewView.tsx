@@ -164,7 +164,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         (p) =>
           allowedIds.includes(p.shop_id) &&
           (p.status === 'completed' || (p as any).status === 'success') &&
-          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
+          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 299900 || p.amount_minor === 2999) ||
            (p.reference && p.reference.toLowerCase().includes('sub')))
       );
       const isBraveAndCave = s.name.toLowerCase().includes('brave') || (s.free_sales_limit || 0) > 100;
