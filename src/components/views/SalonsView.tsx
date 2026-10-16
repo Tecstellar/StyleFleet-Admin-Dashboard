@@ -9,6 +9,7 @@ import { Shop } from '../../types/database';
 
 interface SalonsViewProps {
   shops: Shop[];
+  subscriptions?: any[];
   loading?: boolean;
   selectedShop?: Shop | null;
   onClearSelectedShop?: () => void;
@@ -18,6 +19,7 @@ interface SalonsViewProps {
 
 export const SalonsView: React.FC<SalonsViewProps> = ({
   shops,
+  subscriptions = [],
   loading = false,
   selectedShop: externalSelectedShop,
   onClearSelectedShop,
@@ -454,6 +456,7 @@ export const SalonsView: React.FC<SalonsViewProps> = ({
         onClose={handleCloseModal}
         onStaffChange={onStaffChange}
         initialTab={modalTab}
+        subscriptions={subscriptions}
       />
     </div>
   );

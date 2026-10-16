@@ -342,6 +342,34 @@ export async function fetchShopSubscription(
   }
 }
 
+/** Company Admin Panel: all subscription rows for a salon. */
+export async function fetchShopSubscriptions(
+  shopId: string
+): Promise<{ data: ShopSubscriptionRow[]; error: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('id, shop_id, plan_id, status, subscription_start_date, subscription_end_date, cashfree_order_id, amount_minor, created_at')
+      .eq('shop_id', shopId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return { data: data || [], error: null };
+  } catch (err: any) {
+    console.error('Error loading subscriptions:', err);
+    return { data: [], error: err.message || 'Failed to load subscriptions' };
+  }
+}
+
+/** Safely normalizes subscription amount whether stored as minor units (paise >= 10000) or rupees directly (e.g. 2999) */
+export function normalizeSubscriptionAmount(amtMinor?: number | null, amt?: number | null): number {
+  if (typeof amtMinor === 'number' && amtMinor > 0) {
+    if (amtMinor >= 10000) return Math.round(amtMinor / 100);
+    return amtMinor;
+  }
+  if (typeof amt === 'number' && amt > 0) return amt;
+  return 0;
+}
+
 /** True when the app would treat this row as an active Pro plan. */
 export function isSubscriptionActive(sub: ShopSubscriptionRow | null): boolean {
   if (!sub) return false;

@@ -637,6 +637,7 @@ export const App: React.FC = () => {
               customers={customers}
               bills={bills}
               payments={payments}
+              subscriptions={subscriptions}
               appointments={appointments}
               deletions={deletions}
               supportMessages={supportMessages}

@@ -157,7 +157,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
 
       if (sub) {
         const rawAmt = typeof sub.amount_minor === 'number' && sub.amount_minor > 0
-          ? (sub.amount_minor >= 100 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
+          ? (sub.amount_minor >= 10000 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
           : (typeof sub.amount === 'number' && sub.amount > 0 ? sub.amount : 0);
 
         const subDate = sub.subscription_start_date || sub.created_at;
@@ -372,7 +372,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
       if (!owner) return;
 
       const rawAmt = typeof sub.amount_minor === 'number' && sub.amount_minor > 0
-        ? (sub.amount_minor >= 100 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
+        ? (sub.amount_minor >= 10000 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
         : (typeof sub.amount === 'number' && sub.amount > 0 ? sub.amount : 0);
       const amt = rawAmt;
 

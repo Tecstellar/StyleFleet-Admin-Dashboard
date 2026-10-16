@@ -360,7 +360,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     let amtText = '₹0';
     if (subRecord) {
       const raw = typeof subRecord.amount_minor === 'number' && subRecord.amount_minor > 0
-        ? (subRecord.amount_minor >= 100 ? Math.round(subRecord.amount_minor / 100) : subRecord.amount_minor)
+        ? (subRecord.amount_minor >= 10000 ? Math.round(subRecord.amount_minor / 100) : subRecord.amount_minor)
         : (typeof subRecord.amount === 'number' && subRecord.amount > 0 ? subRecord.amount : 0);
       amtText = `₹${raw.toLocaleString('en-IN')}`;
     } else if (proPayment?.amount_minor) {
@@ -369,7 +369,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
 
     const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
     const pLabel = isSub
-      ? (subRecord?.plan_name || (subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
+      ? (subRecord?.plan_name || (subRecord?.plan_id === '3_months' ? 'Pro Plan (3 Months)' : subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
       : 'Free Plan (100 Quota)';
 
     return {
@@ -1090,6 +1090,42 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           </table>
         </div>
       </div>
+
+      {/* SUBSCRIPTION BILLING & PAYMENT LEDGER (IF SUBSCRIBED) */}
+      {isSubscriber && (
+        <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-4 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-[#071952]" />
+              <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+                Subscription Billing &amp; Payment Ledger
+              </h3>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#071952] text-white">
+              ★ Active Pro Subscription
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
+              <span className="text-[10px] font-mono text-black/60 uppercase">Plan</span>
+              <div className="font-bold text-black mt-0.5">{planLabel}</div>
+            </div>
+            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
+              <span className="text-[10px] font-mono text-black/60 uppercase">Billed Amount</span>
+              <div className="font-bold text-emerald-800 mt-0.5 font-mono">{subscriptionAmountText}</div>
+            </div>
+            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
+              <span className="text-[10px] font-mono text-black/60 uppercase">Billing Date</span>
+              <div className="font-bold text-black mt-0.5 font-mono">{subscribedDateText}</div>
+            </div>
+            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
+              <span className="text-[10px] font-mono text-black/60 uppercase">Expiry / Renewal</span>
+              <div className="font-bold text-black mt-0.5 font-mono">{planExpiry}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* SECTION 5: BILLS AND ORDERS */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">

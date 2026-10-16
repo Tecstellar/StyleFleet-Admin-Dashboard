@@ -11,6 +11,7 @@ interface SalonsCombinedViewProps {
   customers: Customer[];
   bills: Bill[];
   payments: Payment[];
+  subscriptions?: any[];
   appointments: Appointment[];
   deletions: AccountDeletion[];
   supportMessages: SupportMessage[];
@@ -25,6 +26,7 @@ interface SalonsCombinedViewProps {
 export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
   shops,
   staff,
+  subscriptions = [],
   loading = false,
   selectedShop,
   onClearSelectedShop,
@@ -72,6 +74,7 @@ export const SalonsCombinedView: React.FC<SalonsCombinedViewProps> = ({
       {activeTab === 'directory' && (
         <SalonsView
           shops={shops}
+          subscriptions={subscriptions}
           loading={loading}
           selectedShop={selectedShop || modalShop}
           onClearSelectedShop={() => {

@@ -179,7 +179,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
 
         const tier: SubscriptionTier = (sub.plan as SubscriptionTier) || (sub.plan_id as SubscriptionTier) || '3m';
         const rawAmt = typeof sub.amount_minor === 'number' && sub.amount_minor > 0
-          ? (sub.amount_minor >= 100 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
+          ? (sub.amount_minor >= 10000 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
           : (typeof sub.amount === 'number' ? sub.amount : 0);
         const price = rawAmt;
         const actDate = sub.created_at || sub.subscription_start_date || new Date().toISOString();
