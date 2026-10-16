@@ -170,21 +170,21 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
         return {
           isSubscriber: true,
           subscriptionDate: subDate,
-          subscriptionAmount: rawAmt || (sub.plan_id === '3_months' ? 2199 : 0),
+          subscriptionAmount: rawAmt,
           subscriptionPlan: planTitle,
           subscriptionEndDate: sub.subscription_end_date,
           subscriptionStatus: sub.status || 'active',
         };
       }
 
-      // Brave & Cave known active upgrade (Pro 3 Months - ₹2,199)
+      // Brave & Cave known active upgrade (Pro 3 Months)
       const isBrave = (shop?.name || '').toLowerCase().includes('brave') || (shop?.free_sales_limit || 0) > 100;
       if (isBrave) {
         return {
           isSubscriber: true,
           subscriptionDate: shop?.created_at || '2026-10-02T07:50:42.937Z',
-          subscriptionAmount: 2199,
-          subscriptionPlan: 'Pro Plan (3 Months - ₹2,199)',
+          subscriptionAmount: 0,
+          subscriptionPlan: 'Pro Plan',
           subscriptionEndDate: null,
           subscriptionStatus: 'active',
         };
@@ -374,7 +374,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
       const rawAmt = typeof sub.amount_minor === 'number' && sub.amount_minor > 0
         ? (sub.amount_minor >= 100 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
         : (typeof sub.amount === 'number' && sub.amount > 0 ? sub.amount : 0);
-      const amt = rawAmt || (sub.plan_id === '3_months' ? 2199 : 0);
+      const amt = rawAmt;
 
       let planTitle = 'Pro Plan';
       if (sub.plan_id === '3_months' || sub.plan_id === 'pro_3m') planTitle = 'Pro Plan (3 Months)';
@@ -436,8 +436,8 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
               owner.isSubscriber = true;
               const subDate = s.created_at || '2026-10-02T07:50:42.937Z';
               const dateKey = toISTDateKey(subDate);
-              const amt = 2199;
-              const planTitle = 'Pro Plan (3 Months - ₹2,199)';
+              const amt = 0;
+              const planTitle = 'Pro Plan';
 
               if (dateKey) {
                 const record = getOrCreateDate(dateKey);

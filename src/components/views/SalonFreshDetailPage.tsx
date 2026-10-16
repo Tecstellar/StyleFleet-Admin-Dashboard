@@ -361,19 +361,15 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     if (subRecord) {
       const raw = typeof subRecord.amount_minor === 'number' && subRecord.amount_minor > 0
         ? (subRecord.amount_minor >= 100 ? Math.round(subRecord.amount_minor / 100) : subRecord.amount_minor)
-        : (typeof subRecord.amount === 'number' && subRecord.amount > 0 ? subRecord.amount : (subRecord.plan_id === '3_months' ? 2199 : 0));
+        : (typeof subRecord.amount === 'number' && subRecord.amount > 0 ? subRecord.amount : 0);
       amtText = `₹${raw.toLocaleString('en-IN')}`;
-    } else if (isBraveAndCave) {
-      amtText = '₹2,199';
     } else if (proPayment?.amount_minor) {
       amtText = `₹${Math.round(proPayment.amount_minor / 100).toLocaleString('en-IN')}`;
     }
 
     const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
-    const pLabel = isBraveAndCave
-      ? 'Pro Plan (3 Months - ₹2,199)'
-      : isSub
-      ? (subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan (Subscriber)')
+    const pLabel = isSub
+      ? (subRecord?.plan_name || (subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
       : 'Free Plan (100 Quota)';
 
     return {

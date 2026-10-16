@@ -199,18 +199,21 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
       }
     });
 
-    // 2. Database subscriptions table entries
     subscriptions.forEach((sub) => {
       const shop = shopMap.get(sub.shop_id);
       const uniqueKey = `sub:${sub.id}`;
       if (!seenKeys.has(uniqueKey)) {
         seenKeys.add(uniqueKey);
 
-        const tier: SubscriptionTier = (sub.plan as SubscriptionTier) || '3m';
-        const price = sub.amount || PLAN_PRICING[tier]?.price || 1499;
-        const actDate = sub.created_at || new Date().toISOString();
+        const tier: SubscriptionTier = (sub.plan as SubscriptionTier) || (sub.plan_id as SubscriptionTier) || '3m';
+        const rawAmt = typeof sub.amount_minor === 'number' && sub.amount_minor > 0
+          ? (sub.amount_minor >= 100 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
+          : (typeof sub.amount === 'number' ? sub.amount : 0);
+        const price = rawAmt;
+        const actDate = sub.created_at || sub.subscription_start_date || new Date().toISOString();
         const exp =
           sub.expires_at ||
+          sub.subscription_end_date ||
           new Date(
             new Date(actDate).setMonth(
               new Date(actDate).getMonth() + (PLAN_PRICING[tier]?.durationMonths || 3)
@@ -224,45 +227,15 @@ export const SubscriptionRevenueView: React.FC<SubscriptionRevenueViewProps> = (
           city: shop?.city || 'Tamil Nadu',
           phone: shop?.phone || '—',
           tier,
-          planName: PLAN_PRICING[tier]?.name || 'StyleFleet Pro Plan',
+          planName: sub.plan_name || PLAN_PRICING[tier]?.name || 'StyleFleet Pro Plan',
           amountINR: price,
           paymentMethod: sub.payment_method || 'Razorpay UPI',
-          reference: sub.reference || `SUB-${sub.id.slice(0, 8).toUpperCase()}`,
+          reference: sub.reference || sub.cashfree_order_id || `SUB-${sub.id.slice(0, 8).toUpperCase()}`,
           status: 'active',
           activatedAt: actDate,
           expiresAt: exp,
           source: 'database_subscription',
         });
-      }
-    });
-    // 3. Active Pro subscription for Brave & Cave (3 Months - ₹2,199)
-    shops.forEach((s) => {
-      if ((s.name || '').toLowerCase().includes('brave') || (s.free_sales_limit || 0) > 100) {
-        const uniqueKey = `brave:${s.id}`;
-        if (!seenKeys.has(uniqueKey)) {
-          seenKeys.add(uniqueKey);
-
-          const actDate = s.created_at || new Date().toISOString();
-          const exp = new Date(actDate);
-          exp.setMonth(exp.getMonth() + 3);
-
-          list.push({
-            id: `PRO-${s.id.slice(0, 8).toUpperCase()}`,
-            shopId: s.id,
-            shopName: s.name,
-            city: s.city || 'Tamil Nadu',
-            phone: s.phone || '—',
-            tier: '3m',
-            planName: '3 Months Pro (₹2,199)',
-            amountINR: 2199,
-            paymentMethod: 'UPI / Direct Activation',
-            reference: 'PRO-UPGRADE-3M-2199',
-            status: 'active',
-            activatedAt: actDate,
-            expiresAt: exp.toISOString(),
-            source: 'manual_activation',
-          });
-        }
       }
     });
     manualSubscriptions.forEach((m) => {
