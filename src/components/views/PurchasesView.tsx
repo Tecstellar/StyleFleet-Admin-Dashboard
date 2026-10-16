@@ -206,7 +206,36 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
         });
       }
     });
+    // 3. Active Pro subscription for Brave & Cave (3 Months - ₹2,199)
+    shops.forEach((s) => {
+      if ((s.name || '').toLowerCase().includes('brave') || (s.free_sales_limit || 0) > 100) {
+        const uniqueKey = `brave:${s.id}`;
+        if (!seenKeys.has(uniqueKey)) {
+          seenKeys.add(uniqueKey);
 
+          const actDate = s.created_at || new Date().toISOString();
+          const exp = new Date(actDate);
+          exp.setMonth(exp.getMonth() + 3);
+
+          list.push({
+            id: `PRO-${s.id.slice(0, 8).toUpperCase()}`,
+            shopId: s.id,
+            shopName: s.name,
+            city: s.city || 'Tamil Nadu',
+            phone: s.phone || '—',
+            tier: '3m',
+            planName: '3 Months Pro (₹2,199)',
+            amountINR: 2199,
+            paymentMethod: 'UPI / Direct Activation',
+            reference: 'PRO-UPGRADE-3M-2199',
+            status: 'completed',
+            activatedAt: actDate,
+            expiresAt: exp.toISOString(),
+            source: 'manual_activation',
+          });
+        }
+      }
+    });
 
     // 4. Manually recorded subscriptions in localStorage
     manualSubscriptions.forEach((m) => {

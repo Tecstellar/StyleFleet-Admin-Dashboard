@@ -278,11 +278,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   }, [staff, matchingShopIds]);
 
   // Financial calculations
-  const totalBilledMinor = scopedBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
+  const totalBilledMinor = scopedBills.reduce((acc, b) => (b.status === 'deleted' ? acc : acc + (b.total_minor || 0)), 0);
   const totalPaidMinor = scopedPayments.reduce((acc, p) => acc + (p.amount_minor || 0), 0);
-  const avgTicketMinor = scopedBills.length > 0 ? Math.round(totalBilledMinor / scopedBills.length) : 0;
-  const pendingBills = scopedBills.filter((b) => b.status === 'pending');
-  const pendingAmountMinor = pendingBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
+  const activeScopedBills = scopedBills.filter((b) => b.status !== 'deleted');
+  const avgTicketMinor = activeScopedBills.length > 0 ? Math.round(totalBilledMinor / activeScopedBills.length) : 0;
+
+  // Real pending dues calculation strictly from non-deleted bills with due_amount_minor or notes due:(\d+)
+  const { pendingBillsList, pendingAmountMinor } = useMemo(() => {
+    let sum = 0;
+    const list: Bill[] = [];
+    scopedBills.forEach((b) => {
+      if (b.status === 'deleted') return;
+      let due = b.due_amount_minor || 0;
+      if (!due && b.notes && b.notes.includes('due:')) {
+        const matches = Array.from(b.notes.matchAll(/due:(\d+)/g));
+        if (matches.length > 0) {
+          due = parseInt(matches[matches.length - 1][1], 10);
+        }
+      }
+      if (due > 0) {
+        sum += due;
+        list.push(b);
+      }
+    });
+    return { pendingBillsList: list, pendingAmountMinor: sum };
+  }, [scopedBills]);
 
   // Active salons that generated at least 1 bill in this filtered view
   const activeSalonsWithBillsCount = useMemo(() => {
@@ -353,9 +373,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       let pendingCount = 0;
 
       data.bills.forEach((b) => {
+        if (b.status === 'deleted') return;
         uniqueSalons.add(b.shop_id);
-        if (b.status === 'paid') paidCount++;
-        if (b.status === 'pending') pendingCount++;
+        let due = b.due_amount_minor || 0;
+        if (!due && b.notes && b.notes.includes('due:')) {
+          const matches = Array.from(b.notes.matchAll(/due:(\d+)/g));
+          if (matches.length > 0) due = parseInt(matches[matches.length - 1][1], 10);
+        }
+        if (due > 0) pendingCount++;
+        else paidCount++;
 
         const sName = b.shop?.name || 'Salon';
         if (!salonCounts[b.shop_id]) {
@@ -619,11 +645,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <Metric
           label="Pending dues"
           value={formatCurrency(pendingAmountMinor)}
-          sub={`${pendingBills.length} bills`}
+          sub={`${pendingBillsList.length} ${pendingBillsList.length === 1 ? 'bill' : 'bills'}`}
           onClick={() => {
-            setBillStatusFilter('pending');
-            setBillsPage(1);
             setActiveTab('all_bills');
+            setBillsPage(1);
           }}
         />
         <Metric label="Appointments" value={formatNumber(scopedAppts.length)} />

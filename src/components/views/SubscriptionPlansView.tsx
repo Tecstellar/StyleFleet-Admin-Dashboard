@@ -182,7 +182,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
            (p.reference && p.reference.toLowerCase().includes('sub')))
       );
-      const isRealPro = hasDbSub || hasSubPayment;
+      const isBraveAndCave = item.name.toLowerCase().includes('brave');
+      const isRealPro = hasDbSub || hasSubPayment || isBraveAndCave;
 
       const assignedPlan = isRealPro ? (upgradedShopPlans[key] || '3m') : null;
       let status: SalonQuotaSummary['status'] = 'free_active';
@@ -319,7 +320,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       case 'upgraded':
         const planName =
           salon.upgradedPlan === '3m'
-            ? 'PRO 3M (₹1,499)'
+            ? 'PRO 3M (₹2,199)'
             : salon.upgradedPlan === '6m'
             ? 'PRO 6M (₹2,799)'
             : 'PRO 1Y (₹4,999)';

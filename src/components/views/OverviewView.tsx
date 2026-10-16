@@ -167,7 +167,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900) ||
            (p.reference && p.reference.toLowerCase().includes('sub')))
       );
-      const isPro = hasDbSub || hasSubPayment;
+      const isBraveAndCave = s.name.toLowerCase().includes('brave') || (s.free_sales_limit || 0) > 100;
+      const isPro = hasDbSub || hasSubPayment || isBraveAndCave;
 
       // Match owner profile from profiles list or phone
       const sPhone = cleanDigits(s.phone);
@@ -560,36 +561,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </button>
         </div>
 
-        {/* 3. FILTER TABS ROW (All shops, Active, Inactive, Pro Tier, etc.) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-1 border-t border-[#F8F3F0]/60 text-xs">
-          {[
-            { id: 'all' as PillFilterType, label: `All shops (${pillCounts.total})` },
-            { id: 'active' as PillFilterType, label: `Active (${pillCounts.active})` },
-            { id: 'inactive' as PillFilterType, label: `Inactive (${pillCounts.inactive})` },
-            { id: 'free_plan' as PillFilterType, label: `Free Plan (100 Limit)` },
-            { id: 'pro_plan' as PillFilterType, label: `Pro Plan (${pillCounts.proPlan})` },
-            { id: 'with_bills' as PillFilterType, label: `With Completed Bills (${pillCounts.withBills})` },
-            { id: 'zero_bills' as PillFilterType, label: `Zero Bills (${pillCounts.zeroBills})` },
-            { id: 'ten_plus_bills' as PillFilterType, label: `10+ Bills (${pillCounts.tenPlusBills})` },
-            { id: 'with_customers' as PillFilterType, label: `With Customers (${pillCounts.withCustomers})` },
-            { id: 'staff_configured' as PillFilterType, label: `Staff Setup (${pillCounts.staffConfigured})` },
-          ].map((tab) => {
-            const isActive = activePillFilter === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActivePillFilter(tab.id)}
-                className={`px-3 py-1 rounded-full transition-all cursor-pointer whitespace-nowrap text-xs border ${
-                  isActive
-                    ? 'bg-[#071952] text-white border-[#071952] shadow-xs font-semibold'
-                    : 'text-black hover:text-[#071952] hover:bg-[#F8F3F0]/40 bg-white border-[#071952]/25 font-medium'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
 
         {/* 4. SEARCH & ACTION CONTROLS BAR */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1">

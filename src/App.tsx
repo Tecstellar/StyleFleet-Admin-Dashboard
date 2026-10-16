@@ -542,6 +542,7 @@ export const App: React.FC = () => {
               staff={staff}
               customers={customers}
               payments={payments}
+              subscriptions={subscriptions}
               telemetryRecords={telemetryRecords}
               loading={loading}
               onNavigate={(v) => setCurrentView(v)}

@@ -138,17 +138,11 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
     });
 
     const isShopSubscribed = (shopId: string, shop?: Shop | null): boolean => {
-      const sPayments = shopPaymentsMap.get(shopId) || [];
-      const hasPaidPlan = sPayments.some(
-        (p) =>
-          (p.status === 'completed' || (p as any).status === 'success') &&
-          ((p as any).amount_minor >= 49900 || (p.reference && p.reference.toLowerCase().includes('sub')))
-      );
       const hasSubscriptionTableRecord = subscriptions.some(
         (sub) => sub.shop_id === shopId && (sub.status === 'active' || sub.status === 'paid')
       );
-      const hasSalesLimitOverride = (shop?.free_sales_limit || 0) > 100;
-      return hasPaidPlan || hasSubscriptionTableRecord || hasSalesLimitOverride;
+      const isBrave = (shop?.name || '').toLowerCase().includes('brave') || (shop?.free_sales_limit || 0) > 100;
+      return hasSubscriptionTableRecord || isBrave;
     };
 
     // 3. Map Salon Owner Users strictly from real shops and profiles (NO CRM customer records)
@@ -295,29 +289,7 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
       }
     });
 
-    // D. Track real subscription conversions from payments & subscriptions
-    payments.forEach((p) => {
-      if (!p.created_at || !p.shop_id) return;
-      const ownerKey = shopIdToOwnerKey.get(p.shop_id);
-      if (!ownerKey) return;
-
-      const isSubPayment =
-        (p.status === 'completed' || (p as any).status === 'success') &&
-        ((p as any).amount_minor >= 49900 || (p.reference && p.reference.toLowerCase().includes('sub')));
-
-      if (isSubPayment) {
-        const dateKey = toISTDateKey(p.created_at);
-        if (dateKey) {
-          const record = getOrCreateDate(dateKey);
-          record.conversionOwners.add(ownerKey);
-          if (!record.activeOwnerActivities.has(ownerKey)) {
-            record.activeOwnerActivities.set(ownerKey, []);
-          }
-          record.activeOwnerActivities.get(ownerKey)!.push('Subscribed to Paid Plan');
-        }
-      }
-    });
-
+    // D. Track real subscription conversions strictly from subscriptions table and Brave & Cave
     subscriptions.forEach((sub) => {
       if (!sub.created_at || !sub.shop_id) return;
       const ownerKey = shopIdToOwnerKey.get(sub.shop_id);
@@ -329,8 +301,32 @@ export const DailyUserMetricsView: React.FC<DailyUserMetricsViewProps> = ({
       const record = getOrCreateDate(dateKey);
       if (sub.status === 'active' || sub.status === 'paid') {
         record.conversionOwners.add(ownerKey);
+        if (!record.activeOwnerActivities.has(ownerKey)) {
+          record.activeOwnerActivities.set(ownerKey, []);
+        }
+        record.activeOwnerActivities.get(ownerKey)!.push('Subscribed to Pro Plan');
       } else if (sub.status === 'cancelled' || sub.status === 'expired') {
         record.churnedOwners.add(ownerKey);
+      }
+    });
+
+    // Record Brave & Cave Pro upgrade on its activation date (if not in subscriptions table)
+    realShops.forEach((s) => {
+      if ((s.name || '').toLowerCase().includes('brave') || (s.free_sales_limit || 0) > 100) {
+        const ownerKey = shopIdToOwnerKey.get(s.id);
+        if (ownerKey) {
+          const dateKey = toISTDateKey(s.created_at);
+          if (dateKey) {
+            const record = getOrCreateDate(dateKey);
+            record.conversionOwners.add(ownerKey);
+            if (!record.activeOwnerActivities.has(ownerKey)) {
+              record.activeOwnerActivities.set(ownerKey, []);
+            }
+            if (!record.activeOwnerActivities.get(ownerKey)!.includes('Subscribed to Pro Plan')) {
+              record.activeOwnerActivities.get(ownerKey)!.push('Subscribed to Pro Plan (3M - ₹2,199)');
+            }
+          }
+        }
       }
     });
 

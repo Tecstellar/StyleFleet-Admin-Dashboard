@@ -292,7 +292,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
          (p.reference && p.reference.toLowerCase().includes('sub')))
     );
 
-    const isSub = Boolean(subRecord || proPayment);
+    const isBraveAndCave = shop.name.toLowerCase().includes('brave') || (shop.free_sales_limit || 0) > 100;
+    const isSub = Boolean(subRecord || proPayment || isBraveAndCave);
 
     let expiryText = 'N/A (Quota Based)';
     if (subRecord?.expires_at) {
@@ -309,14 +310,22 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       });
     } else if (proPayment?.paid_at) {
       const d = new Date(proPayment.paid_at);
-      d.setDate(d.getDate() + 30);
+      d.setDate(d.getDate() + 90);
       expiryText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    } else if (isBraveAndCave) {
+      const d = new Date(shop.created_at || Date.now());
+      d.setDate(d.getDate() + 90);
+      expiryText = `${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} (3 Months Pro)`;
     } else if (isSub) {
       expiryText = 'Active (Auto-Renews)';
     }
 
     const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
-    const pLabel = isSub ? 'Pro Plan (Subscriber)' : 'Free Plan (100 Quota)';
+    const pLabel = isBraveAndCave
+      ? 'Pro Plan (3 Months - ₹2,199)'
+      : isSub
+      ? 'Pro Plan (Subscriber)'
+      : 'Free Plan (100 Quota)';
 
     return { isSubscriber: isSub, planExpiry: expiryText, paymentStatus: payStatus, planLabel: pLabel };
   }, [shop, subscriptions, payments]);

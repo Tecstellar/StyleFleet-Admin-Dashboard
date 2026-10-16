@@ -40,6 +40,7 @@ interface ProductAnalyticsViewProps {
   staff: Staff[];
   appointments?: any[];
   payments?: Payment[];
+  subscriptions?: any[];
   telemetryRecords?: any[];
   loading?: boolean;
   onNavigate?: (view: NavView) => void;
@@ -50,7 +51,10 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
   bills,
   customers,
   staff,
+  appointments = [],
   payments = [],
+  subscriptions = [],
+  telemetryRecords = [],
   loading: parentLoading = false,
   onNavigate,
 }) => {
@@ -74,7 +78,10 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
         bills,
         customers,
         staff,
+        appointments,
         payments,
+        subscriptions,
+        telemetryRecords,
       });
       setData(payload);
     } catch (err) {
@@ -87,7 +94,7 @@ export const ProductAnalyticsView: React.FC<ProductAnalyticsViewProps> = ({
 
   useEffect(() => {
     loadAnalytics(false);
-  }, [shops, bills, customers, staff, payments]);
+  }, [shops, bills, customers, staff, appointments, payments, subscriptions, telemetryRecords]);
 
   // Customer Success Opportunities Filtering & Pagination
   const filteredCSOpps = useMemo(() => {

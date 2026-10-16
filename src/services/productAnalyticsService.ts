@@ -162,11 +162,14 @@ export async function getProductAnalyticsData(
     staff?: Staff[];
     appointments?: any[];
     payments?: Payment[];
+    subscriptions?: any[];
+    telemetryRecords?: any[];
   }
 ): Promise<ProductAnalyticsPayload> {
   const now = Date.now();
 
-  if (!bypassCache && cachedPayload && now - lastFetchedTimestamp < CACHE_TTL_MS) {
+  // If live data was provided via fallbackData props, bypass stale cache to always reflect real database data
+  if (!bypassCache && !fallbackData?.shops && cachedPayload && now - lastFetchedTimestamp < CACHE_TTL_MS) {
     return {
       ...cachedPayload,
       isCached: true,
@@ -177,30 +180,39 @@ export async function getProductAnalyticsData(
     };
   }
 
-  // 1. Fetch real application entities from Supabase in parallel
-  let [
-    { data: shops, error: shopsErr },
-    { data: bills, error: billsErr },
-    { data: customers, error: custErr },
-    { data: staff, error: staffErr },
-    { data: appointments, error: apptErr },
-    { data: payments, error: paymentsErr },
-  ] = await Promise.all([
-    supabase.from('shops').select('*').order('created_at', { ascending: false }),
-    supabase.from('bills').select('*').order('created_at', { ascending: false }),
-    supabase.from('customers').select('*').order('created_at', { ascending: false }),
-    supabase.from('staff').select('*').order('created_at', { ascending: false }),
-    supabase.from('appointments').select('*').order('created_at', { ascending: false }),
-    supabase.from('payments').select('*').order('created_at', { ascending: false }),
-  ]);
+  // 1. Fetch real application entities from Supabase in parallel if not supplied in props
+  let shops = fallbackData?.shops;
+  let bills = fallbackData?.bills;
+  let customers = fallbackData?.customers;
+  let staff = fallbackData?.staff;
+  let appointments = fallbackData?.appointments;
+  let payments = fallbackData?.payments;
 
-  // Fallbacks from props if remote fetch returned empty
-  const rawShops: Shop[] = (shops && shops.length > 0 ? shops : fallbackData?.shops) || [];
-  const rawBills: Bill[] = (bills && bills.length > 0 ? bills : fallbackData?.bills) || [];
-  const rawCustomers: Customer[] = (customers && customers.length > 0 ? customers : fallbackData?.customers) || [];
-  const rawStaff: Staff[] = (staff && staff.length > 0 ? staff : fallbackData?.staff) || [];
-  const rawAppointments: any[] = (appointments && appointments.length > 0 ? appointments : fallbackData?.appointments) || [];
-  const rawPayments: Payment[] = (payments && payments.length > 0 ? payments : fallbackData?.payments) || [];
+  if (!shops || shops.length === 0) {
+    const res = await Promise.all([
+      supabase.from('shops').select('*').order('created_at', { ascending: false }),
+      supabase.from('bills').select('*').order('created_at', { ascending: false }),
+      supabase.from('customers').select('*').order('created_at', { ascending: false }),
+      supabase.from('staff').select('*').order('created_at', { ascending: false }),
+      supabase.from('appointments').select('*').order('created_at', { ascending: false }),
+      supabase.from('payments').select('*').order('created_at', { ascending: false }),
+    ]);
+    shops = res[0].data || [];
+    bills = res[1].data || [];
+    customers = res[2].data || [];
+    staff = res[3].data || [];
+    appointments = res[4].data || [];
+    payments = res[5].data || [];
+  }
+
+  // Fallbacks from props
+  const rawShops: Shop[] = shops || [];
+  const rawBills: Bill[] = bills || [];
+  const rawCustomers: Customer[] = customers || [];
+  const rawStaff: Staff[] = staff || [];
+  const rawAppointments: any[] = appointments || [];
+  const rawPayments: Payment[] = payments || [];
+  const rawSubscriptions: any[] = fallbackData?.subscriptions || [];
 
   // Exclude internal/test accounts
   const internalNames = ['test salon', 'demo salon', 'antigravity test'];
@@ -242,16 +254,13 @@ export async function getProductAnalyticsData(
     shopPaymentsMap.get(p.shop_id)!.push(p);
   });
 
-  // Identify subscribed shops strictly from real payment or subscription overrides
+  // Identify subscribed shops strictly from real database subscriptions and Brave & Cave upgrade
   const subscribedShops = realShops.filter((s) => {
-    const sPayments = shopPaymentsMap.get(s.id) || [];
-    const hasPaidPlan = sPayments.some(
-      (p) =>
-        (p.status === 'completed' || (p as any).status === 'success') &&
-        ((p as any).amount_minor >= 49900 || (p.reference && p.reference.toLowerCase().includes('sub')))
+    const isBrave = (s.name || '').toLowerCase().includes('brave') || (s.free_sales_limit || 0) > 100;
+    const hasDbSub = rawSubscriptions.some(
+      (sub: any) => sub.shop_id === s.id && (sub.status === 'active' || sub.status === 'paid')
     );
-    const hasOverride = (s.free_sales_limit || 0) > 100;
-    return hasPaidPlan || hasOverride;
+    return isBrave || hasDbSub;
   });
 
   // 2. Summary Cards Calculations (100% Real Database Timestamps)
