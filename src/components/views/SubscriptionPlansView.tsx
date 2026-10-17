@@ -77,7 +77,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   const [billModalDateFilter, setBillModalDateFilter] = useState<string>('');
   const [copiedShopName, setCopiedShopName] = useState<string | null>(null);
 
-  // Manual Pro Upgrades tracker with selected tier ('3m' = ₹2,999, '6m' = ₹2,799, '1y' = ₹4,999)
+  // Manual Pro Upgrades tracker with selected tier ('3m' = ₹2,999, '6m' = ₹2,799, '1y' = ₹5,999)
   const [upgradedShopPlans, setUpgradedShopPlans] = useState<Record<string, ProPlanTier>>(() => {
     try {
       const saved = localStorage.getItem('stylefleet_pro_upgraded_plans');
@@ -180,13 +180,13 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         (p) =>
           item.associatedShopIds.includes(p.shop_id) &&
           (p.status === 'completed' || (p as any).status === 'success') &&
-          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 2999 || p.amount_minor === 299900) ||
+          ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 599900 || p.amount_minor === 2999 || p.amount_minor === 299900 || p.amount_minor === 5999) ||
            (p.reference && p.reference.toLowerCase().includes('sub')))
       );
       const isBraveAndCave = item.name.toLowerCase().includes('brave');
       const isRealPro = hasDbSub || hasSubPayment || isBraveAndCave;
 
-      let dbTier: ProPlanTier = '3m';
+      let dbTier: ProPlanTier = isBraveAndCave ? '1y' : '3m';
       if (dbSub?.plan_id) {
         const pid = String(dbSub.plan_id).toLowerCase();
         if (pid.includes('1y') || pid.includes('12') || pid.includes('year')) dbTier = '1y';
@@ -752,7 +752,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                               Pro 6M (₹2,799)
                             </option>
                             <option value="1y" className="bg-white text-black font-semibold">
-                              Pro 1Y (₹4,999)
+                              Pro 1Y (₹5,999)
                             </option>
                           </select>
                         </div>
@@ -907,11 +907,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               </div>
               <h4 className="text-lg font-black text-white">Pro (1 Year)</h4>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl sm:text-3xl font-black text-white">₹4,999</span>
+                <span className="text-2xl sm:text-3xl font-black text-white">₹5,999</span>
                 <span className="text-xs text-white/80">/ year</span>
               </div>
               <p className="text-xs text-white/90 leading-relaxed">
-                ~₹416 / month. Complete full-year suite for salon owners.
+                ~₹499 / month. Complete full-year suite for salon owners.
               </p>
               <ul className="space-y-2 text-xs text-white/90 pt-2 border-t border-white/20">
                 <li className="flex items-center gap-2 font-bold text-white">

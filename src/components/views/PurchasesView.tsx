@@ -34,7 +34,7 @@ export const PLAN_PRICING: Record<
   '1m': { name: '1 Month Pro', price: 499, durationMonths: 1 },
   '3m': { name: '3 Months Pro', price: 2999, durationMonths: 3 },
   '6m': { name: '6 Months Pro', price: 2799, durationMonths: 6 },
-  '1y': { name: '1 Year Pro', price: 4999, durationMonths: 12 },
+  '1y': { name: '1 Year Pro', price: 5999, durationMonths: 12 },
   'custom': { name: 'Custom Pro Plan', price: 1000, durationMonths: 1 },
 };
 
@@ -135,14 +135,14 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({
         (p.status === 'completed' || (p as any).status === 'success') &&
         (amt >= 499 || (p.reference && p.reference.toLowerCase().includes('sub')) || !p.bill_id);
 
-      if (isSub && (amt === 499 || amt === 2999 || amt === 1499 || amt === 2799 || amt === 4999 || (p.reference && p.reference.toLowerCase().includes('sub')))) {
+      if (isSub && (amt === 499 || amt === 2999 || amt === 1499 || amt === 2799 || amt === 4999 || amt === 5999 || (p.reference && p.reference.toLowerCase().includes('sub')))) {
         const shop = shopMap.get(p.shop_id);
         const uniqueKey = `pay:${p.id}`;
         if (!seenKeys.has(uniqueKey)) {
           seenKeys.add(uniqueKey);
 
           let tier: SubscriptionTier = '1m';
-          if (amt >= 4999) tier = '1y';
+          if (amt >= 4999 || amt === 5999) tier = '1y';
           else if (amt === 2999) tier = '3m';
           else if (amt >= 2799) tier = '6m';
           else if (amt >= 1499) tier = '3m';

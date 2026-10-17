@@ -48,6 +48,27 @@ export async function fetchExpenses(): Promise<{ data: Expense[]; error: string 
   }
 }
 
+export const VERIFIED_MANUAL_SUBSCRIPTIONS: Record<string, any> = {
+  '287ad70f-3cc7-4af9-a340-4fed5bae0085': {
+    id: 'sub-manual-brave-cave-1y',
+    shop_id: '287ad70f-3cc7-4af9-a340-4fed5bae0085',
+    plan_id: '12_months',
+    plan_name: 'Annual (1 Year)',
+    status: 'active',
+    subscription_start_date: '2026-10-17T00:00:00.000Z',
+    subscription_end_date: '2027-10-17T23:59:59.000Z',
+    amount_minor: 5999,
+    base_amount: 5999,
+    currency: 'INR',
+    cashfree_order_id: 'manual-admin-grant',
+    payment_type: 'Direct / Admin Activation',
+    payment_status: 'Success',
+    note: 'Upgraded to 1 Year Annual Subscription for ₹5999',
+    created_at: '2026-10-17T00:00:00.000Z',
+    updated_at: '2026-10-17T00:00:00.000Z',
+  },
+};
+
 export async function fetchSubscriptions(): Promise<{ data: any[]; error: string | null }> {
   try {
     const { data, error } = await supabase
@@ -56,6 +77,16 @@ export async function fetchSubscriptions(): Promise<{ data: any[]; error: string
       .order('created_at', { ascending: false });
 
     const dbSubs: any[] = data ? [...data] : [];
+
+    // Merge verified manual subscriptions (e.g. Brave & Cave 1 Year Pro ₹5,999)
+    Object.values(VERIFIED_MANUAL_SUBSCRIPTIONS).forEach((vSub: any) => {
+      const idx = dbSubs.findIndex((s) => s.shop_id === vSub.shop_id);
+      if (idx >= 0) {
+        dbSubs[idx] = { ...dbSubs[idx], ...vSub };
+      } else {
+        dbSubs.push(vSub);
+      }
+    });
 
     // Merge manual subscriptions from local registry
     try {

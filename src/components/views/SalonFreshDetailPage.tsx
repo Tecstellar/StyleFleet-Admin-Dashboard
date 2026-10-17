@@ -179,7 +179,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       base = 2499;
     } else if (selected === '12_months') {
       months = 12;
-      base = 4999;
+      base = 5999;
     } else if (selected === 'free') {
       months = 0;
       base = 0;
@@ -488,7 +488,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       (p: any) =>
         p.shop_id === shop.id &&
         (p.status === 'completed' || (p as any).status === 'success') &&
-        ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 299900 || p.amount_minor === 2999) ||
+        ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 599900 || p.amount_minor === 299900 || p.amount_minor === 2999 || p.amount_minor === 5999) ||
          (p.reference && p.reference.toLowerCase().includes('sub')))
     );
 
@@ -516,12 +516,10 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       });
     } else if (proPayment?.paid_at) {
       const d = new Date(proPayment.paid_at);
-      d.setDate(d.getDate() + 90);
+      d.setDate(d.getDate() + 365);
       expiryText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     } else if (isBraveAndCave) {
-      const d = new Date(shop.created_at || Date.now());
-      d.setDate(d.getDate() + 90);
-      expiryText = `${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} (3 Months Pro)`;
+      expiryText = '17 Oct 2027 (1 Year Pro)';
     } else if (isSub) {
       expiryText = 'Active (Auto-Renews)';
     }
@@ -541,11 +539,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         year: 'numeric',
       });
     } else if (isBraveAndCave) {
-      subDateText = new Date('2026-10-08T11:15:49.323Z').toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      });
+      subDateText = '17 Oct 2026';
     }
 
     // Amount (amount stored in subscriptions table)
@@ -554,16 +548,16 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       const raw = typeof subRecord.amount_minor === 'number' && subRecord.amount_minor > 0
         ? (subRecord.amount_minor >= 10000 ? Math.round(subRecord.amount_minor / 100) : subRecord.amount_minor)
         : (typeof subRecord.amount === 'number' && subRecord.amount > 0 ? subRecord.amount : 0);
-      amtText = `₹${(raw || (isBraveAndCave ? 2999 : 0)).toLocaleString('en-IN')}`;
+      amtText = `₹${(raw || (isBraveAndCave ? 5999 : 0)).toLocaleString('en-IN')}`;
     } else if (isBraveAndCave) {
-      amtText = '₹2,999';
+      amtText = '₹5,999';
     } else if (proPayment?.amount_minor) {
       amtText = `₹${Math.round(proPayment.amount_minor / 100).toLocaleString('en-IN')}`;
     }
 
     const payStatus = isSub ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)';
     const pLabel = isSub
-      ? (subRecord?.plan_name || (subRecord?.plan_id === '3_months' || isBraveAndCave ? 'Pro Plan (3 Months)' : subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
+      ? (subRecord?.plan_name || (subRecord?.plan_id === '12_months' || isBraveAndCave ? 'Pro Plan (1 Year)' : subRecord?.plan_id === '3_months' ? 'Pro Plan (3 Months)' : subRecord?.plan_id ? `Pro Plan (${subRecord.plan_id})` : 'Pro Plan'))
       : 'Free Plan (100 Quota)';
 
     return {
@@ -783,7 +777,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         '3_months': 'Pro 3M',
         quarterly: 'Quarterly',
         '6_months': 'Half Yearly',
-        '12_months': 'Annual',
+        '12_months': 'Annual (1 Year)',
         free: 'Free Plan',
       };
       const planName = planLabelMap[upgradePlan] || upgradePlan;
@@ -1277,7 +1271,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 <option value="3_months">Pro 3M (3 months) - ₹2999</option>
                 <option value="quarterly">Quarterly (3 months) - ₹1299</option>
                 <option value="6_months">Half Yearly (6 months) - ₹2499</option>
-                <option value="12_months">Annual (12 months) - ₹4999</option>
+                <option value="12_months">Annual (12 months) - ₹5999</option>
                 <option value="free">Free (Move back to Free) - ₹0</option>
               </select>
             </div>

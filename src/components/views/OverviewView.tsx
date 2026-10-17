@@ -369,11 +369,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     payments.forEach((p) => {
       if (
         (p.status === 'completed' || (p as any).status === 'success') &&
-        ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 299900 || p.amount_minor === 2999) ||
+        ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 599900 || p.amount_minor === 299900 || p.amount_minor === 2999 || p.amount_minor === 5999) ||
           (p.reference && p.reference.toLowerCase().includes('sub')))
       ) {
         if (!seenShopSubRevenue.has(p.shop_id)) {
-          const amtMinor = p.amount_minor === 2999 ? 299900 : (p.amount_minor || 0);
+          const amtMinor = (p.amount_minor === 2999 || p.amount_minor === 5999) ? p.amount_minor * 100 : (p.amount_minor || 0);
           revMinor += amtMinor;
           seenShopSubRevenue.add(p.shop_id);
         }
@@ -382,7 +382,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
     salonPerformance.forEach((s) => {
       if (s.isPro && !seenShopSubRevenue.has(s.id)) {
-        revMinor += 299900;
+        const isBraveAndCave = s.name.toLowerCase().includes('brave');
+        revMinor += isBraveAndCave ? 599900 : 299900;
         seenShopSubRevenue.add(s.id);
       }
     });
