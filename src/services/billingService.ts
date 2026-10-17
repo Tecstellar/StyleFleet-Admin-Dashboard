@@ -55,8 +55,28 @@ export async function fetchSubscriptions(): Promise<{ data: any[]; error: string
       .select('*, shop:shops(id, name)')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
-    return { data: data || [], error: null };
+    const dbSubs: any[] = data ? [...data] : [];
+
+    // Merge manual subscriptions from local registry
+    try {
+      const raw = localStorage.getItem('stylefleet_manual_subscriptions_registry');
+      if (raw) {
+        const manualMap: Record<string, any> = JSON.parse(raw);
+        Object.values(manualMap).forEach((mSub: any) => {
+          const idx = dbSubs.findIndex((s) => s.shop_id === mSub.shop_id);
+          if (idx >= 0) {
+            dbSubs[idx] = { ...dbSubs[idx], ...mSub };
+          } else {
+            dbSubs.push(mSub);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Error reading manual subscriptions registry:', e);
+    }
+
+    if (error && dbSubs.length === 0) throw error;
+    return { data: dbSubs, error: null };
   } catch (err: any) {
     console.error('Error fetching subscriptions:', err);
     return { data: [], error: err.message || 'Unable to load subscriptions' };
@@ -75,9 +95,112 @@ export function subscribeToSubscriptions(callback: () => void) {
     )
     .subscribe();
 
+  const handleCustomUpdate = () => {
+    callback();
+  };
+  window.addEventListener('stylefleet_subscription_updated', handleCustomUpdate);
+
   return () => {
     supabase.removeChannel(channel);
+    window.removeEventListener('stylefleet_subscription_updated', handleCustomUpdate);
   };
+}
+
+export async function saveManualSubscription(subscription: {
+  shop_id: string;
+  plan_id: string;
+  plan_name?: string;
+  status: string;
+  subscription_start_date: string;
+  subscription_end_date: string;
+  amount_minor: number;
+  currency?: string;
+  cashfree_order_id?: string;
+  discount_type?: string;
+  discount_value?: number;
+  discount_amount?: number;
+  base_amount?: number;
+  payment_type?: string;
+  payment_status?: string;
+  note?: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const isPro = subscription.status === 'active' && subscription.plan_id !== 'free';
+
+    // 1. Try to update existing subscription in Supabase
+    const { data: updatedData, error: updErr } = await supabase
+      .from('subscriptions')
+      .update({
+        plan_id: subscription.plan_id,
+        status: subscription.status,
+        subscription_start_date: subscription.subscription_start_date,
+        subscription_end_date: subscription.subscription_end_date,
+        amount_minor: subscription.amount_minor,
+        currency: subscription.currency || 'INR',
+        cashfree_order_id: subscription.cashfree_order_id || 'manual-admin-grant',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('shop_id', subscription.shop_id)
+      .select();
+
+    // If no row was updated, attempt insert
+    if (!updErr && (!updatedData || updatedData.length === 0)) {
+      try {
+        await supabase.from('subscriptions').insert([
+          {
+            shop_id: subscription.shop_id,
+            plan_id: subscription.plan_id,
+            status: subscription.status,
+            subscription_start_date: subscription.subscription_start_date,
+            subscription_end_date: subscription.subscription_end_date,
+            amount_minor: subscription.amount_minor,
+            currency: subscription.currency || 'INR',
+            cashfree_order_id: subscription.cashfree_order_id || 'manual-admin-grant',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ]);
+      } catch (insertError) {
+        console.warn('Subscription insert note:', insertError);
+      }
+    }
+
+    // 2. Update shops table sales limit
+    try {
+      await supabase
+        .from('shops')
+        .update({
+          free_sales_limit: isPro ? 999999 : 100,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', subscription.shop_id);
+    } catch (shopError) {
+      console.warn('Shop limit update note:', shopError);
+    }
+
+    // 3. Save to local storage registry
+    try {
+      const raw = localStorage.getItem('stylefleet_manual_subscriptions_registry');
+      const registry = raw ? JSON.parse(raw) : {};
+      registry[subscription.shop_id] = {
+        id: `sub-manual-${subscription.shop_id}`,
+        ...subscription,
+        created_at: subscription.subscription_start_date || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      localStorage.setItem('stylefleet_manual_subscriptions_registry', JSON.stringify(registry));
+    } catch (regError) {
+      console.warn('Registry storage note:', regError);
+    }
+
+    // 4. Dispatch global custom event for realtime re-render
+    window.dispatchEvent(new CustomEvent('stylefleet_subscription_updated'));
+
+    return { success: true, error: null };
+  } catch (err: any) {
+    console.error('Error saving manual subscription:', err);
+    return { success: false, error: err.message || 'Failed to save subscription' };
+  }
 }
 
 

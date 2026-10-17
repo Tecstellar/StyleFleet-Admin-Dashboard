@@ -33,6 +33,7 @@ import { Shop, Profile, Staff, Customer, Bill, Payment, Appointment } from '../.
 import { supabase } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
+import { saveManualSubscription } from '../../services/billingService';
 
 interface SalonFreshDetailPageProps {
   shop: Shop;
@@ -120,6 +121,85 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const [followUpMin, setFollowUpMin] = useState('00');
   const [followUpPriority, setFollowUpPriority] = useState('Medium');
   const [isSavingResponse, setIsSavingResponse] = useState(false);
+
+  // Manual Plan Upgrade State (matching operations console UI)
+  const [upgradePlan, setUpgradePlan] = useState<string>('monthly');
+  const [upgradeNote, setUpgradeNote] = useState<string>('');
+  const [upgradeDurationMonths, setUpgradeDurationMonths] = useState<number>(1);
+  const [upgradeBaseAmount, setUpgradeBaseAmount] = useState<number>(499);
+  const [upgradeDiscountType, setUpgradeDiscountType] = useState<'None' | 'Percentage' | 'Flat'>('None');
+  const [upgradeDiscountValue, setUpgradeDiscountValue] = useState<number>(0);
+  const [upgradePaymentType, setUpgradePaymentType] = useState<string>('MANUAL');
+  const [upgradePaymentStatus, setUpgradePaymentStatus] = useState<'Success' | 'Pending' | 'Failed'>('Success');
+  const [upgradeStartDate, setUpgradeStartDate] = useState<string>(() => {
+    return new Date().toISOString().slice(0, 10);
+  });
+  const [upgradeEndDate, setUpgradeEndDate] = useState<string>(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().slice(0, 10);
+  });
+  const [isUpgradingPlan, setIsUpgradingPlan] = useState<boolean>(false);
+  const [upgradeSuccessMsg, setUpgradeSuccessMsg] = useState<string>('');
+  const [manualSubOverride, setManualSubOverride] = useState<any | null>(null);
+
+  const handleUpgradePlanSelect = (selected: string) => {
+    setUpgradePlan(selected);
+    let months = 1;
+    let base = 499;
+    if (selected === 'monthly') {
+      months = 1;
+      base = 499;
+    } else if (selected === '3_months') {
+      months = 3;
+      base = 2999;
+    } else if (selected === 'quarterly') {
+      months = 3;
+      base = 1299;
+    } else if (selected === '6_months') {
+      months = 6;
+      base = 2499;
+    } else if (selected === '12_months') {
+      months = 12;
+      base = 4999;
+    } else if (selected === 'free') {
+      months = 0;
+      base = 0;
+    }
+    setUpgradeDurationMonths(months);
+    setUpgradeBaseAmount(base);
+
+    const d = new Date(upgradeStartDate || Date.now());
+    d.setMonth(d.getMonth() + months);
+    setUpgradeEndDate(d.toISOString().slice(0, 10));
+  };
+
+  const handleDurationChange = (months: number) => {
+    setUpgradeDurationMonths(months);
+    const d = new Date(upgradeStartDate || Date.now());
+    d.setMonth(d.getMonth() + months);
+    setUpgradeEndDate(d.toISOString().slice(0, 10));
+  };
+
+  const handleStartDateChange = (startDateStr: string) => {
+    setUpgradeStartDate(startDateStr);
+    const d = new Date(startDateStr || Date.now());
+    d.setMonth(d.getMonth() + upgradeDurationMonths);
+    setUpgradeEndDate(d.toISOString().slice(0, 10));
+  };
+
+  const upgradeDiscountAmount = useMemo(() => {
+    if (upgradeDiscountType === 'None') return 0;
+    if (upgradeDiscountType === 'Percentage') {
+      return Math.round((upgradeBaseAmount * upgradeDiscountValue) / 100);
+    }
+    if (upgradeDiscountType === 'Flat') {
+      return Math.min(upgradeBaseAmount, upgradeDiscountValue);
+    }
+    return 0;
+  }, [upgradeDiscountType, upgradeBaseAmount, upgradeDiscountValue]);
+
+  const upgradeFinalAmount = Math.max(0, upgradeBaseAmount - upgradeDiscountAmount);
 
   // Handle Call Status Switch: Answered defaults to Positive + starts timer; No Answer / Not Reachable defaults to Negative + resets timer
   const handleSelectCallStatus = (status: 'Answered' | 'No Answer' | 'Not Reachable') => {
@@ -355,7 +435,26 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     planLabel,
     subscribedDateText,
     subscriptionAmountText,
+    activeSubRecord,
   } = useMemo(() => {
+    // 0. Priority: check manualSubOverride for instant reactive updates
+    if (manualSubOverride) {
+      const isAct = manualSubOverride.status === 'active' && manualSubOverride.plan_id !== 'free';
+      const startD = manualSubOverride.subscription_start_date ? formatDate(manualSubOverride.subscription_start_date) : 'Today';
+      const endD = isAct ? formatDate(manualSubOverride.subscription_end_date) : 'N/A (Free Quota)';
+      const amt = `₹${(manualSubOverride.amount_minor || 0).toLocaleString('en-IN')}`;
+      const pName = manualSubOverride.plan_name || (isAct ? 'Pro Plan' : 'Free Plan (100 Quota)');
+      return {
+        isSubscriber: isAct,
+        planExpiry: endD,
+        paymentStatus: isAct ? 'Paid (Active Pro)' : 'Free Tier (Unpaid)',
+        planLabel: pName,
+        subscribedDateText: isAct ? startD : 'Not Subscribed',
+        subscriptionAmountText: amt,
+        activeSubRecord: manualSubOverride,
+      };
+    }
+
     // 1. Check subscriptions table for active pro record
     const subRecord = subscriptions.find(
       (s: any) =>
@@ -456,8 +555,9 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       planLabel: pLabel,
       subscribedDateText: subDateText,
       subscriptionAmountText: amtText,
+      activeSubRecord: subRecord,
     };
-  }, [shop, subscriptions, payments]);
+  }, [shop, subscriptions, payments, manualSubOverride]);
 
   // Last Login / Activity Time
   const lastLoginFormatted = useMemo(() => {
@@ -642,6 +742,61 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       console.warn('Error deleting response from DB:', err);
     }
     setCallResponses((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  // Manual Plan Upgrade Action
+  const handleExecuteUpgradePlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpgradingPlan(true);
+    setUpgradeSuccessMsg('');
+
+    try {
+      const isFree = upgradePlan === 'free';
+      const planLabelMap: Record<string, string> = {
+        monthly: 'Monthly',
+        '3_months': 'Pro 3M',
+        quarterly: 'Quarterly',
+        '6_months': 'Half Yearly',
+        '12_months': 'Annual',
+        free: 'Free Plan',
+      };
+      const planName = planLabelMap[upgradePlan] || upgradePlan;
+
+      const subData = {
+        shop_id: shop.id,
+        plan_id: upgradePlan,
+        plan_name: planName,
+        status: isFree ? 'expired' : upgradePaymentStatus === 'Success' ? 'active' : 'pending',
+        subscription_start_date: new Date(upgradeStartDate).toISOString(),
+        subscription_end_date: isFree ? new Date().toISOString() : new Date(upgradeEndDate).toISOString(),
+        amount_minor: upgradeFinalAmount,
+        currency: 'INR',
+        cashfree_order_id: `manual-admin-${upgradePaymentType.toLowerCase()}`,
+        discount_type: upgradeDiscountType,
+        discount_value: upgradeDiscountValue,
+        discount_amount: upgradeDiscountAmount,
+        base_amount: upgradeBaseAmount,
+        payment_type: upgradePaymentType,
+        payment_status: upgradePaymentStatus,
+        note: upgradeNote.trim() || undefined,
+      };
+
+      const res = await saveManualSubscription(subData);
+
+      if (res.success) {
+        setManualSubOverride(subData);
+        setUpgradeSuccessMsg(`✓ Successfully upgraded to ${planName}!`);
+        if (onRefresh) onRefresh();
+        setTimeout(() => setUpgradeSuccessMsg(''), 6000);
+      } else {
+        alert(res.error || 'Failed to update subscription');
+      }
+    } catch (err: any) {
+      console.error('Error during manual plan upgrade:', err);
+      alert(err.message || 'Error updating subscription');
+    } finally {
+      setIsUpgradingPlan(false);
+    }
   };
 
   // Report Builder: Generates Comprehensive Salon CSV
@@ -1240,41 +1395,287 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
       </div>
 
-      {/* SUBSCRIPTION BILLING & PAYMENT LEDGER (IF SUBSCRIBED) */}
-      {isSubscriber && (
-        <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-4 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-[#071952]" />
-              <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
-                Subscription Billing &amp; Payment Ledger
-              </h3>
+      {/* MANUAL PLAN UPGRADE & SUBSCRIPTION (MATCHING OPERATIONS CONSOLE UI) */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-5">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#071952]/15">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#071952] block font-mono">
+              ADMIN BILLING
+            </span>
+            <h3 className="text-base sm:text-lg font-bold text-black tracking-tight mt-0.5">
+              Manual plan upgrade
+            </h3>
+            <p className="text-xs text-neutral-600 mt-0.5">
+              Grant Pro or move back to Free without Razorpay Autopay. Admin only.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#071952]/10 text-[#071952] border border-[#071952]/30 font-medium">
+              Current: {isSubscriber ? (planLabel.replace(/\(.*?\)/g, '').trim() || 'Monthly') : 'Free Plan'}
+            </span>
+            <span className="text-xs font-semibold text-neutral-600">
+              {isSubscriber ? 'Subscribed' : 'Free Tier'}
+            </span>
+          </div>
+        </div>
+
+        {/* Upgrade Form */}
+        <form onSubmit={handleExecuteUpgradePlan} className="space-y-4">
+          {upgradeSuccessMsg && (
+            <div className="p-3 rounded-lg bg-[#071952] text-white text-xs font-semibold flex items-center justify-between shadow-xs">
+              <span>{upgradeSuccessMsg}</span>
+              <button
+                type="button"
+                onClick={() => setUpgradeSuccessMsg('')}
+                className="text-white/80 hover:text-white font-bold ml-2 cursor-pointer"
+              >
+                ✕
+              </button>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#071952] text-white">
-              ★ Active Pro Subscription
+          )}
+
+          {/* Row 1: Plan, Note, Duration, Base Amount, Discount Type, Discount Value, Discount Amount, Final Amount */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 items-end">
+            {/* PLAN */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                PLAN
+              </label>
+              <select
+                value={upgradePlan}
+                onChange={(e) => handleUpgradePlanSelect(e.target.value)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] cursor-pointer"
+              >
+                <option value="monthly">Monthly (1 month) - ₹499</option>
+                <option value="3_months">Pro 3M (3 months) - ₹2999</option>
+                <option value="quarterly">Quarterly (3 months) - ₹1299</option>
+                <option value="6_months">Half Yearly (6 months) - ₹2499</option>
+                <option value="12_months">Annual (12 months) - ₹4999</option>
+                <option value="free">Free (Move back to Free) - ₹0</option>
+              </select>
+            </div>
+
+            {/* NOTE (OPTIONAL) */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                NOTE (OPTIONAL)
+              </label>
+              <input
+                type="text"
+                placeholder="Paid offline / goodwill / promo"
+                value={upgradeNote}
+                onChange={(e) => setUpgradeNote(e.target.value)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952]"
+              />
+            </div>
+
+            {/* DURATION (MONTHS) */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                DURATION (MONTHS)
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="60"
+                value={upgradeDurationMonths}
+                onChange={(e) => handleDurationChange(parseInt(e.target.value, 10) || 0)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] font-mono"
+              />
+            </div>
+
+            {/* BASE AMOUNT */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                BASE AMOUNT
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={upgradeBaseAmount}
+                onChange={(e) => setUpgradeBaseAmount(parseInt(e.target.value, 10) || 0)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] font-mono"
+              />
+            </div>
+
+            {/* DISCOUNT TYPE */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                DISCOUNT TYPE
+              </label>
+              <select
+                value={upgradeDiscountType}
+                onChange={(e) => setUpgradeDiscountType(e.target.value as any)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] cursor-pointer"
+              >
+                <option value="None">None</option>
+                <option value="Percentage">Percentage (%)</option>
+                <option value="Flat">Flat (₹)</option>
+              </select>
+            </div>
+
+            {/* DISCOUNT VALUE */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                DISCOUNT VALUE
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={upgradeDiscountValue}
+                onChange={(e) => setUpgradeDiscountValue(parseInt(e.target.value, 10) || 0)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] font-mono"
+              />
+            </div>
+
+            {/* DISCOUNT AMOUNT */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                DISCOUNT AMOUNT
+              </label>
+              <div className="w-full py-1.5 px-2 text-xs bg-neutral-100 text-neutral-700 border border-neutral-300 rounded-md font-mono font-medium">
+                ₹{upgradeDiscountAmount.toLocaleString('en-IN')}
+              </div>
+            </div>
+
+            {/* FINAL AMOUNT */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                FINAL AMOUNT
+              </label>
+              <div className="w-full py-1.5 px-2 text-xs bg-neutral-100 text-[#071952] border border-neutral-300 rounded-md font-mono font-bold">
+                ₹{upgradeFinalAmount.toLocaleString('en-IN')}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Payment Type, Payment Status, Subscription Start, Subscription End, Upgrade Plan Button */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-end pt-1">
+            {/* PAYMENT TYPE */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                PAYMENT TYPE
+              </label>
+              <select
+                value={upgradePaymentType}
+                onChange={(e) => setUpgradePaymentType(e.target.value)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] cursor-pointer font-medium"
+              >
+                <option value="MANUAL">MANUAL</option>
+                <option value="UPI">UPI</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+
+            {/* PAYMENT STATUS */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                PAYMENT STATUS
+              </label>
+              <select
+                value={upgradePaymentStatus}
+                onChange={(e) => setUpgradePaymentStatus(e.target.value as any)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] cursor-pointer font-medium"
+              >
+                <option value="Success">Success</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
+              </select>
+            </div>
+
+            {/* SUBSCRIPTION START */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                SUBSCRIPTION START
+              </label>
+              <input
+                type="date"
+                value={upgradeStartDate}
+                onChange={(e) => handleStartDateChange(e.target.value)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] font-mono cursor-pointer"
+              />
+            </div>
+
+            {/* SUBSCRIPTION END */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block font-mono">
+                SUBSCRIPTION END
+              </label>
+              <input
+                type="date"
+                value={upgradeEndDate}
+                onChange={(e) => setUpgradeEndDate(e.target.value)}
+                className="w-full py-1.5 px-2 text-xs bg-white text-black border border-neutral-300 rounded-md focus:outline-none focus:border-[#071952] font-mono cursor-pointer"
+              />
+            </div>
+
+            {/* UPGRADE PLAN BUTTON */}
+            <div>
+              <button
+                type="submit"
+                disabled={isUpgradingPlan}
+                className="w-full py-2 px-4 rounded-md text-xs font-bold text-white bg-[#071952] hover:bg-[#0b2575] transition-all cursor-pointer shadow-xs disabled:opacity-50"
+              >
+                {isUpgradingPlan ? 'Updating plan...' : 'Upgrade plan'}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {/* Current Subscription Snapshot (Matching operations console footer) */}
+        <div className="pt-4 border-t border-[#071952]/15 space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
+            <h4 className="text-xs font-bold text-black tracking-tight">
+              Current subscription
+            </h4>
+            <span className="text-[11px] text-neutral-500">
+              Plan entitlement and latest billing snapshot for this shop.
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
-              <span className="text-[10px] font-mono text-black/60 uppercase">Plan</span>
-              <div className="font-bold text-black mt-0.5">{planLabel}</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 text-xs bg-white p-3 rounded-xl border border-[#071952]/15 shadow-2xs">
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Status</span>
+              <div className="font-bold text-black mt-0.5">{isSubscriber ? 'Paid (prepaid)' : 'Free Tier (100 Quota)'}</div>
             </div>
-            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
-              <span className="text-[10px] font-mono text-black/60 uppercase">Billed Amount</span>
-              <div className="font-bold text-emerald-800 mt-0.5 font-mono">{subscriptionAmountText}</div>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Plan</span>
+              <div className="font-bold text-black mt-0.5">{isSubscriber ? (planLabel.replace(/\(.*?\)/g, '').trim() || 'Monthly') : 'Free Plan'}</div>
             </div>
-            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
-              <span className="text-[10px] font-mono text-black/60 uppercase">Billing Date</span>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Base amount</span>
+              <div className="font-bold text-black mt-0.5 font-mono">{subscriptionAmountText}</div>
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Discount</span>
+              <div className="font-bold text-black mt-0.5">
+                {activeSubRecord?.discount_type && activeSubRecord?.discount_type !== 'None'
+                  ? `${activeSubRecord.discount_type}`
+                  : 'None'}
+              </div>
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Final amount</span>
+              <div className="font-bold text-[#071952] mt-0.5 font-mono font-extrabold">{subscriptionAmountText}</div>
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Start date</span>
               <div className="font-bold text-black mt-0.5 font-mono">{subscribedDateText}</div>
             </div>
-            <div className="p-2.5 rounded-xl border border-[#071952]/15 bg-[#F8F3F0]">
-              <span className="text-[10px] font-mono text-black/60 uppercase">Expiry / Renewal</span>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">End date</span>
               <div className="font-bold text-black mt-0.5 font-mono">{planExpiry}</div>
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-neutral-500 block uppercase">Payment type</span>
+              <div className="font-bold text-black mt-0.5 font-mono">{activeSubRecord?.payment_type || 'MANUAL'}</div>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* SECTION 5: BILLS AND ORDERS */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
