@@ -640,7 +640,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           {/* Add Response Button */}
           <button
             onClick={() => setIsAddResponseOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#00a389] hover:bg-[#008f78] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
             <PhoneCall className="w-3.5 h-3.5 text-white" />
             <span>Add Response</span>
@@ -946,7 +946,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           </div>
           <button
             onClick={() => setIsAddResponseOpen(true)}
-            className="inline-flex items-center gap-1 px-3 py-1 bg-[#00a389] hover:bg-[#008f78] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-3 py-1 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>Add Response</span>
@@ -1275,30 +1275,30 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-            <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-gray-200 overflow-hidden flex flex-col">
+            <div className="bg-[#F8F3F0] rounded-2xl max-w-3xl w-full shadow-2xl border border-[#071952]/30 overflow-hidden flex flex-col">
               {/* Modal Header */}
-              <div className="bg-[#00a389] px-6 py-3.5 flex items-center justify-between">
+              <div className="bg-[#071952] px-6 py-4 flex items-center justify-between">
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                     Add response
                   </h3>
-                  <div className="flex items-center gap-2 text-white/95 text-xs font-semibold mt-0.5 flex-wrap">
+                  <div className="flex items-center gap-2 text-white/90 text-xs font-semibold mt-0.5 flex-wrap">
                     <span>{shop.name.toUpperCase()}</span>
-                    <span className="opacity-75">•</span>
+                    <span className="opacity-60">•</span>
                     <span>{displayPhone || 'No phone'}</span>
                     {cleanPhoneDigits && (
                       <a
                         href={`https://wa.me/91${cleanPhoneDigits}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500/80 hover:bg-emerald-600 text-white transition-colors"
+                        className="inline-flex items-center justify-center text-white/80 hover:text-white transition-colors"
                         title="Chat on WhatsApp"
                       >
-                        <MessageCircle className="w-3 h-3 fill-white text-white" />
+                        <MessageCircle className="w-3.5 h-3.5 fill-current" />
                       </a>
                     )}
-                    <span className="opacity-75">•</span>
-                    <span className="font-mono text-[11px] opacity-90">
+                    <span className="opacity-60">•</span>
+                    <span className="font-mono text-[11px] opacity-80">
                       {displayId}
                     </span>
                   </div>
@@ -1307,7 +1307,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAddResponseOpen(false)}
-                  className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer"
                   title="Close"
                 >
                   <X className="w-4 h-4" />
@@ -1315,43 +1315,43 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
               </div>
 
               {/* Modal Body: Two Columns */}
-              <div className="p-6 flex flex-col md:flex-row gap-6 bg-white text-xs">
+              <div className="p-6 flex flex-col md:flex-row gap-6 bg-[#F8F3F0] text-xs">
                 {/* Left Column: Preview */}
                 <div className="w-full md:w-56 shrink-0 flex flex-col">
-                  <label className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2 block">
+                  <label className="text-xs font-bold text-black uppercase tracking-wider mb-2 block">
                     Preview
                   </label>
-                  <div className="flex-1 bg-white rounded-xl border border-gray-200 p-3.5 min-h-[280px] max-h-[380px] overflow-y-auto flex flex-col justify-start space-y-3">
+                  <div className="flex-1 bg-white/85 rounded-xl border border-[#071952]/20 p-3.5 min-h-[280px] max-h-[380px] overflow-y-auto flex flex-col justify-start space-y-3">
                     {callResponses.length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center my-auto">
+                      <p className="text-xs text-black/50 text-center my-auto">
                         No previous responses yet.
                       </p>
                     ) : (
                       callResponses.slice(0, 5).map((cr) => (
                         <div
                           key={cr.id}
-                          className="p-2.5 rounded-lg border border-gray-100 bg-gray-50 text-xs space-y-1.5"
+                          className="p-2.5 rounded-lg border border-[#071952]/15 bg-[#F8F3F0] text-xs space-y-1.5"
                         >
                           <div className="flex items-center justify-between gap-1">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 cr.type === 'Answered'
-                                  ? 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-[#071952] text-white'
                                   : cr.type === 'No Answer'
-                                  ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-rose-100 text-rose-800'
+                                  ? 'bg-[#071952]/20 text-[#071952]'
+                                  : 'bg-black/10 text-black'
                               }`}
                             >
                               {cr.type}
                             </span>
-                            <span className="text-[10px] text-gray-500 font-mono">
+                            <span className="text-[10px] text-black/60 font-mono">
                               {new Date(cr.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                             </span>
                           </div>
-                          <p className="text-[11px] text-gray-700 leading-snug line-clamp-3">
+                          <p className="text-[11px] text-black/85 leading-snug line-clamp-3">
                             {cr.notes}
                           </p>
-                          <div className="text-[10px] text-gray-500 flex items-center justify-between">
+                          <div className="text-[10px] text-black/60 flex items-center justify-between">
                             <span>By {cr.recordedBy || 'Support'}</span>
                             {cr.duration && <span>⏱ {cr.duration}</span>}
                           </div>
@@ -1365,9 +1365,9 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 <form onSubmit={handleSaveResponse} className="flex-1 space-y-4">
                   {/* CALL STATUS * */}
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1">
+                    <label className="text-[11px] font-bold text-black uppercase tracking-wider flex items-center gap-1">
                       <span>CALL STATUS</span>
-                      <span className="text-red-500">*</span>
+                      <span className="text-[#071952] font-black">*</span>
                     </label>
                     <div className="flex items-center gap-2 flex-wrap">
                       {(['Answered', 'No Answer', 'Not Reachable'] as const).map((status) => {
@@ -1377,10 +1377,10 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                             key={status}
                             type="button"
                             onClick={() => setCallStatus(status)}
-                            className={`px-4 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
-                                ? 'bg-[#00a389] text-white border border-[#00a389] shadow-xs'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
+                                ? 'bg-[#071952] text-white border border-[#071952] shadow-xs'
+                                : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
                             }`}
                           >
                             {status}
@@ -1393,7 +1393,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                   {/* NOTES & RESPONSE TIMER */}
                   <div className="flex items-start gap-3">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                      <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
                         NOTES
                       </label>
                       <textarea
@@ -1401,15 +1401,15 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                         placeholder="Optional notes"
                         value={responseNotes}
                         onChange={(e) => setResponseNotes(e.target.value)}
-                        className="w-full p-2.5 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] resize-none"
+                        className="w-full p-2.5 text-xs rounded-lg border border-[#071952]/30 bg-white text-black placeholder-black/40 focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] resize-none"
                       />
                     </div>
 
                     <div className="w-28 shrink-0 space-y-1">
-                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block whitespace-nowrap">
+                      <label className="text-[11px] font-bold text-black uppercase tracking-wider block whitespace-nowrap">
                         RESPONSE TIMER
                       </label>
-                      <div className="w-full py-2 px-3 rounded-lg border border-gray-300 bg-gray-50 text-center font-mono font-bold text-xs text-gray-800 shadow-2xs">
+                      <div className="w-full py-2 px-3 rounded-lg border border-[#071952]/30 bg-white text-center font-mono font-bold text-xs text-[#071952] shadow-2xs">
                         {formatTimer(timerSeconds)}
                       </div>
                     </div>
@@ -1418,25 +1418,25 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                   {/* RESPONSE DATE & REPORTED BY */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                      <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
                         RESPONSE DATE
                       </label>
                       <input
                         type="datetime-local"
                         value={responseDate}
                         onChange={(e) => setResponseDate(e.target.value)}
-                        className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] font-medium"
+                        className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] font-medium"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                      <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
                         REPORTED BY
                       </label>
                       <select
                         value={reportedBy}
                         onChange={(e) => setReportedBy(e.target.value)}
-                        className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] cursor-pointer"
+                        className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                       >
                         <option value="Support">Support</option>
                         <option value="Admin">Admin</option>
@@ -1448,40 +1448,40 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                   </div>
 
                   {/* SCHEDULE FOLLOW-UP SECTION */}
-                  <div className="rounded-xl border border-gray-200 bg-gray-50/70 p-3.5 space-y-3">
+                  <div className="rounded-xl border border-[#071952]/20 bg-white/80 p-3.5 space-y-3">
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={scheduleFollowUp}
                         onChange={(e) => setScheduleFollowUp(e.target.checked)}
-                        className="w-4 h-4 rounded text-[#00a389] accent-[#00a389] focus:ring-[#00a389] cursor-pointer"
+                        className="w-4 h-4 rounded text-[#071952] accent-[#071952] focus:ring-[#071952] cursor-pointer"
                       />
-                      <span className="text-xs font-bold text-gray-800">Schedule follow-up</span>
+                      <span className="text-xs font-bold text-black">Schedule follow-up</span>
                     </label>
 
                     {scheduleFollowUp && (
                       <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-1">
                         <div className="sm:col-span-5 space-y-1">
-                          <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">
+                          <label className="text-[10px] font-bold text-black/70 uppercase tracking-wider block">
                             FOLLOW-UP DATE
                           </label>
                           <input
                             type="date"
                             value={followUpDate}
                             onChange={(e) => setFollowUpDate(e.target.value)}
-                            className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] cursor-pointer"
+                            className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
                           />
                         </div>
 
                         <div className="sm:col-span-4 space-y-1">
-                          <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">
+                          <label className="text-[10px] font-bold text-black/70 uppercase tracking-wider block">
                             TIME
                           </label>
                           <div className="flex items-center gap-1.5">
                             <select
                               value={followUpHour}
                               onChange={(e) => setFollowUpHour(e.target.value)}
-                              className="flex-1 p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] cursor-pointer"
+                              className="flex-1 p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                             >
                               <option value="">Hour</option>
                               <option value="09 AM">09 AM</option>
@@ -1500,7 +1500,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                             <select
                               value={followUpMin}
                               onChange={(e) => setFollowUpMin(e.target.value)}
-                              className="w-16 p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] cursor-pointer"
+                              className="w-16 p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                             >
                               <option value="">Min</option>
                               <option value="00">00</option>
@@ -1512,13 +1512,13 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                         </div>
 
                         <div className="sm:col-span-3 space-y-1">
-                          <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">
+                          <label className="text-[10px] font-bold text-black/70 uppercase tracking-wider block">
                             PRIORITY
                           </label>
                           <select
                             value={followUpPriority}
                             onChange={(e) => setFollowUpPriority(e.target.value)}
-                            className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] cursor-pointer"
+                            className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                           >
                             <option value="Low">Low</option>
                             <option value="Medium">Medium</option>
@@ -1531,18 +1531,18 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                   </div>
 
                   {/* FOOTER ACTIONS */}
-                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#071952]/15">
                     <button
                       type="button"
                       onClick={() => setIsAddResponseOpen(false)}
-                      className="px-5 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer"
+                      className="px-5 py-2 rounded-lg text-xs font-semibold text-black/70 bg-[#F8F3F0] border border-[#071952]/30 hover:bg-[#071952]/10 transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isSavingResponse}
-                      className="px-6 py-2 rounded-lg text-xs font-bold text-white bg-[#00a389] hover:bg-[#008f78] shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                      className="px-6 py-2 rounded-lg text-xs font-bold text-white bg-[#071952] hover:bg-[#0b2575] shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                     >
                       {isSavingResponse ? 'Saving...' : 'Save'}
                     </button>
