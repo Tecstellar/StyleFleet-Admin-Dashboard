@@ -1042,22 +1042,28 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
                       {/* 9. FREE 100 SALES QUOTA */}
                       <td className="px-3 py-2.5 min-w-[130px]">
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-[10.5px]">
-                            <span className="font-semibold text-black tabular-nums">
-                              {s.lifetimeSalesCount} / {s.freeLimit} Sales
-                            </span>
-                            <span className="text-[10px] text-neutral-500 font-mono">
-                              {s.quotaPercent}%
-                            </span>
+                        {s.isPro ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-[#071952] text-white">
+                            PRO (UNLIMITED)
+                          </span>
+                        ) : (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10.5px]">
+                              <span className="font-semibold text-black tabular-nums">
+                                {s.lifetimeSalesCount} / {s.freeLimit} Sales
+                              </span>
+                              <span className="text-[10px] text-neutral-500 font-mono">
+                                {s.quotaPercent}%
+                              </span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-[#F8F3F0] overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all bg-[#071952]"
+                                style={{ width: `${s.quotaPercent}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="w-full h-1.5 rounded-full bg-[#F8F3F0] overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all bg-[#071952]"
-                              style={{ width: `${s.quotaPercent}%` }}
-                            />
-                          </div>
-                        </div>
+                        )}
                       </td>
 
                       {/* 10. TOTAL SALES (₹) */}

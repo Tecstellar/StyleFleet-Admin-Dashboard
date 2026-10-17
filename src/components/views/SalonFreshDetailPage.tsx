@@ -28,6 +28,9 @@ import {
   ChevronRight,
   Trash2,
   MessageCircle,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { Shop, Profile, Staff, Customer, Bill, Payment, Appointment } from '../../types/database';
 import { supabase } from '../../services/supabase';
@@ -160,6 +163,26 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const [isUpgradingPlan, setIsUpgradingPlan] = useState<boolean>(false);
   const [upgradeSuccessMsg, setUpgradeSuccessMsg] = useState<string>('');
   const [manualSubOverride, setManualSubOverride] = useState<any | null>(null);
+
+  // Collapsible Accordion States (default collapsed as requested)
+  const [isServicesExpanded, setIsServicesExpanded] = useState<boolean>(false);
+  const [isBillsExpanded, setIsBillsExpanded] = useState<boolean>(false);
+  const [isAppointmentsExpanded, setIsAppointmentsExpanded] = useState<boolean>(false);
+
+  // Edit Current Subscription Modal / Form State
+  const [isEditingSubscription, setIsEditingSubscription] = useState<boolean>(false);
+  const [editPlanId, setEditPlanId] = useState<string>('12_months');
+  const [editAmount, setEditAmount] = useState<number>(5999);
+  const [editStartDate, setEditStartDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
+  const [editEndDate, setEditEndDate] = useState<string>(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().slice(0, 10);
+  });
+  const [editPaymentType, setEditPaymentType] = useState<string>('MANUAL');
+  const [editPaymentStatus, setEditPaymentStatus] = useState<'Success' | 'Pending' | 'Failed'>('Success');
+  const [editNotes, setEditNotes] = useState<string>('');
+  const [isSavingEditSub, setIsSavingEditSub] = useState<boolean>(false);
 
   const handleUpgradePlanSelect = (selected: string) => {
     setUpgradePlan(selected);
@@ -819,6 +842,56 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     }
   };
 
+  // Save Subscription Edit to Supabase
+  const handleSaveSubscriptionEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingEditSub(true);
+    try {
+      const isFree = editPlanId === 'free';
+      const planLabelMap: Record<string, string> = {
+        monthly: 'Monthly',
+        '3_months': 'Pro 3M',
+        quarterly: 'Quarterly',
+        '6_months': 'Half Yearly',
+        '12_months': 'Annual (1 Year)',
+        free: 'Free Plan',
+      };
+      const planName = planLabelMap[editPlanId] || editPlanId;
+
+      const subData = {
+        shop_id: shop.id,
+        plan_id: editPlanId,
+        plan_name: planName,
+        status: isFree ? 'expired' : editPaymentStatus === 'Success' ? 'active' : 'pending',
+        subscription_start_date: new Date(editStartDate).toISOString(),
+        subscription_end_date: isFree ? new Date().toISOString() : new Date(editEndDate).toISOString(),
+        amount_minor: Number(editAmount) || 0,
+        currency: 'INR',
+        cashfree_order_id: `admin-edit-${editPaymentType.toLowerCase()}`,
+        base_amount: Number(editAmount) || 0,
+        discount_amount: 0,
+        payment_type: editPaymentType,
+        payment_status: editPaymentStatus,
+        note: editNotes.trim() || undefined,
+      };
+
+      const res = await saveManualSubscription(subData);
+
+      if (res.success) {
+        setManualSubOverride(subData);
+        setIsEditingSubscription(false);
+        if (onRefresh) onRefresh();
+      } else {
+        alert(res.error || 'Failed to update subscription in database');
+      }
+    } catch (err: any) {
+      console.error('Error saving subscription edit:', err);
+      alert(err.message || 'Error updating subscription');
+    } finally {
+      setIsSavingEditSub(false);
+    }
+  };
+
   // Report Builder: Generates Comprehensive Salon CSV
   const handleGenerateReport = () => {
     const lines: string[] = [];
@@ -975,6 +1048,11 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                   <span className="text-black/60 font-mono">
                     Owner: <strong>{ownerProfile?.full_name || shop.name}</strong>
                   </span>
+                  <span>•</span>
+                  <span className="inline-flex items-center gap-1.5 font-mono font-bold text-[#071952] bg-white px-2.5 py-0.5 rounded-md border border-[#071952]/20 shadow-2xs">
+                    <Clock className="w-3.5 h-3.5 text-[#071952]" />
+                    Last Active: <span className="text-black">{lastLoginFormatted}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -1005,6 +1083,10 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                 <span>{callResponses[0].outcome === 'Positive' ? 'Positive Customer' : 'Negative Customer'}</span>
               </div>
             )}
+            <div className="inline-flex items-center gap-1 text-[11px] font-mono text-black/70 bg-white/70 px-2.5 py-0.5 rounded-md border border-[#071952]/15">
+              <Clock className="w-3 h-3 text-[#071952]" />
+              <span>Last Active: <strong>{lastLoginFormatted}</strong></span>
+            </div>
             <span className="text-[11px] font-mono text-black/70">
               GST: {shop.gstin ? shop.gstin : 'Not Registered'}
             </span>
@@ -1108,18 +1190,20 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           </div>
         </div>
 
-        {/* Free Orders Quota Progress Bar */}
-        <div className="pt-3 border-t border-[#071952]/15">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-black mb-1.5">
-            <span>Free Orders Quota Status:</span>
-            <span>
-              {freeOrdersUsed} / {freeSalesLimit} Used ({freeOrdersRemaining} Orders Left)
-            </span>
+        {/* Free Orders Quota Progress Bar (Hidden for subscribed members) */}
+        {!isSubscriber && (
+          <div className="pt-3 border-t border-[#071952]/15">
+            <div className="flex items-center justify-between text-xs font-mono font-bold text-black mb-1.5">
+              <span>Free Orders Quota Status:</span>
+              <span>
+                {freeOrdersUsed} / {freeSalesLimit} Used ({freeOrdersRemaining} Orders Left)
+              </span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-black/10 overflow-hidden">
+              <div className="h-full bg-[#071952] transition-all" style={{ width: `${freeOrdersPercent}%` }} />
+            </div>
           </div>
-          <div className="w-full h-2 rounded-full bg-black/10 overflow-hidden">
-            <div className="h-full bg-[#071952] transition-all" style={{ width: `${freeOrdersPercent}%` }} />
-          </div>
-        </div>
+        )}
       </div>
 
       {/* 4. DOWN BY DOWN SECTIONS (NO SIDE-BY-SIDE) */}
@@ -1445,15 +1529,192 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </form>
 
         {/* Current Subscription Snapshot (Matching operations console footer) */}
-        <div className="pt-4 border-t border-[#071952]/15 space-y-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
-            <h4 className="text-xs font-bold text-black tracking-tight">
-              Current subscription
-            </h4>
+        <div className="pt-4 border-t border-[#071952]/15 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
+            <div className="flex items-center gap-2.5">
+              <h4 className="text-xs font-bold text-black tracking-tight">
+                Current subscription
+              </h4>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isEditingSubscription) {
+                    setEditPlanId(activeSubRecord?.plan_id || (isSubscriber ? '12_months' : 'free'));
+                    const rawAmt = typeof activeSubRecord?.amount_minor === 'number'
+                      ? (activeSubRecord.amount_minor >= 10000 ? Math.round(activeSubRecord.amount_minor / 100) : activeSubRecord.amount_minor)
+                      : (typeof activeSubRecord?.amount === 'number' ? activeSubRecord.amount : (isSubscriber ? 5999 : 0));
+                    setEditAmount(rawAmt || 0);
+                    const now = new Date();
+                    const start = activeSubRecord?.subscription_start_date ? new Date(activeSubRecord.subscription_start_date).toISOString().slice(0, 10) : now.toISOString().slice(0, 10);
+                    const end = activeSubRecord?.subscription_end_date ? new Date(activeSubRecord.subscription_end_date).toISOString().slice(0, 10) : (() => {
+                      const d = new Date(start);
+                      d.setFullYear(d.getFullYear() + 1);
+                      return d.toISOString().slice(0, 10);
+                    })();
+                    setEditStartDate(start);
+                    setEditEndDate(end);
+                    setEditPaymentType(activeSubRecord?.payment_type || 'MANUAL');
+                    setEditPaymentStatus(activeSubRecord?.status === 'active' || isSubscriber ? 'Success' : 'Pending');
+                    setEditNotes(activeSubRecord?.note || activeSubRecord?.notes || '');
+                  }
+                  setIsEditingSubscription(!isEditingSubscription);
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white shadow-2xs transition-colors cursor-pointer"
+              >
+                <Pencil className="w-3 h-3 text-white" />
+                <span>{isEditingSubscription ? 'Cancel Edit' : 'Edit Subscription'}</span>
+              </button>
+            </div>
             <span className="text-[11px] text-neutral-500">
               Plan entitlement and latest billing snapshot for this shop.
             </span>
           </div>
+
+          {/* Inline Edit Form */}
+          {isEditingSubscription && (
+            <form onSubmit={handleSaveSubscriptionEdit} className="p-4 bg-white rounded-xl border border-[#071952]/30 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-[#071952]/10 pb-2">
+                <span className="text-xs font-bold font-mono text-[#071952] uppercase flex items-center gap-1.5">
+                  <Pencil className="w-3.5 h-3.5" />
+                  Edit Subscription & Sync Database
+                </span>
+                <span className="text-[11px] text-black/60 font-mono">
+                  Persists to Supabase `subscriptions` table
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">Plan</label>
+                  <select
+                    value={editPlanId}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditPlanId(val);
+                      if (val === '12_months') {
+                        setEditAmount(5999);
+                        const d = new Date(editStartDate || Date.now());
+                        d.setFullYear(d.getFullYear() + 1);
+                        setEditEndDate(d.toISOString().slice(0, 10));
+                      } else if (val === '6_months') {
+                        setEditAmount(2499);
+                        const d = new Date(editStartDate || Date.now());
+                        d.setMonth(d.getMonth() + 6);
+                        setEditEndDate(d.toISOString().slice(0, 10));
+                      } else if (val === '3_months') {
+                        setEditAmount(2999);
+                        const d = new Date(editStartDate || Date.now());
+                        d.setMonth(d.getMonth() + 3);
+                        setEditEndDate(d.toISOString().slice(0, 10));
+                      } else if (val === 'monthly') {
+                        setEditAmount(499);
+                        const d = new Date(editStartDate || Date.now());
+                        d.setMonth(d.getMonth() + 1);
+                        setEditEndDate(d.toISOString().slice(0, 10));
+                      } else if (val === 'free') {
+                        setEditAmount(0);
+                      }
+                    }}
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono font-medium focus:outline-none focus:border-[#071952]"
+                  >
+                    <option value="12_months">Annual Pro (12 Months - ₹5,999)</option>
+                    <option value="6_months">6 Months (₹2,499)</option>
+                    <option value="3_months">3 Months (₹2,999)</option>
+                    <option value="quarterly">Quarterly (₹1,299)</option>
+                    <option value="monthly">Monthly Pro (₹499)</option>
+                    <option value="free">Free Tier (100 Quota)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(Number(e.target.value))}
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono font-bold focus:outline-none focus:border-[#071952]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">Payment Type</label>
+                  <select
+                    value={editPaymentType}
+                    onChange={(e) => setEditPaymentType(e.target.value)}
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono focus:outline-none focus:border-[#071952]"
+                  >
+                    <option value="MANUAL">MANUAL (Admin Verified)</option>
+                    <option value="UPI">UPI</option>
+                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                    <option value="CASH">Cash</option>
+                    <option value="CARD">Card</option>
+                    <option value="ONLINE">Online (Gateway)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    value={editStartDate}
+                    onChange={(e) => setEditStartDate(e.target.value)}
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono focus:outline-none focus:border-[#071952]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">End Date</label>
+                  <input
+                    type="date"
+                    value={editEndDate}
+                    onChange={(e) => setEditEndDate(e.target.value)}
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono focus:outline-none focus:border-[#071952]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">Payment Status</label>
+                  <select
+                    value={editPaymentStatus}
+                    onChange={(e) => setEditPaymentStatus(e.target.value as any)}
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono focus:outline-none focus:border-[#071952]"
+                  >
+                    <option value="Success">Success (Active Pro)</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Failed">Failed</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <label className="block text-[11px] font-bold text-black/70 mb-1">Notes / Admin Reference</label>
+                  <input
+                    type="text"
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    placeholder="e.g. Updated subscription details from admin console"
+                    className="w-full bg-[#F8F3F0] border border-[#071952]/20 rounded-lg p-2 font-mono text-xs focus:outline-none focus:border-[#071952]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#071952]/10">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingSubscription(false)}
+                  className="px-3 py-1.5 rounded-lg border border-[#071952]/20 text-xs font-semibold hover:bg-[#F8F3F0] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEditSub}
+                  className="px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingEditSub ? 'Saving to Database...' : 'Save Changes to Database'}
+                </button>
+              </div>
+            </form>
+          )}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 text-xs bg-white p-3 rounded-xl border border-[#071952]/15 shadow-2xs">
             <div>
@@ -1635,172 +1896,205 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
       </div>
 
-      {/* SECTION 4: SERVICES */}
+      {/* SECTION 4: SERVICES (COLLAPSIBLE ACCORDION) */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
-        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setIsServicesExpanded(!isServicesExpanded)}
+          className="w-full p-4 bg-[#F8F3F0] flex items-center justify-between hover:bg-[#071952]/5 transition-colors cursor-pointer text-left"
+        >
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4 text-[#071952]" />
             <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
               Services Catalog ({services.length})
             </h3>
           </div>
-          <span className="text-[11px] font-mono text-black/60">Active pricing & duration</span>
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-black/60 hidden sm:inline">Active pricing & duration</span>
+            <span className="p-1 rounded-md bg-[#071952]/10 text-[#071952]">
+              {isServicesExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
+          </div>
+        </button>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
-                <th className="py-3 px-4">Service Name</th>
-                <th className="py-3 px-3 text-right">Price</th>
-                <th className="py-3 px-3 text-center">Duration</th>
-                <th className="py-3 px-3 text-center">Catalog Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#071952]/10 text-black">
-              {servicesLoading ? (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
-                    Loading services catalog...
-                  </td>
+        {isServicesExpanded && (
+          <div className="overflow-x-auto border-t border-[#071952]/15">
+            <table className="w-full text-xs text-left">
+              <thead>
+                <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                  <th className="py-3 px-4">Service Name</th>
+                  <th className="py-3 px-3 text-right">Price</th>
+                  <th className="py-3 px-3 text-center">Duration</th>
+                  <th className="py-3 px-3 text-center">Catalog Status</th>
                 </tr>
-              ) : services.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
-                    No services entered for this salon.
-                  </td>
-                </tr>
-              ) : (
-                services.map((srv) => (
-                  <tr key={srv.id} className="hover:bg-[#071952]/5 transition-colors">
-                    <td className="py-3 px-4 font-bold text-black">{srv.name}</td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-black">
-                      ₹{(srv.price_minor / 100).toLocaleString('en-IN')}
-                    </td>
-                    <td className="py-3 px-3 text-center font-mono text-black/80">{srv.duration_minutes} mins</td>
-                    <td className="py-3 px-3 text-center">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                          srv.is_active
-                            ? 'bg-[#071952] text-white border border-[#071952]'
-                            : 'bg-black/10 text-black/60'
-                        }`}
-                      >
-                        {srv.is_active ? 'ACTIVE' : 'DISABLED'}
-                      </span>
+              </thead>
+              <tbody className="divide-y divide-[#071952]/10 text-black">
+                {servicesLoading ? (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-xs text-black/50">
+                      Loading services catalog...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : services.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-xs text-black/50">
+                      No services entered for this salon.
+                    </td>
+                  </tr>
+                ) : (
+                  services.map((srv) => (
+                    <tr key={srv.id} className="hover:bg-[#071952]/5 transition-colors">
+                      <td className="py-3 px-4 font-bold text-black">{srv.name}</td>
+                      <td className="py-3 px-3 text-right font-mono font-bold text-black">
+                        ₹{(srv.price_minor / 100).toLocaleString('en-IN')}
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono text-black/80">{srv.duration_minutes} mins</td>
+                      <td className="py-3 px-3 text-center">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                            srv.is_active
+                              ? 'bg-[#071952] text-white border border-[#071952]'
+                              : 'bg-black/10 text-black/60'
+                          }`}
+                        >
+                          {srv.is_active ? 'ACTIVE' : 'DISABLED'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* SECTION 4: BILLS AND ORDERS */}
+      {/* SECTION 5: BILLS AND ORDERS (COLLAPSIBLE ACCORDION) */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
-        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setIsBillsExpanded(!isBillsExpanded)}
+          className="w-full p-4 bg-[#F8F3F0] flex items-center justify-between hover:bg-[#071952]/5 transition-colors cursor-pointer text-left"
+        >
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-[#071952]" />
             <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
               Bills and Orders History ({salonBills.length})
             </h3>
           </div>
-          <span className="text-[11px] font-mono text-black/60">
-            Total Revenue: ₹{Math.round(totalRevenue / 100).toLocaleString('en-IN')}
-          </span>
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-black/60 hidden sm:inline">
+              Total Revenue: ₹{Math.round(totalRevenue / 100).toLocaleString('en-IN')}
+            </span>
+            <span className="p-1 rounded-md bg-[#071952]/10 text-[#071952]">
+              {isBillsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
+          </div>
+        </button>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
-                <th className="py-3 px-4">Invoice #</th>
-                <th className="py-3 px-3">Date</th>
-                <th className="py-3 px-3">Customer</th>
-                <th className="py-3 px-3 text-right">Amount</th>
-                <th className="py-3 px-3 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#071952]/10 text-black">
-              {salonBills.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
-                    No bills issued yet by this salon.
-                  </td>
+        {isBillsExpanded && (
+          <div className="overflow-x-auto border-t border-[#071952]/15">
+            <table className="w-full text-xs text-left">
+              <thead>
+                <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                  <th className="py-3 px-4">Invoice #</th>
+                  <th className="py-3 px-3">Date</th>
+                  <th className="py-3 px-3">Customer</th>
+                  <th className="py-3 px-3 text-right">Amount</th>
+                  <th className="py-3 px-3 text-center">Status</th>
                 </tr>
-              ) : (
-                salonBills.map((b) => (
-                  <tr key={b.id} className="hover:bg-[#071952]/5 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-[#071952]">{b.invoice_number}</td>
-                    <td className="py-3 px-3 font-mono text-black/70 text-[11px]">
-                      {formatDate(b.issued_at || b.created_at)}
-                    </td>
-                    <td className="py-3 px-3 text-black font-medium">{b.customer?.name || 'Walk-in Client'}</td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-black">
-                      ₹{(b.total_minor / 100).toLocaleString('en-IN')}
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#071952]/10 text-black border border-[#071952]/20">
-                        {b.status}
-                      </span>
+              </thead>
+              <tbody className="divide-y divide-[#071952]/10 text-black">
+                {salonBills.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-xs text-black/50">
+                      No bills issued yet by this salon.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  salonBills.map((b) => (
+                    <tr key={b.id} className="hover:bg-[#071952]/5 transition-colors">
+                      <td className="py-3 px-4 font-mono font-bold text-[#071952]">{b.invoice_number}</td>
+                      <td className="py-3 px-3 font-mono text-black/70 text-[11px]">
+                        {formatDate(b.issued_at || b.created_at)}
+                      </td>
+                      <td className="py-3 px-3 text-black font-medium">{b.customer?.name || 'Walk-in Client'}</td>
+                      <td className="py-3 px-3 text-right font-mono font-bold text-black">
+                        ₹{(b.total_minor / 100).toLocaleString('en-IN')}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#071952]/10 text-black border border-[#071952]/20">
+                          {b.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* SECTION 6: APPOINTMENTS */}
+      {/* SECTION 6: APPOINTMENTS (COLLAPSIBLE ACCORDION) */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
-        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setIsAppointmentsExpanded(!isAppointmentsExpanded)}
+          className="w-full p-4 bg-[#F8F3F0] flex items-center justify-between hover:bg-[#071952]/5 transition-colors cursor-pointer text-left"
+        >
           <div className="flex items-center gap-2">
             <CalendarClock className="w-4 h-4 text-[#071952]" />
             <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
               Appointments Schedule ({salonAppointments.length})
             </h3>
           </div>
-          <span className="text-[11px] font-mono text-black/60">Booking and calendar log</span>
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-black/60 hidden sm:inline">Booking and calendar log</span>
+            <span className="p-1 rounded-md bg-[#071952]/10 text-[#071952]">
+              {isAppointmentsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
+          </div>
+        </button>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
-                <th className="py-3 px-4">Schedule Time</th>
-                <th className="py-3 px-3">Client</th>
-                <th className="py-3 px-3">Assigned Stylist</th>
-                <th className="py-3 px-3 text-center">Duration</th>
-                <th className="py-3 px-3 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#071952]/10 text-black">
-              {salonAppointments.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
-                    No appointments recorded for this salon.
-                  </td>
+        {isAppointmentsExpanded && (
+          <div className="overflow-x-auto border-t border-[#071952]/15">
+            <table className="w-full text-xs text-left">
+              <thead>
+                <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                  <th className="py-3 px-4">Schedule Time</th>
+                  <th className="py-3 px-3">Client</th>
+                  <th className="py-3 px-3">Assigned Stylist</th>
+                  <th className="py-3 px-3 text-center">Duration</th>
+                  <th className="py-3 px-3 text-center">Status</th>
                 </tr>
-              ) : (
-                salonAppointments.map((a) => (
-                  <tr key={a.id} className="hover:bg-[#071952]/5 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-black">{formatDate(a.starts_at)}</td>
-                    <td className="py-3 px-3 text-black font-medium">{a.customer?.name || 'Client'}</td>
-                    <td className="py-3 px-3 text-black/80">{a.staff?.name || 'Any Staff'}</td>
-                    <td className="py-3 px-3 text-center font-mono text-black/80">{a.duration_minutes}m</td>
-                    <td className="py-3 px-3 text-center">
-                      <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#071952]/10 text-black border border-[#071952]/20">
-                        {a.status}
-                      </span>
+              </thead>
+              <tbody className="divide-y divide-[#071952]/10 text-black">
+                {salonAppointments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-xs text-black/50">
+                      No appointments recorded for this salon.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  salonAppointments.map((a) => (
+                    <tr key={a.id} className="hover:bg-[#071952]/5 transition-colors">
+                      <td className="py-3 px-4 font-mono font-bold text-black">{formatDate(a.starts_at)}</td>
+                      <td className="py-3 px-3 text-black font-medium">{a.customer?.name || 'Client'}</td>
+                      <td className="py-3 px-3 text-black/80">{a.staff?.name || 'Any Staff'}</td>
+                      <td className="py-3 px-3 text-center font-mono text-black/80">{a.duration_minutes}m</td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#071952]/10 text-black border border-[#071952]/20">
+                          {a.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* 5. ADD RESPONSE / CALL NOTE MODAL (MATCHING OPERATIONS CONSOLE UI) */}
