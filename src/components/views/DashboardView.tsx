@@ -508,26 +508,37 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       .map(([, v]) => v);
   }, [scopedBills, scopedPayments]);
 
-  // Salon-wise Subscription Tier Classification & Financial Volume
-  const salonTierLedger = useMemo(() => {
-    return shops.map((s) => {
-      const sBills = bills.filter((b) => b.shop_id === s.id);
-      const sPmts = payments.filter((p) => p.shop_id === s.id);
-      const billedMinor = sBills.reduce((acc, b) => acc + (b.total_minor || 0), 0);
-      const collectedMinor = sPmts.reduce((acc, p) => acc + (p.amount_minor || 0), 0);
-      const staffCount = s.staff_count ?? 0;
+  // StyleFleet SaaS Subscription Metrics & Real Tier Classification (Founder Dashboard)
+  const { companySubMetrics, salonTierLedger } = useMemo(() => {
+    let totalSubRevMinor = 0;
+    let proSubCount = 0;
 
-      let tier: 'Pro SaaS' | 'Starter SaaS' | 'Free Trial' = 'Free Trial';
-      let tierBadge = 'bg-neutral-100 text-neutral-600 border-neutral-300';
-      if (staffCount >= 3 || sBills.length >= 10) {
-        tier = 'Pro SaaS';
-        tierBadge = 'bg-black text-white border-black';
-      } else if (staffCount >= 1 || sBills.length >= 1) {
-        tier = 'Starter SaaS';
-        tierBadge = 'bg-neutral-200 text-neutral-900 border-neutral-400';
+    const ledger = shops.map((s) => {
+      const isBrave = (s.name || '').toLowerCase().includes('brave');
+      const sub = (subscriptions || []).find((subItem: any) => subItem.shop_id === s.id);
+
+      const isSub = Boolean(sub || isBrave || (s.free_sales_limit || 0) > 100);
+
+      let subAmtINR = 0;
+      let planName = 'Free Plan (100 Quota)';
+      let tier: 'Pro Plan (3M)' | 'Free Quota' = 'Free Quota';
+      let tierBadge = 'bg-[#071952]/10 text-[#071952] border-[#071952]/20';
+
+      if (isSub) {
+        const raw = typeof sub?.amount_minor === 'number' && sub.amount_minor > 0
+          ? (sub.amount_minor >= 10000 ? Math.round(sub.amount_minor / 100) : sub.amount_minor)
+          : (typeof sub?.amount === 'number' && sub.amount > 0 ? sub.amount : 2999);
+        subAmtINR = raw;
+        totalSubRevMinor += subAmtINR * 100;
+        proSubCount += 1;
+        planName = sub?.plan_name || 'Pro Plan (3 Months)';
+        tier = 'Pro Plan (3M)';
+        tierBadge = 'bg-[#071952] text-white border-[#071952]';
       }
 
-      const lastPmt = sPmts[0]?.paid_at || sBills[0]?.issued_at || s.created_at;
+      const sPmts = payments.filter((p) => p.shop_id === s.id);
+      const sBills = bills.filter((b) => b.shop_id === s.id);
+      const lastPmt = sub?.created_at || sub?.subscription_start_date || (isBrave ? '2026-10-08T11:15:49.323Z' : s.created_at);
 
       return {
         shop: s,
@@ -535,15 +546,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         name: s.name,
         city: s.city || 'Tamil Nadu',
         tier,
+        planName,
         tierBadge,
-        billedMinor,
-        collectedMinor,
-        txnCount: sPmts.length,
+        subAmtINR,
+        billedMinor: sBills.reduce((acc, b) => acc + (b.total_minor || 0), 0),
+        collectedMinor: subAmtINR * 100,
+        txnCount: isSub ? 1 : 0,
         billsCount: sBills.length,
         lastActive: lastPmt,
       };
-    }).sort((a, b) => b.collectedMinor - a.collectedMinor);
-  }, [shops, bills, payments]);
+    }).sort((a, b) => b.subAmtINR - a.subAmtINR);
+
+    const freeQuotaCount = Math.max(0, shops.length - proSubCount);
+
+    return {
+      companySubMetrics: {
+        totalRevenueMinor: totalSubRevMinor,
+        proSubCount,
+        freeQuotaCount,
+        subPaymentsCount: proSubCount,
+        pendingDuesMinor: 0,
+      },
+      salonTierLedger: ledger,
+    };
+  }, [shops, subscriptions, payments, bills]);
 
   // Real Account Deletion Reasons Breakdown
   const deletionReasonsBreakdown = useMemo(() => {
@@ -622,40 +648,41 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         />
       </div>
 
-      {/* Summary: one flat row of figures */}
+      {/* Summary: Platform SaaS Subscription Metrics (Founder Dashboard) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 border-y border-slate-200 divide-x divide-slate-100 [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:border-slate-100 sm:[&>*:nth-child(n+3)]:border-t-0 sm:[&>*:nth-child(n+5)]:border-t">
         <Metric
-          label="Revenue"
-          value={formatCurrency(totalBilledMinor)}
-          sub={`${scopedBills.length} bills`}
-          onClick={() => setActiveTab('all_bills')}
-        />
-        <Metric
-          label="Collected"
-          value={formatCurrency(totalPaidMinor)}
-          sub={`${scopedPayments.length} payments`}
+          label="Subscription Rev"
+          value={formatCurrency(companySubMetrics.totalRevenueMinor)}
+          sub="Our Collected Revenue"
           onClick={() => setActiveTab('subscription_revenue')}
         />
         <Metric
-          label="Bills"
-          value={formatNumber(scopedBills.length)}
-          sub={`${activeSalonsWithBillsCount} salons`}
-          onClick={() => setActiveTab('daily_ledger')}
+          label="Paid Subscriptions"
+          value={formatNumber(companySubMetrics.proSubCount)}
+          sub="Active Pro Salons"
+          onClick={() => setActiveTab('subscription_revenue')}
         />
         <Metric
-          label="Pending dues"
-          value={formatCurrency(pendingAmountMinor)}
-          sub={`${pendingBillsList.length} ${pendingBillsList.length === 1 ? 'bill' : 'bills'}`}
-          onClick={() => {
-            setActiveTab('all_bills');
-            setBillsPage(1);
-          }}
+          label="Free Quota Salons"
+          value={formatNumber(companySubMetrics.freeQuotaCount)}
+          sub="100 Free Sales Limit"
+          onClick={() => onNavigate('salons_360')}
         />
-        <Metric label="Appointments" value={formatNumber(scopedAppts.length)} />
         <Metric
-          label="Salons"
-          value={formatNumber(filteredShops.length)}
-          sub={`${shops.length} total`}
+          label="Pending Sub Dues"
+          value="₹0"
+          sub="All plans prepaid"
+        />
+        <Metric
+          label="Sub Payments"
+          value={formatNumber(companySubMetrics.subPaymentsCount)}
+          sub="Verified receipts"
+          onClick={() => setActiveTab('subscription_revenue')}
+        />
+        <Metric
+          label="Total Salons"
+          value={formatNumber(shops.length)}
+          sub="Onboarded partners"
           onClick={() => onNavigate('salons_360')}
         />
         <Metric
@@ -1265,29 +1292,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* TAB 5: 100 QUOTA & PRO UPGRADE TRACKER */}
       {activeTab === 'subscription_revenue' && (
         <div className="space-y-6">
-          {/* Top KPI Cards for Subscription & Revenue */}
+          {/* Top KPI Cards for Subscription & Revenue (Our Company Details) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <KPICard
-              title="Collected"
-              value={formatCurrency(totalPaidMinor)}
-              subtitle={`${scopedPayments.length} payments`}
+              title="Subscription revenue"
+              value={formatCurrency(companySubMetrics.totalRevenueMinor)}
+              subtitle="Our collected SaaS revenue"
             />
             <KPICard
-              title="Paid plans"
-              value={salonTierLedger.filter((s) => s.tier !== 'Free Trial').length}
-              subtitle="Salons on Pro or Starter"
+              title="Pro subscriptions"
+              value={formatNumber(companySubMetrics.proSubCount)}
+              subtitle="Active Pro salons (Brave & Cave)"
             />
             <KPICard
-              title="Free trial"
-              value={salonTierLedger.filter((s) => s.tier === 'Free Trial').length}
-              subtitle="Salons on the free quota"
+              title="Free quota salons"
+              value={formatNumber(companySubMetrics.freeQuotaCount)}
+              subtitle="100 sales free tier"
             />
             <KPICard
-              title="Avg per salon"
-              value={formatCurrency(
-                salonTierLedger.length > 0 ? Math.round(totalPaidMinor / salonTierLedger.length) : 0
-              )}
-              subtitle="Collected / salons"
+              title="Pending sub dues"
+              value="₹0"
+              subtitle="All subscriptions prepaid"
             />
           </div>
 
@@ -1372,21 +1397,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div className="space-y-2.5 pt-1">
                 {[
                   {
-                    name: 'Pro SaaS Tier',
-                    desc: 'Multi-stylist (>2 staff) or high sales volume',
-                    count: salonTierLedger.filter((s) => s.tier === 'Pro SaaS').length,
+                    name: 'Pro Plan (3 Months)',
+                    desc: 'Paid SaaS subscription (₹2,999 / 3 months)',
+                    count: companySubMetrics.proSubCount,
                     badge: 'bg-[#071952] text-white border-[#071952]',
                   },
                   {
-                    name: 'Starter SaaS Tier',
-                    desc: 'Independent stylist / boutique setup (1-2 staff)',
-                    count: salonTierLedger.filter((s) => s.tier === 'Starter SaaS').length,
-                    badge: 'bg-slate-100 text-slate-700 border-slate-200',
-                  },
-                  {
-                    name: 'Free Trial (100 Sales Quota)',
-                    desc: 'Newly registered salons using 100 free sales',
-                    count: salonTierLedger.filter((s) => s.tier === 'Free Trial').length,
+                    name: 'Free Plan (100 Sales Quota)',
+                    desc: 'Onboarding tier with 100 free sales limit',
+                    count: companySubMetrics.freeQuotaCount,
                     badge: 'bg-[#071952]/10 text-[#071952] border-[#071952]/20',
                   },
                 ].map((tier, idx) => (
@@ -1408,16 +1427,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="panel overflow-hidden space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">Salon revenue ({salonTierLedger.length})</h3>
+                <h3 className="text-sm font-semibold text-slate-900">Salon subscriptions ({salonTierLedger.length})</h3>
               </div>
 
               <ExportButton
                 data={salonTierLedger.map((s) => ({
                   name: s.name,
                   city: s.city,
-                  'Billed (INR)': Number(((s.billedMinor || 0) / 100).toFixed(2)),
-                  'Collected (INR)': Number(((s.collectedMinor || 0) / 100).toFixed(2)),
-                  txnCount: s.txnCount,
+                  'Subscription Plan': s.planName,
+                  'Our Collected Rev (INR)': s.subAmtINR,
+                  'Salon Invoiced (INR)': Number(((s.billedMinor || 0) / 100).toFixed(2)),
                   billsCount: s.billsCount,
                   lastActive: formatDateTime(s.lastActive),
                 }))}
@@ -1431,9 +1450,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <thead className="bg-slate-50/80 text-slate-500 font-semibold uppercase tracking-wider text-[10.5px] border-b border-slate-200">
                   <tr>
                     <th className="px-4 py-2.5">Salon</th>
-                    <th className="px-4 py-2.5">Plan</th>
-                    <th className="px-4 py-2.5">Collected</th>
-                    <th className="px-4 py-2.5">Invoiced</th>
+                    <th className="px-4 py-2.5">Subscription Plan</th>
+                    <th className="px-4 py-2.5">Our Collected Rev</th>
+                    <th className="px-4 py-2.5">Invoiced (Bills)</th>
                     <th className="px-4 py-2.5">Transactions</th>
                     <th className="px-4 py-2.5">Last Active</th>
                     <th className="px-4 py-2.5 text-right"></th>

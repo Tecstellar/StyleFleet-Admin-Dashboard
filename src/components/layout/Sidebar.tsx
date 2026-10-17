@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   deletionsCount = 0,
   supportCount = 0,
 }) => {
-  const { logout } = useAuth();
+  const { logout, canAccessModule } = useAuth();
   const [isAppActivityOpen, setIsAppActivityOpen] = useState(false);
   const [isShopAnalyticsOpen, setIsShopAnalyticsOpen] = useState(false);
 
@@ -74,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     badge?: number,
     badgeColor?: string
   ) => {
+    if (canAccessModule && !canAccessModule(id)) return null;
     const active = isItemActive(id);
     return (
       <button
@@ -151,6 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     Icon: React.ComponentType<{ className?: string }>,
     badge?: number
   ) => {
+    if (canAccessModule && !canAccessModule(id)) return null;
     const active = isItemActive(id);
     return (
       <button

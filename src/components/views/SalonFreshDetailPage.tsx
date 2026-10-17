@@ -492,13 +492,31 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       ? `${followUpDate}${followUpHour ? ` ${followUpHour}` : ''}${followUpMin ? `:${followUpMin}` : ''} [${followUpPriority}]`.trim()
       : undefined;
 
+    // Database safe follow-up date (strictly YYYY-MM-DD or null for PostgreSQL DATE type)
+    const dbFollowUpDate = scheduleFollowUp && followUpDate ? followUpDate.slice(0, 10) : null;
+
+    // Rich notes capturing call details, timer, and follow-up time & priority
+    const notesParts: string[] = [];
+    if (responseNotes.trim()) {
+      notesParts.push(responseNotes.trim());
+    } else {
+      notesParts.push(`Call Status: ${callStatus}`);
+    }
+    if (durationStr) {
+      notesParts.push(`Duration: ${durationStr}`);
+    }
+    if (scheduleFollowUp && followUpDate) {
+      notesParts.push(`Follow-up: ${followUpDate}${followUpHour ? ` ${followUpHour}` : ''}${followUpMin ? `:${followUpMin}` : ''} [${followUpPriority}]`);
+    }
+    const combinedNotes = notesParts.join(' | ');
+
     const newEntry: CallResponse = {
       id: `resp-${Date.now()}`,
       date: responseDate,
       type: callStatus,
       outcome: callStatus,
       contactPerson: reportedBy,
-      notes: responseNotes.trim() || `Call Status: ${callStatus}`,
+      notes: combinedNotes,
       followUpDate: followUpCombined,
       recordedBy: reportedBy,
       duration: durationStr,
@@ -516,10 +534,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             type: callStatus,
             outcome: callStatus,
             contact_person: reportedBy,
-            notes: responseNotes.trim()
-              ? `${responseNotes.trim()} (Duration: ${durationStr})`
-              : `Call Status: ${callStatus} (Duration: ${durationStr})`,
-            follow_up_date: followUpCombined || null,
+            notes: combinedNotes,
+            follow_up_date: dbFollowUpDate,
             recorded_by: reportedBy,
           },
         ])

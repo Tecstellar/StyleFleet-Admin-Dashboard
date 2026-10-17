@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, RefreshCw, LogOut } from 'lucide-react';
+import { Menu, RefreshCw, LogOut, UserPlus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NavView } from '../../types/dashboard';
 
@@ -9,6 +9,7 @@ interface HeaderProps {
   onRefreshData?: () => void;
   isRefreshing?: boolean;
   onOpenResetPassword?: () => void;
+  onOpenAddUserAccount?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,9 +17,10 @@ export const Header: React.FC<HeaderProps> = ({
   onRefreshData,
   isRefreshing = false,
   onOpenResetPassword,
+  onOpenAddUserAccount,
 }) => {
-  const { user, logout } = useAuth();
-  const userEmail = user?.email || 'stylefleet@tecstellar.com';
+  const { user, logout, isMasterAdmin } = useAuth();
+  const userEmail = user?.email || 'info@tecstellar.com';
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 bg-[#F8F3F0] border-b border-[#071952]/15 shadow-2xs">
@@ -42,18 +44,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right Controls: Refresh, Reset Password, Admin Avatar Circle, Sign Out */}
+      {/* Right Controls: Add User Account, Reset Password, Admin Avatar Circle, Sign Out */}
       <div className="flex items-center gap-2.5 sm:gap-3">
-        {/* Manual Refresh Button */}
-        {onRefreshData && (
+        {/* Add User Account Button (for info@tecstellar.com master admin) */}
+        {isMasterAdmin && onOpenAddUserAccount && (
           <button
-            onClick={onRefreshData}
-            disabled={isRefreshing}
-            title="Refresh Data from Supabase"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#071952]/20 bg-[#F8F3F0] text-black hover:bg-white transition-colors cursor-pointer shadow-2xs text-xs font-semibold"
+            onClick={onOpenAddUserAccount}
+            title="Create staff or admin accounts"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white transition-colors cursor-pointer shadow-2xs text-xs font-semibold"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#071952]' : 'text-[#071952]'}`} />
-            <span className="hidden sm:inline">Refresh</span>
+            <UserPlus className="w-3.5 h-3.5 text-white" />
+            <span className="hidden sm:inline">Add user account</span>
           </button>
         )}
 

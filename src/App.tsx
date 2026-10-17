@@ -25,6 +25,7 @@ import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
 import { DeleteAccountView } from './components/views/DeleteAccountView';
 import { SalonFreshDetailPage } from './components/views/SalonFreshDetailPage';
 import { ResetPasswordModal } from './components/modals/ResetPasswordModal';
+import { AddUserAccountModal } from './components/modals/AddUserAccountModal';
 import { useAuth } from './context/AuthContext';
 
 import { fetchShops } from './services/salonsService';
@@ -208,6 +209,7 @@ export const App: React.FC = () => {
   const [originViewBeforeDetail, setOriginViewBeforeDetail] = useState<NavView | null>(null);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [shopForPasswordReset, setShopForPasswordReset] = useState<Shop | null>(null);
+  const [isAddUserAccountOpen, setIsAddUserAccountOpen] = useState(false);
 
   // Real Database Entities
   const [shops, setShops] = useState<Shop[]>([]);
@@ -476,6 +478,7 @@ export const App: React.FC = () => {
             setShopForPasswordReset(null);
             setIsResetPasswordOpen(true);
           }}
+          onOpenAddUserAccount={() => setIsAddUserAccountOpen(true)}
         />
 
         {/* Global Error Banner */}
@@ -786,6 +789,12 @@ export const App: React.FC = () => {
           setIsResetPasswordOpen(false);
           setShopForPasswordReset(null);
         }}
+      />
+
+      {/* Add User Account Modal (Master Admin Only) */}
+      <AddUserAccountModal
+        isOpen={isAddUserAccountOpen}
+        onClose={() => setIsAddUserAccountOpen(false)}
       />
     </div>
   );
