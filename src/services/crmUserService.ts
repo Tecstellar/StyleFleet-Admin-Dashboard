@@ -138,18 +138,50 @@ export async function deleteCrmUserAccount(id: string): Promise<boolean> {
   return true;
 }
 
+export const SUPER_ADMIN_ACCOUNT: CrmUserAccount = {
+  id: 'crm-super-admin-textellar',
+  name: 'Textellar Super Admin',
+  email: 'info@textellar.com',
+  password: 'textellar@123',
+  crm_role: 'admin',
+  access_type: 'full',
+  allowed_modules: ALL_AVAILABLE_MODULES.map((m) => m.id),
+  created_by: 'System',
+  created_at: '2026-10-17T00:00:00.000Z',
+};
+
+const RANDOM_EMPLOYEE_NAMES = ['kesavan', 'jagadeswari', 'kamalesh'];
+
 function getLocalCrmUserAccounts(): CrmUserAccount[] {
   try {
     const raw = localStorage.getItem(CRM_USERS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const parsed: CrmUserAccount[] = raw ? JSON.parse(raw) : [];
+
+    // Filter out any random mock employees
+    const filtered = parsed.filter(
+      (u) => !RANDOM_EMPLOYEE_NAMES.includes((u.name || '').trim().toLowerCase()) &&
+             !RANDOM_EMPLOYEE_NAMES.includes((u.email || '').trim().toLowerCase().split('@')[0])
+    );
+
+    // Ensure Super Admin info@textellar.com is present
+    if (!filtered.some((u) => u.email.toLowerCase() === 'info@textellar.com')) {
+      filtered.unshift(SUPER_ADMIN_ACCOUNT);
+    }
+
+    return filtered;
   } catch {
-    return [];
+    return [SUPER_ADMIN_ACCOUNT];
   }
 }
 
 function saveLocalCrmUserAccounts(users: CrmUserAccount[]) {
   try {
-    localStorage.setItem(CRM_USERS_STORAGE_KEY, JSON.stringify(users));
+    // Filter out random mock employees before persisting
+    const cleaned = users.filter(
+      (u) => !RANDOM_EMPLOYEE_NAMES.includes((u.name || '').trim().toLowerCase()) &&
+             !RANDOM_EMPLOYEE_NAMES.includes((u.email || '').trim().toLowerCase().split('@')[0])
+    );
+    localStorage.setItem(CRM_USERS_STORAGE_KEY, JSON.stringify(cleaned));
   } catch (e) {
     console.error('Failed to save CRM user accounts locally:', e);
   }

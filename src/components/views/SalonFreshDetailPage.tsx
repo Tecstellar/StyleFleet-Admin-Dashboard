@@ -34,6 +34,7 @@ import { supabase } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 import { saveManualSubscription } from '../../services/billingService';
+import { fetchCrmUserAccounts, CrmUserAccount } from '../../services/crmUserService';
 
 interface SalonFreshDetailPageProps {
   shop: Shop;
@@ -104,10 +105,27 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     const now = new Date();
     return now.toISOString().slice(0, 16);
   });
-  const [reportedBy, setReportedBy] = useState(() => user?.name || user?.email || 'Support');
+  const [reportedBy, setReportedBy] = useState(() => user?.name || user?.email || 'Textellar Super Admin');
+  const [crmUsers, setCrmUsers] = useState<CrmUserAccount[]>([]);
 
   useEffect(() => {
-    if (user?.name && (reportedBy === 'Support' || !reportedBy)) {
+    let isMounted = true;
+    async function loadCrmStaff() {
+      try {
+        const list = await fetchCrmUserAccounts();
+        if (isMounted) setCrmUsers(list);
+      } catch (e) {
+        console.warn('Could not load CRM users in detail page:', e);
+      }
+    }
+    loadCrmStaff();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (user?.name && (reportedBy === 'Support' || reportedBy === 'Textellar Super Admin' || !reportedBy)) {
       setReportedBy(user.name);
     }
   }, [user]);
@@ -725,6 +743,14 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     }
 
     setCallResponses((prev) => [newEntry, ...prev]);
+
+    // Dispatch event for real-time UI synchronization across Overview & Customer Tracking
+    try {
+      window.dispatchEvent(new CustomEvent('stylefleet_call_response_added', { detail: newEntry }));
+    } catch (e) {
+      console.warn('Event dispatch error:', e);
+    }
+
     setIsSavingResponse(false);
     setIsAddResponseOpen(false);
     setResponseNotes('');
@@ -2092,16 +2118,18 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                         onChange={(e) => setReportedBy(e.target.value)}
                         className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer font-medium"
                       >
-                        {user?.name && <option value={user.name}>{user.name} (You)</option>}
-                        <option value="Sankarajothi">Sankarajothi</option>
-                        <option value="Kesavan">Kesavan</option>
-                        <option value="Jagadeswari">Jagadeswari</option>
-                        <option value="Kamalesh">Kamalesh</option>
-                        <option value="Support">Support</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Sales">Sales</option>
+                        <option value={user?.name || user?.email || 'Textellar Super Admin'}>
+                          {user?.name || user?.email || 'Textellar Super Admin'} (You)
+                        </option>
+                        {crmUsers
+                          .filter((u) => u.name !== (user?.name || 'Textellar Super Admin') && u.email !== user?.email)
+                          .map((u) => (
+                            <option key={u.id} value={u.name}>
+                              {u.name} ({u.crm_role === 'admin' ? 'Admin' : 'Staff'})
+                            </option>
+                          ))}
+                        <option value="Support Team">Support Team</option>
                         <option value="Operations">Operations</option>
-                        <option value="Founder">Founder</option>
                       </select>
                     </div>
                   </div>

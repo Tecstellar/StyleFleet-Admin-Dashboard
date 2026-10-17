@@ -17,6 +17,8 @@ import {
   CreditCard,
   AlertTriangle,
   PhoneCall,
+  Clock,
+  Receipt,
 } from 'lucide-react';
 import { ExportButton } from '../common/ExportButton';
 import { useDateFilter } from '../../context/DateFilterContext';
@@ -57,6 +59,7 @@ type PillFilterType =
   | 'all'
   | 'positive_response'
   | 'negative_response'
+  | 'follow_ups'
   | 'active'
   | 'inactive'
   | 'free_plan'
@@ -102,7 +105,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [viewingFreshSalon, setViewingFreshSalon] = useState<Shop | null>(null);
-  const [shopResponses, setShopResponses] = useState<Record<string, { outcome: 'Positive' | 'Negative'; date: string; notes: string }>>({});
+  const [shopResponses, setShopResponses] = useState<Record<string, { outcome: 'Positive' | 'Negative'; date: string; notes: string; hasFollowUp: boolean }>>({});
+  const [followUpCallsCount, setFollowUpCallsCount] = useState<number>(0);
 
   // Load latest responses from Supabase admin_responses and localStorage cache
   useEffect(() => {
@@ -111,13 +115,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       try {
         const { data, error } = await supabase
           .from('admin_responses')
-          .select('shop_id, outcome, type, date, notes, created_at')
+          .select('shop_id, outcome, type, date, notes, follow_up_date, created_at')
           .order('date', { ascending: false });
 
-        const map: Record<string, { outcome: 'Positive' | 'Negative'; date: string; notes: string }> = {};
+        const map: Record<string, { outcome: 'Positive' | 'Negative'; date: string; notes: string; hasFollowUp: boolean }> = {};
+        let totalFollowUps = 0;
 
         if (!error && data && data.length > 0) {
           data.forEach((row: any) => {
+            const hasFollowUp = !!row.follow_up_date || (row.notes && row.notes.toLowerCase().includes('follow-up'));
+            if (hasFollowUp) totalFollowUps++;
+
             if (row.shop_id && !map[row.shop_id]) {
               const isAns = (row.type || '').toLowerCase().includes('answer') && !(row.type || '').toLowerCase().includes('no');
               const defaultOutcome = isAns ? 'Positive' : 'Negative';
@@ -132,33 +140,43 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 outcome,
                 date: row.date || row.created_at,
                 notes: row.notes || '',
+                hasFollowUp,
               };
+            } else if (row.shop_id && hasFollowUp && map[row.shop_id]) {
+              map[row.shop_id].hasFollowUp = true;
             }
           });
         }
 
         // Also check localStorage for local responses cache
         shops.forEach((s) => {
-          if (!map[s.id]) {
-            try {
-              const saved = localStorage.getItem(`stylefleet_call_responses_${s.id}`);
-              if (saved) {
-                const list = JSON.parse(saved);
-                if (list && list.length > 0) {
+          try {
+            const saved = localStorage.getItem(`stylefleet_call_responses_${s.id}`);
+            if (saved) {
+              const list = JSON.parse(saved);
+              if (Array.isArray(list) && list.length > 0) {
+                list.forEach((item: any) => {
+                  if (item.followUpDate || (item.notes && item.notes.toLowerCase().includes('follow-up'))) {
+                    totalFollowUps++;
+                  }
+                });
+                if (!map[s.id]) {
                   const first = list[0];
                   map[s.id] = {
                     outcome: first.outcome === 'Positive' ? 'Positive' : 'Negative',
                     date: first.date,
                     notes: first.notes || '',
+                    hasFollowUp: !!first.followUpDate || (first.notes && first.notes.toLowerCase().includes('follow-up')),
                   };
                 }
               }
-            } catch {}
-          }
+            }
+          } catch {}
         });
 
         if (isMounted) {
           setShopResponses(map);
+          setFollowUpCallsCount(totalFollowUps);
         }
       } catch (err) {
         console.warn('Error fetching shop responses in OverviewView:', err);
@@ -166,8 +184,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     }
 
     loadResponses();
+
+    const handleNewResponse = () => {
+      loadResponses();
+    };
+    window.addEventListener('stylefleet_call_response_added', handleNewResponse);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('stylefleet_call_response_added', handleNewResponse);
     };
   }, [shops]);
 
@@ -261,6 +286,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       const resp = shopResponses[s.id];
       const latestOutcome: 'Positive' | 'Negative' | 'none' = resp ? resp.outcome : 'none';
       const latestResponseDate = resp ? resp.date : null;
+      const hasFollowUp = !!resp?.hasFollowUp;
 
       return {
         ...s,
@@ -282,6 +308,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         ownerPhone,
         latestOutcome,
         latestResponseDate,
+        hasFollowUp,
       };
     });
   }, [shops, scopedBills, scopedPayments, staff, scopedCustomers, customers, bills, profiles, subscriptions, payments, shopResponses]);
@@ -291,6 +318,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     const total = salonPerformance.length;
     const positiveResponse = salonPerformance.filter((s) => s.latestOutcome === 'Positive').length;
     const negativeResponse = salonPerformance.filter((s) => s.latestOutcome === 'Negative').length;
+    const followUps = salonPerformance.filter((s) => s.hasFollowUp).length;
     const active = salonPerformance.filter((s) => s.lifetimeSalesCount > 0).length;
     const inactive = salonPerformance.filter((s) => s.lifetimeSalesCount === 0).length;
     const freePlan = salonPerformance.filter((s) => !s.isPro).length;
@@ -308,6 +336,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       total,
       positiveResponse,
       negativeResponse,
+      followUps,
       active,
       inactive,
       freePlan,
@@ -367,6 +396,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
     const totalSubRevenueInr = Math.round(revMinor / 100);
     const totalCalls = (pillCounts.positiveResponse || 0) + (pillCounts.negativeResponse || 0);
+    const positiveCalls = pillCounts.positiveResponse || 0;
+    const negativeCalls = pillCounts.negativeResponse || 0;
+    const positivePct = totalCalls > 0 ? Math.round((positiveCalls / totalCalls) * 100) : 0;
+    const negativePct = totalCalls > 0 ? Math.round((negativeCalls / totalCalls) * 100) : 0;
+
+    const totalBillsCount = bills.length;
+    const totalBillsRevenueMinor = bills.reduce((acc, b) => (b.status === 'deleted' ? acc : acc + (b.total_minor || 0)), 0);
 
     return {
       totalSalons,
@@ -375,10 +411,14 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       nearLimitSalons,
       totalSubRevenueInr,
       totalCalls,
-      positiveCalls: pillCounts.positiveResponse || 0,
-      negativeCalls: pillCounts.negativeResponse || 0,
+      positiveCalls,
+      negativeCalls,
+      positivePct,
+      negativePct,
+      totalBillsCount,
+      totalBillsRevenueInr: Math.round(totalBillsRevenueMinor / 100),
     };
-  }, [salonPerformance, subscriptions, payments, pillCounts]);
+  }, [salonPerformance, subscriptions, payments, pillCounts, bills]);
 
   // Filtered and Sorted Salons
   const displayedSalons = useMemo(() => {
@@ -404,6 +444,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       let matchesPill = true;
       if (activePillFilter === 'positive_response') matchesPill = s.latestOutcome === 'Positive';
       else if (activePillFilter === 'negative_response') matchesPill = s.latestOutcome === 'Negative';
+      else if (activePillFilter === 'follow_ups') matchesPill = !!s.hasFollowUp;
       else if (activePillFilter === 'active') matchesPill = s.lifetimeSalesCount > 0;
       else if (activePillFilter === 'inactive') matchesPill = s.lifetimeSalesCount === 0;
       else if (activePillFilter === 'free_plan') matchesPill = !s.isPro;
@@ -543,7 +584,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       </div>
 
       {/* 2. SUBSCRIPTION & REVENUE SUMMARY CARDS (ABOVE CALL RESPONSES & MERCHANT FILTERS) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Card 1: Active Pro Subscriptions */}
         <div
           onClick={() => setActivePillFilter(activePillFilter === 'pro_plan' ? 'all' : 'pro_plan')}
@@ -671,49 +712,75 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
         </div>
 
-        {/* Card 5: Call Tracking */}
+        {/* Card 5: Follow-up Calls Done */}
         <div
-          onClick={() => {
-            if (activePillFilter === 'positive_response') setActivePillFilter('negative_response');
-            else if (activePillFilter === 'negative_response') setActivePillFilter('all');
-            else setActivePillFilter('positive_response');
-          }}
+          onClick={() => setActivePillFilter(activePillFilter === 'follow_ups' ? 'all' : 'follow_ups')}
           className={`p-3.5 rounded-2xl border transition-all cursor-pointer shadow-2xs ${
-            activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
+            activePillFilter === 'follow_ups'
               ? 'bg-[#071952] text-white border-[#071952]'
               : 'bg-white text-black border-[#F8F3F0] hover:border-[#071952]/30'
           }`}
-          title="Click to toggle between Positive and Negative response filters"
+          title="Click to filter salons with follow-up calls done"
         >
           <div className="flex items-center justify-between">
             <span
               className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
-                activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
-                  ? 'text-white/80'
-                  : 'text-neutral-500'
+                activePillFilter === 'follow_ups' ? 'text-white/80' : 'text-neutral-500'
               }`}
             >
-              Call Tracking
+              Follow-ups
             </span>
-            <PhoneCall
+            <Clock
               className={`w-4 h-4 ${
-                activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
-                  ? 'text-white'
-                  : 'text-[#071952]'
+                activePillFilter === 'follow_ups' ? 'text-white' : 'text-[#071952]'
               }`}
             />
           </div>
           <div className="text-xl sm:text-2xl font-black font-mono tracking-tight mt-1">
-            {subscriptionMetrics.totalCalls}
+            {followUpCallsCount}
           </div>
           <div
             className={`text-[11px] mt-0.5 font-medium ${
-              activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
-                ? 'text-white/70'
-                : 'text-neutral-500'
+              activePillFilter === 'follow_ups' ? 'text-white/70' : 'text-neutral-500'
             }`}
           >
-            {subscriptionMetrics.positiveCalls} Pos • {subscriptionMetrics.negativeCalls} Neg
+            {pillCounts.followUps} salons scheduled
+          </div>
+        </div>
+
+        {/* Card 6: Total Bills (SET IN THE CORNER!) */}
+        <div
+          onClick={() => setActivePillFilter(activePillFilter === 'with_bills' ? 'all' : 'with_bills')}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer shadow-2xs ${
+            activePillFilter === 'with_bills'
+              ? 'bg-[#071952] text-white border-[#071952]'
+              : 'bg-white text-black border-[#F8F3F0] hover:border-[#071952]/30'
+          }`}
+          title="Click to filter salons with completed bills"
+        >
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
+                activePillFilter === 'with_bills' ? 'text-white/80' : 'text-neutral-500'
+              }`}
+            >
+              Total Bills
+            </span>
+            <Receipt
+              className={`w-4 h-4 ${
+                activePillFilter === 'with_bills' ? 'text-white' : 'text-[#071952]'
+              }`}
+            />
+          </div>
+          <div className="text-xl sm:text-2xl font-black font-mono tracking-tight mt-1">
+            {subscriptionMetrics.totalBillsCount}
+          </div>
+          <div
+            className={`text-[11px] mt-0.5 font-medium ${
+              activePillFilter === 'with_bills' ? 'text-white/70' : 'text-neutral-500'
+            }`}
+          >
+            ₹{subscriptionMetrics.totalBillsRevenueInr.toLocaleString('en-IN')} invoiced
           </div>
         </div>
       </div>
@@ -747,7 +814,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Registered <span className="font-mono ml-1">{pillCounts.total}</span>
           </button>
 
-          {/* Positive Response Pill */}
+          {/* Positive Response Pill with Percentage */}
           <button
             onClick={() => setActivePillFilter(activePillFilter === 'positive_response' ? 'all' : 'positive_response')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
@@ -757,9 +824,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             }`}
           >
             Positive Response <span className="font-mono ml-1 font-bold">{pillCounts.positiveResponse}</span>
+            <span className="font-mono text-[10.5px] ml-1 font-semibold opacity-75">({subscriptionMetrics.positivePct}%)</span>
           </button>
 
-          {/* Negative Response Pill */}
+          {/* Negative Response Pill with Percentage */}
           <button
             onClick={() => setActivePillFilter(activePillFilter === 'negative_response' ? 'all' : 'negative_response')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
@@ -769,6 +837,19 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             }`}
           >
             Negative Response <span className="font-mono ml-1 font-bold">{pillCounts.negativeResponse}</span>
+            <span className="font-mono text-[10.5px] ml-1 font-semibold opacity-75">({subscriptionMetrics.negativePct}%)</span>
+          </button>
+
+          {/* Follow-ups Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'follow_ups' ? 'all' : 'follow_ups')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'follow_ups'
+                ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
+            }`}
+          >
+            Follow-ups <span className="font-mono ml-1 font-bold">{followUpCallsCount}</span>
           </button>
 
           {/* Active Pill */}
@@ -1028,20 +1109,20 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 <th className="px-3 py-2.5 text-center">RESPONSE</th>
                 <th className="px-3 py-2.5 min-w-[130px]">FREE 100 SALES QUOTA</th>
                 <th
-                  onClick={() => handleSort('lifetimeSalesCount')}
-                  className="px-3 py-2.5 cursor-pointer hover:text-black text-center"
-                >
-                  <div className="flex items-center justify-center gap-1">
-                    <span>BILLS</span>
-                    <ArrowUpDown className="w-3 h-3 text-[#071952]/60" />
-                  </div>
-                </th>
-                <th
                   onClick={() => handleSort('billed')}
                   className="px-3 py-2.5 cursor-pointer hover:text-black text-right"
                 >
                   <div className="flex items-center justify-end gap-1">
                     <span>TOTAL SALES (₹)</span>
+                    <ArrowUpDown className="w-3 h-3 text-[#071952]/60" />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort('lifetimeSalesCount')}
+                  className="px-3 py-2.5 cursor-pointer hover:text-black text-center"
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    <span>BILLS</span>
                     <ArrowUpDown className="w-3 h-3 text-[#071952]/60" />
                   </div>
                 </th>
@@ -1187,16 +1268,16 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                         </div>
                       </td>
 
-                      {/* 10. BILLS */}
+                      {/* 10. TOTAL SALES (₹) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-right font-black text-black tabular-nums text-xs font-mono">
+                        {formatCurrency(s.billed)}
+                      </td>
+
+                      {/* 11. BILLS */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-[#F8F3F0] text-black border border-[#F8F3F0] tabular-nums">
                           {s.lifetimeSalesCount} bills
                         </span>
-                      </td>
-
-                      {/* 11. TOTAL SALES (₹) */}
-                      <td className="px-3 py-2.5 whitespace-nowrap text-right font-black text-black tabular-nums text-xs font-mono">
-                        {formatCurrency(s.billed)}
                       </td>
 
                       {/* 12. ACTION (View Salon -> Fresh Page) */}

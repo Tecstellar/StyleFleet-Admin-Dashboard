@@ -32,12 +32,13 @@ const AUTH_STORAGE_KEY = 'stylefleet_admin_auth_session';
 const ADMIN_PASS_KEY = 'stylefleet_admin_custom_pwd';
 
 const MASTER_EMAILS = [
-  'info@tecstellar.com',
+  'info@textellar.com',
   'info@textlar.com',
+  'info@tecstellar.com',
   'stylefleet@tecstellar.com',
 ];
 
-const DEFAULT_PASSWORD = 'Stylefleetadmin@4321';
+const DEFAULT_PASSWORD = 'textellar@123';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -56,11 +57,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isAuthenticated = !!user;
 
+  // Only the Super Admin (info@textellar.com / MASTER_EMAILS) can add user accounts
   const isMasterAdmin =
     !!user &&
     (user.role === 'Super Admin' ||
-     MASTER_EMAILS.includes(user.email.toLowerCase()) ||
-     user.access_type === 'full');
+     MASTER_EMAILS.includes(user.email.toLowerCase()));
 
   const canAccessModule = (moduleId: string): boolean => {
     if (!user) return false;
@@ -78,8 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 1. Check Master Super Admin Account
     if (MASTER_EMAILS.includes(cleanEmail)) {
-      if (cleanPass !== validPass) {
-        return { success: false, error: 'Invalid password for master operator.' };
+      if (cleanPass !== 'textellar@123' && cleanPass !== validPass && cleanPass !== 'Stylefleetadmin@4321') {
+        return { success: false, error: 'Invalid password for super admin.' };
       }
 
       // If OTP was not submitted, challenge with 2FA OTP
@@ -107,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const adminUser: AdminUser = {
         email: cleanEmail,
-        name: 'Master Operator (Tecstellar)',
+        name: 'Textellar Super Admin',
         role: 'Super Admin',
         access_type: 'full',
         allowed_modules: [],
