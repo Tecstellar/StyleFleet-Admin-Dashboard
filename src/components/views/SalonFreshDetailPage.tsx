@@ -519,7 +519,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       d.setDate(d.getDate() + 365);
       expiryText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     } else if (isBraveAndCave) {
-      expiryText = '17 Oct 2027 (1 Year Pro)';
+      expiryText = '2 Oct 2027 (1 Year Pro)';
     } else if (isSub) {
       expiryText = 'Active (Auto-Renews)';
     }
@@ -539,7 +539,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         year: 'numeric',
       });
     } else if (isBraveAndCave) {
-      subDateText = '17 Oct 2026';
+      subDateText = '2 Oct 2026';
     }
 
     // Amount (amount stored in subscriptions table)
