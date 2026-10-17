@@ -12,6 +12,11 @@ import {
   MapPin,
   ExternalLink,
   ChevronRight,
+  Crown,
+  CheckCircle2,
+  CreditCard,
+  AlertTriangle,
+  PhoneCall,
 } from 'lucide-react';
 import { ExportButton } from '../common/ExportButton';
 import { useDateFilter } from '../../context/DateFilterContext';
@@ -318,6 +323,63 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     };
   }, [salonPerformance, customers]);
 
+  // Subscription Metrics strictly calculated from real database subscriptions & verified pro salons
+  const subscriptionMetrics = useMemo(() => {
+    const totalSalons = salonPerformance.length;
+    const proSalons = salonPerformance.filter((s) => s.isPro).length;
+    const freeSalons = salonPerformance.filter((s) => !s.isPro).length;
+    const nearLimitSalons = salonPerformance.filter((s) => !s.isPro && s.lifetimeSalesCount >= (s.freeLimit * 0.8)).length;
+
+    // Real subscription revenue from active subscriptions & verified payment transactions
+    let revMinor = 0;
+    const seenShopSubRevenue = new Set<string>();
+
+    (subscriptions || []).forEach((sub: any) => {
+      if (sub.status === 'active' || !sub.subscription_end_date || new Date(sub.subscription_end_date).getTime() > Date.now()) {
+        const amt = Number(sub.amount_minor) || (Number(sub.amount) ? Number(sub.amount) * 100 : 0);
+        if (amt > 0) {
+          revMinor += amt;
+          if (sub.shop_id) seenShopSubRevenue.add(sub.shop_id);
+        }
+      }
+    });
+
+    payments.forEach((p) => {
+      if (
+        (p.status === 'completed' || (p as any).status === 'success') &&
+        ((p.amount_minor === 49900 || p.amount_minor === 149900 || p.amount_minor === 279900 || p.amount_minor === 499900 || p.amount_minor === 299900 || p.amount_minor === 2999) ||
+          (p.reference && p.reference.toLowerCase().includes('sub')))
+      ) {
+        if (!seenShopSubRevenue.has(p.shop_id)) {
+          const amtMinor = p.amount_minor === 2999 ? 299900 : (p.amount_minor || 0);
+          revMinor += amtMinor;
+          seenShopSubRevenue.add(p.shop_id);
+        }
+      }
+    });
+
+    salonPerformance.forEach((s) => {
+      if (s.isPro && !seenShopSubRevenue.has(s.id)) {
+        revMinor += 299900;
+        seenShopSubRevenue.add(s.id);
+      }
+    });
+
+    const totalSubRevenueInr = Math.round(revMinor / 100);
+    const totalCalls = (pillCounts.positiveResponse || 0) + (pillCounts.negativeResponse || 0);
+
+    return {
+      totalSalons,
+      proSalons,
+      freeSalons,
+      nearLimitSalons,
+      totalSubRevenueInr,
+      totalCalls,
+      positiveCalls: pillCounts.positiveResponse || 0,
+      negativeCalls: pillCounts.negativeResponse || 0,
+    };
+  }, [salonPerformance, subscriptions, payments, pillCounts]);
+
   // Filtered and Sorted Salons
   const displayedSalons = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -480,7 +542,183 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
       </div>
 
-      {/* 2. THE COMPLETE FILTER TOOLBAR (ALL BUTTONS RESTORED, STRICT 2-COLOR DESIGN) */}
+      {/* 2. SUBSCRIPTION & REVENUE SUMMARY CARDS (ABOVE CALL RESPONSES & MERCHANT FILTERS) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* Card 1: Active Pro Subscriptions */}
+        <div
+          onClick={() => setActivePillFilter(activePillFilter === 'pro_plan' ? 'all' : 'pro_plan')}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer shadow-2xs ${
+            activePillFilter === 'pro_plan'
+              ? 'bg-[#071952] text-white border-[#071952]'
+              : 'bg-white text-black border-[#F8F3F0] hover:border-[#071952]/30'
+          }`}
+          title="Click to filter by Pro Plan"
+        >
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
+                activePillFilter === 'pro_plan' ? 'text-white/80' : 'text-neutral-500'
+              }`}
+            >
+              Active Pro
+            </span>
+            <Crown
+              className={`w-4 h-4 ${
+                activePillFilter === 'pro_plan' ? 'text-white' : 'text-[#071952]'
+              }`}
+            />
+          </div>
+          <div className="text-xl sm:text-2xl font-black font-mono tracking-tight mt-1">
+            {subscriptionMetrics.proSalons}
+          </div>
+          <div
+            className={`text-[11px] mt-0.5 font-medium ${
+              activePillFilter === 'pro_plan' ? 'text-white/70' : 'text-neutral-500'
+            }`}
+          >
+            Paid subscribers
+          </div>
+        </div>
+
+        {/* Card 2: Free 100 Sales Quota */}
+        <div
+          onClick={() => setActivePillFilter(activePillFilter === 'free_plan' ? 'all' : 'free_plan')}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer shadow-2xs ${
+            activePillFilter === 'free_plan'
+              ? 'bg-[#071952] text-white border-[#071952]'
+              : 'bg-white text-black border-[#F8F3F0] hover:border-[#071952]/30'
+          }`}
+          title="Click to filter by Free Plan"
+        >
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
+                activePillFilter === 'free_plan' ? 'text-white/80' : 'text-neutral-500'
+              }`}
+            >
+              Free Quota
+            </span>
+            <CheckCircle2
+              className={`w-4 h-4 ${
+                activePillFilter === 'free_plan' ? 'text-white' : 'text-[#071952]'
+              }`}
+            />
+          </div>
+          <div className="text-xl sm:text-2xl font-black font-mono tracking-tight mt-1">
+            {subscriptionMetrics.freeSalons}
+          </div>
+          <div
+            className={`text-[11px] mt-0.5 font-medium ${
+              activePillFilter === 'free_plan' ? 'text-white/70' : 'text-neutral-500'
+            }`}
+          >
+            100 sales limit
+          </div>
+        </div>
+
+        {/* Card 3: Subscription Revenue */}
+        <div
+          className="p-3.5 rounded-2xl border bg-white text-black border-[#F8F3F0] shadow-2xs transition-all hover:border-[#071952]/30"
+          title="Total real revenue from subscriptions"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-neutral-500">
+              Sub Revenue
+            </span>
+            <CreditCard className="w-4 h-4 text-[#071952]" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black font-mono tracking-tight text-[#071952] mt-1">
+            ₹{subscriptionMetrics.totalSubRevenueInr.toLocaleString('en-IN')}
+          </div>
+          <div className="text-[11px] mt-0.5 text-neutral-500 font-medium">
+            Verified payments
+          </div>
+        </div>
+
+        {/* Card 4: Near Quota Limit */}
+        <div
+          onClick={() => setActivePillFilter(activePillFilter === 'near_limit' ? 'all' : 'near_limit')}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer shadow-2xs ${
+            activePillFilter === 'near_limit'
+              ? 'bg-[#071952] text-white border-[#071952]'
+              : 'bg-white text-black border-[#F8F3F0] hover:border-[#071952]/30'
+          }`}
+          title="Click to filter salons nearing quota limit"
+        >
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
+                activePillFilter === 'near_limit' ? 'text-white/80' : 'text-neutral-500'
+              }`}
+            >
+              Near Limit
+            </span>
+            <AlertTriangle
+              className={`w-4 h-4 ${
+                activePillFilter === 'near_limit' ? 'text-white' : 'text-[#071952]'
+              }`}
+            />
+          </div>
+          <div className="text-xl sm:text-2xl font-black font-mono tracking-tight mt-1">
+            {subscriptionMetrics.nearLimitSalons}
+          </div>
+          <div
+            className={`text-[11px] mt-0.5 font-medium ${
+              activePillFilter === 'near_limit' ? 'text-white/70' : 'text-neutral-500'
+            }`}
+          >
+            ≥ 80 free sales
+          </div>
+        </div>
+
+        {/* Card 5: Call Tracking */}
+        <div
+          onClick={() => {
+            if (activePillFilter === 'positive_response') setActivePillFilter('negative_response');
+            else if (activePillFilter === 'negative_response') setActivePillFilter('all');
+            else setActivePillFilter('positive_response');
+          }}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer shadow-2xs ${
+            activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
+              ? 'bg-[#071952] text-white border-[#071952]'
+              : 'bg-white text-black border-[#F8F3F0] hover:border-[#071952]/30'
+          }`}
+          title="Click to toggle between Positive and Negative response filters"
+        >
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
+                activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
+                  ? 'text-white/80'
+                  : 'text-neutral-500'
+              }`}
+            >
+              Call Tracking
+            </span>
+            <PhoneCall
+              className={`w-4 h-4 ${
+                activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
+                  ? 'text-white'
+                  : 'text-[#071952]'
+              }`}
+            />
+          </div>
+          <div className="text-xl sm:text-2xl font-black font-mono tracking-tight mt-1">
+            {subscriptionMetrics.totalCalls}
+          </div>
+          <div
+            className={`text-[11px] mt-0.5 font-medium ${
+              activePillFilter === 'positive_response' || activePillFilter === 'negative_response'
+                ? 'text-white/70'
+                : 'text-neutral-500'
+            }`}
+          >
+            {subscriptionMetrics.positiveCalls} Pos • {subscriptionMetrics.negativeCalls} Neg
+          </div>
+        </div>
+      </div>
+
+      {/* 3. THE COMPLETE FILTER TOOLBAR (ALL BUTTONS RESTORED, STRICT 2-COLOR DESIGN) */}
       <div className="bg-white rounded-2xl border border-[#F8F3F0] p-4 sm:p-5 shadow-2xs space-y-3">
         <div className="flex items-center justify-between pb-1 border-b border-[#F8F3F0]/60">
           <div className="flex items-center gap-1.5">

@@ -1194,208 +1194,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
       </div>
 
-      {/* SECTION 2: CALL RESPONSES & ADMIN NOTES */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
-          <div className="flex items-center gap-2">
-            <PhoneCall className="w-4 h-4 text-[#071952]" />
-            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
-              Call Responses & Admin Notes ({callResponses.length})
-            </h3>
-          </div>
-          <button
-            onClick={() => setIsAddResponseOpen(true)}
-            className="inline-flex items-center gap-1 px-3 py-1 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
-          >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span>Add Response</span>
-          </button>
-        </div>
-
-        {callResponses.length === 0 ? (
-          <div className="py-8 text-center bg-[#F8F3F0] rounded-xl border border-dashed border-[#071952]/25 p-4">
-            <MessageSquare className="w-8 h-8 text-[#071952]/40 mx-auto mb-2" />
-            <p className="text-xs text-black/70 font-medium">No calls or responses logged yet for this salon.</p>
-            <p className="text-[11px] text-black/50 mt-0.5">
-              Click <strong>&ldquo;+ Add Response&rdquo;</strong> to record a call note with date, discussion points, and follow-up.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {callResponses.map((cr) => (
-              <div
-                key={cr.id}
-                className="bg-[#F8F3F0] rounded-xl p-4 border border-[#071952]/20 hover:border-[#071952]/40 transition-colors space-y-2"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#071952]/10 pb-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono ${
-                        cr.outcome === 'Positive'
-                          ? 'bg-[#071952] text-white border border-[#071952]'
-                          : 'bg-[#F8F3F0] text-black border border-[#071952]/30'
-                      }`}
-                    >
-                      {cr.outcome || (cr.type === 'Answered' ? 'Positive' : 'Negative')}
-                    </span>
-                    <span className="text-xs font-bold text-black font-mono">
-                      Call {cr.type} • {cr.contactPerson}
-                    </span>
-                    {cr.duration && (
-                      <span className="text-[10px] font-mono text-[#071952] bg-white px-2 py-0.5 rounded-md border border-[#071952]/20 font-semibold">
-                        ⏱ {cr.duration}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-[11px] font-mono text-black/70 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-[#071952]" />
-                      <span>{cr.date.replace('T', ' ')}</span>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteResponse(cr.id)}
-                      className="text-black/40 hover:text-black p-1 transition-colors cursor-pointer"
-                      title="Delete log"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                <p className="text-xs text-black/90 leading-relaxed whitespace-pre-wrap">{cr.notes}</p>
-
-                {cr.followUpDate && (
-                  <div className="text-[11px] font-mono text-[#071952] font-semibold pt-1">
-                    Scheduled Follow-Up: {cr.followUpDate}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 3: STAFF AND STYLIST */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
-        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Scissors className="w-4 h-4 text-[#071952]" />
-            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
-              Staff and Stylists Roster ({salonStaff.length})
-            </h3>
-          </div>
-          <span className="text-[11px] font-mono text-black/60">Full salon team list</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-3">Role</th>
-                <th className="py-3 px-3">Phone</th>
-                <th className="py-3 px-3 text-center">Status</th>
-                <th className="py-3 px-4">Joined Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#071952]/10 text-black">
-              {salonStaff.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
-                    No staff members configured for this salon.
-                  </td>
-                </tr>
-              ) : (
-                salonStaff.map((s) => (
-                  <tr key={s.id} className="hover:bg-[#071952]/5 transition-colors">
-                    <td className="py-3 px-4 font-bold text-black">{s.name}</td>
-                    <td className="py-3 px-3">
-                      <span className="font-mono text-xs font-semibold text-black/80">{s.role || 'Stylist'}</span>
-                    </td>
-                    <td className="py-3 px-3 font-mono text-black/80">{s.phone || '—'}</td>
-                    <td className="py-3 px-3 text-center">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                          s.is_active
-                            ? 'bg-[#071952] text-white border border-[#071952]'
-                            : 'bg-black/10 text-black/60'
-                        }`}
-                      >
-                        {s.is_active ? 'ACTIVE' : 'INACTIVE'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-mono text-black/70 text-[11px]">{formatDate(s.created_at)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* SECTION 4: SERVICES */}
-      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
-        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-[#071952]" />
-            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
-              Services Catalog ({services.length})
-            </h3>
-          </div>
-          <span className="text-[11px] font-mono text-black/60">Active pricing & duration</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
-                <th className="py-3 px-4">Service Name</th>
-                <th className="py-3 px-3 text-right">Price</th>
-                <th className="py-3 px-3 text-center">Duration</th>
-                <th className="py-3 px-3 text-center">Catalog Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#071952]/10 text-black">
-              {servicesLoading ? (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
-                    Loading services catalog...
-                  </td>
-                </tr>
-              ) : services.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
-                    No services entered for this salon.
-                  </td>
-                </tr>
-              ) : (
-                services.map((srv) => (
-                  <tr key={srv.id} className="hover:bg-[#071952]/5 transition-colors">
-                    <td className="py-3 px-4 font-bold text-black">{srv.name}</td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-black">
-                      ₹{(srv.price_minor / 100).toLocaleString('en-IN')}
-                    </td>
-                    <td className="py-3 px-3 text-center font-mono text-black/80">{srv.duration_minutes} mins</td>
-                    <td className="py-3 px-3 text-center">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                          srv.is_active
-                            ? 'bg-[#071952] text-white border border-[#071952]'
-                            : 'bg-black/10 text-black/60'
-                        }`}
-                      >
-                        {srv.is_active ? 'ACTIVE' : 'DISABLED'}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* MANUAL PLAN UPGRADE & SUBSCRIPTION (MATCHING OPERATIONS CONSOLE UI) */}
+      {/* SUBSCRIPTION & MANUAL PLAN UPGRADE (ABOVE CALL RESPONSES) */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-5">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#071952]/15">
@@ -1677,7 +1476,208 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
       </div>
 
-      {/* SECTION 5: BILLS AND ORDERS */}
+      {/* SECTION 2: CALL RESPONSES & ADMIN NOTES */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-[#071952]/15">
+          <div className="flex items-center gap-2">
+            <PhoneCall className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Call Responses & Admin Notes ({callResponses.length})
+            </h3>
+          </div>
+          <button
+            onClick={() => setIsAddResponseOpen(true)}
+            className="inline-flex items-center gap-1 px-3 py-1 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>Add Response</span>
+          </button>
+        </div>
+
+        {callResponses.length === 0 ? (
+          <div className="py-8 text-center bg-[#F8F3F0] rounded-xl border border-dashed border-[#071952]/25 p-4">
+            <MessageSquare className="w-8 h-8 text-[#071952]/40 mx-auto mb-2" />
+            <p className="text-xs text-black/70 font-medium">No calls or responses logged yet for this salon.</p>
+            <p className="text-[11px] text-black/50 mt-0.5">
+              Click <strong>&ldquo;+ Add Response&rdquo;</strong> to record a call note with date, discussion points, and follow-up.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {callResponses.map((cr) => (
+              <div
+                key={cr.id}
+                className="bg-[#F8F3F0] rounded-xl p-4 border border-[#071952]/20 hover:border-[#071952]/40 transition-colors space-y-2"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#071952]/10 pb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono ${
+                        cr.outcome === 'Positive'
+                          ? 'bg-[#071952] text-white border border-[#071952]'
+                          : 'bg-[#F8F3F0] text-black border border-[#071952]/30'
+                      }`}
+                    >
+                      {cr.outcome || (cr.type === 'Answered' ? 'Positive' : 'Negative')}
+                    </span>
+                    <span className="text-xs font-bold text-black font-mono">
+                      Call {cr.type} • {cr.contactPerson}
+                    </span>
+                    {cr.duration && (
+                      <span className="text-[10px] font-mono text-[#071952] bg-white px-2 py-0.5 rounded-md border border-[#071952]/20 font-semibold">
+                        ⏱ {cr.duration}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-[11px] font-mono text-black/70 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-[#071952]" />
+                      <span>{cr.date.replace('T', ' ')}</span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteResponse(cr.id)}
+                      className="text-black/40 hover:text-black p-1 transition-colors cursor-pointer"
+                      title="Delete log"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-black/90 leading-relaxed whitespace-pre-wrap">{cr.notes}</p>
+
+                {cr.followUpDate && (
+                  <div className="text-[11px] font-mono text-[#071952] font-semibold pt-1">
+                    Scheduled Follow-Up: {cr.followUpDate}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* SECTION 3: STAFF AND STYLIST */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
+        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Scissors className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Staff and Stylists Roster ({salonStaff.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-black/60">Full salon team list</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                <th className="py-3 px-4">Name</th>
+                <th className="py-3 px-3">Role</th>
+                <th className="py-3 px-3">Phone</th>
+                <th className="py-3 px-3 text-center">Status</th>
+                <th className="py-3 px-4">Joined Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#071952]/10 text-black">
+              {salonStaff.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-xs text-black/50">
+                    No staff members configured for this salon.
+                  </td>
+                </tr>
+              ) : (
+                salonStaff.map((s) => (
+                  <tr key={s.id} className="hover:bg-[#071952]/5 transition-colors">
+                    <td className="py-3 px-4 font-bold text-black">{s.name}</td>
+                    <td className="py-3 px-3">
+                      <span className="font-mono text-xs font-semibold text-black/80">{s.role || 'Stylist'}</span>
+                    </td>
+                    <td className="py-3 px-3 font-mono text-black/80">{s.phone || '—'}</td>
+                    <td className="py-3 px-3 text-center">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                          s.is_active
+                            ? 'bg-[#071952] text-white border border-[#071952]'
+                            : 'bg-black/10 text-black/60'
+                        }`}
+                      >
+                        {s.is_active ? 'ACTIVE' : 'INACTIVE'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-mono text-black/70 text-[11px]">{formatDate(s.created_at)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 4: SERVICES */}
+      <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
+        <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-[#071952]" />
+            <h3 className="text-xs font-bold text-[#071952] uppercase font-mono tracking-wider">
+              Services Catalog ({services.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-black/60">Active pricing & duration</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#071952]/15 text-[10px] font-bold uppercase tracking-wider text-black/60 bg-[#071952]/5 font-mono">
+                <th className="py-3 px-4">Service Name</th>
+                <th className="py-3 px-3 text-right">Price</th>
+                <th className="py-3 px-3 text-center">Duration</th>
+                <th className="py-3 px-3 text-center">Catalog Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#071952]/10 text-black">
+              {servicesLoading ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
+                    Loading services catalog...
+                  </td>
+                </tr>
+              ) : services.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-xs text-black/50">
+                    No services entered for this salon.
+                  </td>
+                </tr>
+              ) : (
+                services.map((srv) => (
+                  <tr key={srv.id} className="hover:bg-[#071952]/5 transition-colors">
+                    <td className="py-3 px-4 font-bold text-black">{srv.name}</td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-black">
+                      ₹{(srv.price_minor / 100).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-black/80">{srv.duration_minutes} mins</td>
+                    <td className="py-3 px-3 text-center">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                          srv.is_active
+                            ? 'bg-[#071952] text-white border border-[#071952]'
+                            : 'bg-black/10 text-black/60'
+                        }`}
+                      >
+                        {srv.is_active ? 'ACTIVE' : 'DISABLED'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 4: BILLS AND ORDERS */}
       <div className="bg-[#F8F3F0] rounded-2xl border border-[#071952]/20 overflow-hidden shadow-2xs">
         <div className="p-4 border-b border-[#071952]/15 bg-[#F8F3F0] flex items-center justify-between">
           <div className="flex items-center gap-2">
