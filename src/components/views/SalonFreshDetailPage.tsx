@@ -58,10 +58,14 @@ interface SalonService {
 interface CallResponse {
   id: string;
   date: string;
-  type: string;
-  outcome: string;
+  type: 'Answered' | 'No Answer' | 'Not Reachable' | string;
+  outcome: 'Positive' | 'Negative' | string;
   contactPerson: string;
   notes: string;
+  customerFeedback?: string;
+  leadSource?: string;
+  demoStatus?: string;
+  serviceType?: string;
   followUpDate?: string;
   recordedBy: string;
   duration?: string;
@@ -83,11 +87,16 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const [services, setServices] = useState<SalonService[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
 
-  // Add Response Modal State (styled according to operations console response form)
+  // Add Response Modal State (matching operations console response form)
   const [isAddResponseOpen, setIsAddResponseOpen] = useState(false);
   const [callStatus, setCallStatus] = useState<'Answered' | 'No Answer' | 'Not Reachable'>('Answered');
+  const [responseSentiment, setResponseSentiment] = useState<'Positive' | 'Negative'>('Positive');
+  const [leadSource, setLeadSource] = useState('');
+  const [demoStatus, setDemoStatus] = useState<'WhatsApp Demo' | 'Call Demo' | 'No Demo' | ''>('No Demo');
+  const [serviceType, setServiceType] = useState<string>('Hair & Styling');
+  const [customerFeedback, setCustomerFeedback] = useState('');
   const [responseNotes, setResponseNotes] = useState('');
-  const [timerSeconds, setTimerSeconds] = useState(15);
+  const [timerSeconds, setTimerSeconds] = useState(0);
   const [responseDate, setResponseDate] = useState(() => {
     const now = new Date();
     return now.toISOString().slice(0, 16);
@@ -104,19 +113,32 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const [followUpPriority, setFollowUpPriority] = useState('Medium');
   const [isSavingResponse, setIsSavingResponse] = useState(false);
 
-  // Timer: count seconds when modal is open
+  // Handle Call Status Switch: Answered defaults to Positive + starts timer; No Answer / Not Reachable defaults to Negative + resets timer
+  const handleSelectCallStatus = (status: 'Answered' | 'No Answer' | 'Not Reachable') => {
+    setCallStatus(status);
+    if (status === 'Answered') {
+      setResponseSentiment('Positive');
+      setTimerSeconds(0);
+    } else {
+      setResponseSentiment('Negative');
+      setTimerSeconds(0);
+    }
+  };
+
+  // Timer: count seconds ONLY when modal is open AND callStatus === 'Answered'
   useEffect(() => {
     let interval: any;
-    if (isAddResponseOpen) {
-      setTimerSeconds(0);
+    if (isAddResponseOpen && callStatus === 'Answered') {
       interval = setInterval(() => {
         setTimerSeconds((prev) => prev + 1);
       }, 1000);
+    } else {
+      setTimerSeconds(0);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isAddResponseOpen]);
+  }, [isAddResponseOpen, callStatus]);
 
   const formatTimer = (totalSeconds: number) => {
     const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -159,15 +181,29 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
 
         if (!adminErr && adminData && adminData.length > 0) {
           adminData.forEach((row: any) => {
+            const isAns = (row.type || '').toLowerCase().includes('answer') && !(row.type || '').toLowerCase().includes('no');
+            const defaultOutcome = isAns ? 'Positive' : 'Negative';
+            const rawOutcome = (row.outcome || '').trim();
+            const normalizedOutcome = rawOutcome.toLowerCase().includes('pos')
+              ? 'Positive'
+              : rawOutcome.toLowerCase().includes('neg')
+              ? 'Negative'
+              : defaultOutcome;
+
+            // Extract duration if in notes
+            const timerMatch = (row.notes || '').match(/Timer:\s*([0-9:]+)/i);
+            const duration = timerMatch ? timerMatch[1] : undefined;
+
             loadedItems.push({
               id: row.id,
               date: row.date || row.created_at,
-              type: row.type || 'Phone Call',
-              outcome: row.outcome || 'Connected & Discussed',
+              type: row.type || (isAns ? 'Answered' : 'No Answer'),
+              outcome: normalizedOutcome,
               contactPerson: row.contact_person || ownerProfile?.full_name || shop.name,
               notes: row.notes || '',
               followUpDate: row.follow_up_date || undefined,
               recordedBy: row.recorded_by || 'Admin Team',
+              duration,
             });
           });
         }
@@ -487,7 +523,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     e.preventDefault();
 
     setIsSavingResponse(true);
-    const durationStr = formatTimer(timerSeconds);
+    const durationStr = callStatus === 'Answered' && timerSeconds > 0 ? formatTimer(timerSeconds) : undefined;
     const followUpCombined = scheduleFollowUp && followUpDate
       ? `${followUpDate}${followUpHour ? ` ${followUpHour}` : ''}${followUpMin ? `:${followUpMin}` : ''} [${followUpPriority}]`.trim()
       : undefined;
@@ -495,15 +531,23 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     // Database safe follow-up date (strictly YYYY-MM-DD or null for PostgreSQL DATE type)
     const dbFollowUpDate = scheduleFollowUp && followUpDate ? followUpDate.slice(0, 10) : null;
 
-    // Rich notes capturing call details, timer, and follow-up time & priority
+    // Rich notes capturing call details, timer, customer feedback, and follow-up
     const notesParts: string[] = [];
-    if (responseNotes.trim()) {
-      notesParts.push(responseNotes.trim());
+    if (callStatus === 'Answered') {
+      notesParts.push(`[${responseSentiment.toUpperCase()}]`);
+      if (leadSource) notesParts.push(`Source: ${leadSource}`);
+      if (demoStatus) notesParts.push(`Demo: ${demoStatus}`);
+      if (serviceType) notesParts.push(`Service: ${serviceType}`);
+      if (customerFeedback.trim()) notesParts.push(`Feedback: "${customerFeedback.trim()}"`);
     } else {
-      notesParts.push(`Call Status: ${callStatus}`);
+      notesParts.push(`[NEGATIVE - ${callStatus.toUpperCase()}]`);
+    }
+
+    if (responseNotes.trim()) {
+      notesParts.push(`Notes: ${responseNotes.trim()}`);
     }
     if (durationStr) {
-      notesParts.push(`Duration: ${durationStr}`);
+      notesParts.push(`Timer: ${durationStr}`);
     }
     if (scheduleFollowUp && followUpDate) {
       notesParts.push(`Follow-up: ${followUpDate}${followUpHour ? ` ${followUpHour}` : ''}${followUpMin ? `:${followUpMin}` : ''} [${followUpPriority}]`);
@@ -514,9 +558,13 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       id: `resp-${Date.now()}`,
       date: responseDate,
       type: callStatus,
-      outcome: callStatus,
+      outcome: responseSentiment,
       contactPerson: reportedBy,
       notes: combinedNotes,
+      customerFeedback: customerFeedback.trim() || undefined,
+      leadSource: leadSource || undefined,
+      demoStatus: demoStatus || undefined,
+      serviceType: serviceType || undefined,
       followUpDate: followUpCombined,
       recordedBy: reportedBy,
       duration: durationStr,
@@ -532,7 +580,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             shop_id: shop.id,
             date: new Date(responseDate).toISOString(),
             type: callStatus,
-            outcome: callStatus,
+            outcome: responseSentiment,
             contact_person: reportedBy,
             notes: combinedNotes,
             follow_up_date: dbFollowUpDate,
@@ -547,7 +595,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       }
 
       // 2. Also write to support_messages as fail-safe fallback
-      const formattedNote = `[Admin Call Note | ${callStatus} | By: ${reportedBy} | Timer: ${durationStr}] ${responseNotes.trim()}${followUpCombined ? ` | Follow-up: ${followUpCombined}` : ''}`;
+      const formattedNote = `[Admin Call Note | ${callStatus} | ${responseSentiment} | By: ${reportedBy}${durationStr ? ` | Timer: ${durationStr}` : ''}] ${combinedNotes}`;
       await supabase.from('support_messages').insert([
         {
           shop_id: shop.id,
@@ -565,6 +613,9 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     setIsSavingResponse(false);
     setIsAddResponseOpen(false);
     setResponseNotes('');
+    setCustomerFeedback('');
+    setLeadSource('');
+    setTimerSeconds(0);
   };
 
   // Delete Call Response
@@ -986,12 +1037,23 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#071952]/10 pb-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-[#071952] text-white">
-                      {cr.outcome}
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono ${
+                        cr.outcome === 'Positive'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                          : 'bg-rose-100 text-rose-800 border border-rose-300'
+                      }`}
+                    >
+                      {cr.outcome || (cr.type === 'Answered' ? 'Positive' : 'Negative')}
                     </span>
                     <span className="text-xs font-bold text-black font-mono">
-                      {cr.type} with {cr.contactPerson}
+                      Call {cr.type} • {cr.contactPerson}
                     </span>
+                    {cr.duration && (
+                      <span className="text-[10px] font-mono text-[#071952] bg-white px-2 py-0.5 rounded-md border border-[#071952]/20 font-semibold">
+                        ⏱ {cr.duration}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-[11px] font-mono text-black/70 flex items-center gap-1">
@@ -1333,43 +1395,41 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
               {/* Modal Body: Two Columns */}
               <div className="p-6 flex flex-col md:flex-row gap-6 bg-[#F8F3F0] text-xs">
                 {/* Left Column: Preview */}
-                <div className="w-full md:w-56 shrink-0 flex flex-col">
+                <div className="w-full md:w-64 shrink-0 flex flex-col">
                   <label className="text-xs font-bold text-black uppercase tracking-wider mb-2 block">
-                    Preview
+                    Preview ({callResponses.length})
                   </label>
-                  <div className="flex-1 bg-white/85 rounded-xl border border-[#071952]/20 p-3.5 min-h-[280px] max-h-[380px] overflow-y-auto flex flex-col justify-start space-y-3">
+                  <div className="flex-1 bg-white/85 rounded-xl border border-[#071952]/20 p-3 min-h-[320px] max-h-[460px] overflow-y-auto flex flex-col justify-start space-y-2.5">
                     {callResponses.length === 0 ? (
                       <p className="text-xs text-black/50 text-center my-auto">
                         No previous responses yet.
                       </p>
                     ) : (
-                      callResponses.slice(0, 5).map((cr) => (
+                      callResponses.map((cr) => (
                         <div
                           key={cr.id}
-                          className="p-2.5 rounded-lg border border-[#071952]/15 bg-[#F8F3F0] text-xs space-y-1.5"
+                          className="p-2.5 rounded-lg border border-[#071952]/15 bg-[#F8F3F0] text-xs space-y-1.5 shadow-2xs"
                         >
                           <div className="flex items-center justify-between gap-1">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                cr.type === 'Answered'
-                                  ? 'bg-[#071952] text-white'
-                                  : cr.type === 'No Answer'
-                                  ? 'bg-[#071952]/20 text-[#071952]'
-                                  : 'bg-black/10 text-black'
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                cr.outcome === 'Positive'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                  : 'bg-rose-100 text-rose-800 border border-rose-300'
                               }`}
                             >
-                              {cr.type}
+                              {cr.outcome || (cr.type === 'Answered' ? 'Positive' : 'Negative')}
                             </span>
                             <span className="text-[10px] text-black/60 font-mono">
-                              {new Date(cr.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                              {new Date(cr.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(cr.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                             </span>
                           </div>
-                          <p className="text-[11px] text-black/85 leading-snug line-clamp-3">
-                            {cr.notes}
+                          <p className="text-[11px] text-black/85 leading-snug line-clamp-2 italic">
+                            {cr.customerFeedback ? `"${cr.customerFeedback}"` : cr.notes.replace(/\[.*?\]/g, '').trim() || '—'}
                           </p>
-                          <div className="text-[10px] text-black/60 flex items-center justify-between">
-                            <span>By {cr.recordedBy || 'Support'}</span>
-                            {cr.duration && <span>⏱ {cr.duration}</span>}
+                          <div className="text-[10px] text-black/60 flex items-center justify-between pt-1 border-t border-black/5">
+                            <span>Call {cr.type} - {cr.recordedBy || 'Support'}</span>
+                            {cr.duration && <span className="font-mono text-[#071952] font-semibold">⏱ {cr.duration}</span>}
                           </div>
                         </div>
                       ))
@@ -1379,36 +1439,185 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
 
                 {/* Right Column: Form Fields */}
                 <form onSubmit={handleSaveResponse} className="flex-1 space-y-4">
-                  {/* CALL STATUS * */}
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-black uppercase tracking-wider flex items-center gap-1">
-                      <span>CALL STATUS</span>
-                      <span className="text-[#071952] font-black">*</span>
-                    </label>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {(['Answered', 'No Answer', 'Not Reachable'] as const).map((status) => {
-                        const isSelected = callStatus === status;
-                        return (
+                  {/* ROW 1: CALL STATUS & (IF ANSWERED) RESPONSE SENTIMENT */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* CALL STATUS * */}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-black uppercase tracking-wider flex items-center gap-1">
+                        <span>CALL STATUS</span>
+                        <span className="text-[#071952] font-black">*</span>
+                      </label>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {(['Answered', 'No Answer', 'Not Reachable'] as const).map((status) => {
+                          const isSelected = callStatus === status;
+                          return (
+                            <button
+                              key={status}
+                              type="button"
+                              onClick={() => handleSelectCallStatus(status)}
+                              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#071952] text-white border border-[#071952] shadow-xs'
+                                  : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
+                              }`}
+                            >
+                              {status}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* RESPONSE (POSITIVE / NEGATIVE) — Shown when Answered */}
+                    {callStatus === 'Answered' && (
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
+                          RESPONSE
+                        </label>
+                        <div className="flex items-center gap-2">
                           <button
-                            key={status}
                             type="button"
-                            onClick={() => setCallStatus(status)}
+                            onClick={() => setResponseSentiment('Positive')}
                             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-[#071952] text-white border border-[#071952] shadow-xs'
-                                : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
+                              responseSentiment === 'Positive'
+                                ? 'bg-emerald-600 text-white border border-emerald-600 shadow-xs'
+                                : 'bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50'
                             }`}
                           >
-                            {status}
+                            Positive
                           </button>
-                        );
-                      })}
-                    </div>
+                          <button
+                            type="button"
+                            onClick={() => setResponseSentiment('Negative')}
+                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                              responseSentiment === 'Negative'
+                                ? 'bg-rose-600 text-white border border-rose-600 shadow-xs'
+                                : 'bg-white text-rose-800 border border-rose-300 hover:bg-rose-50'
+                            }`}
+                          >
+                            Negative
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-black/50">Select Positive or Negative.</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* NOTES & RESPONSE TIMER */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1 space-y-1">
+                  {/* ANSWERED-SPECIFIC FIELDS (SOURCE, DEMO STATUS, SERVICES, TIMER) */}
+                  {callStatus === 'Answered' && (
+                    <>
+                      {/* ROW 2: HOW DID YOU HEAR & DEMO STATUS */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
+                            HOW DID YOU HEAR ABOUT STYLEFLEET?
+                          </label>
+                          <select
+                            value={leadSource}
+                            onChange={(e) => setLeadSource(e.target.value)}
+                            className="w-full p-2.5 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer"
+                          >
+                            <option value="">Select source</option>
+                            <option value="Google Search / Website">Google Search / Website</option>
+                            <option value="Instagram / Social Media">Instagram / Social Media</option>
+                            <option value="Friend / Salon Referral">Friend / Salon Referral</option>
+                            <option value="Sales Executive Outreach">Sales Executive Outreach</option>
+                            <option value="WhatsApp / SMS">WhatsApp / SMS</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
+                            DEMO STATUS
+                          </label>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {(['WhatsApp Demo', 'Call Demo', 'No Demo'] as const).map((dm) => (
+                              <button
+                                key={dm}
+                                type="button"
+                                onClick={() => setDemoStatus(dm)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                                  demoStatus === dm
+                                    ? 'bg-[#071952] text-white border border-[#071952]'
+                                    : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
+                                }`}
+                              >
+                                {dm}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ROW 3: WHICH SERVICE ARE YOU DOING & RESPONSE TIMER */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                        <div className="sm:col-span-2 space-y-1.5">
+                          <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
+                            WHICH SERVICE ARE YOU DOING?
+                          </label>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {(['Hair & Styling', 'Spa & Facial', 'Bridal & Makeup', 'Full Unisex Salon', 'Other'] as const).map((srv) => (
+                              <button
+                                key={srv}
+                                type="button"
+                                onClick={() => setServiceType(srv)}
+                                className={`px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
+                                  serviceType === srv
+                                    ? 'bg-[#071952] text-white border border-[#071952]'
+                                    : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
+                                }`}
+                              >
+                                {srv}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-bold text-black uppercase tracking-wider block whitespace-nowrap">
+                            RESPONSE TIMER
+                          </label>
+                          <div className="w-full py-2 px-3 rounded-lg border border-[#071952]/30 bg-white text-center font-mono font-bold text-xs text-[#071952] shadow-2xs">
+                            {formatTimer(timerSeconds)}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ROW 4: NOTES & CUSTOMER FEEDBACK */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
+                            NOTES
+                          </label>
+                          <textarea
+                            rows={3}
+                            placeholder="Internal CRM notes..."
+                            value={responseNotes}
+                            onChange={(e) => setResponseNotes(e.target.value)}
+                            className="w-full p-2.5 text-xs rounded-lg border border-[#071952]/30 bg-white text-black placeholder-black/40 focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] resize-none"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
+                            CUSTOMER FEEDBACK
+                          </label>
+                          <textarea
+                            rows={3}
+                            placeholder="What did the customer say?"
+                            value={customerFeedback}
+                            onChange={(e) => setCustomerFeedback(e.target.value)}
+                            className="w-full p-2.5 text-xs rounded-lg border border-[#071952]/30 bg-white text-black placeholder-black/40 focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] resize-none"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* UNANSWERED FORM (NO ANSWER / NOT REACHABLE): ONLY NOTES */}
+                  {callStatus !== 'Answered' && (
+                    <div className="space-y-1">
                       <label className="text-[11px] font-bold text-black uppercase tracking-wider block">
                         NOTES
                       </label>
@@ -1420,16 +1629,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                         className="w-full p-2.5 text-xs rounded-lg border border-[#071952]/30 bg-white text-black placeholder-black/40 focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] resize-none"
                       />
                     </div>
-
-                    <div className="w-28 shrink-0 space-y-1">
-                      <label className="text-[11px] font-bold text-black uppercase tracking-wider block whitespace-nowrap">
-                        RESPONSE TIMER
-                      </label>
-                      <div className="w-full py-2 px-3 rounded-lg border border-[#071952]/30 bg-white text-center font-mono font-bold text-xs text-[#071952] shadow-2xs">
-                        {formatTimer(timerSeconds)}
-                      </div>
-                    </div>
-                  </div>
+                  )}
 
                   {/* RESPONSE DATE & REPORTED BY */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1452,7 +1652,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                       <select
                         value={reportedBy}
                         onChange={(e) => setReportedBy(e.target.value)}
-                        className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
+                        className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer"
                       >
                         <option value="Support">Support</option>
                         <option value="Admin">Admin</option>
