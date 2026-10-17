@@ -118,7 +118,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       autoComplete="off"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="info@textellar.com"
+                      placeholder="info@tecstellar.com"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm font-normal placeholder:text-slate-400 focus:outline-none focus:border-slate-400 transition-colors shadow-2xs"
                     />
                   </div>

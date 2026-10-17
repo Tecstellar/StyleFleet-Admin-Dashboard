@@ -139,10 +139,10 @@ export async function deleteCrmUserAccount(id: string): Promise<boolean> {
 }
 
 export const SUPER_ADMIN_ACCOUNT: CrmUserAccount = {
-  id: 'crm-super-admin-textellar',
-  name: 'Textellar Super Admin',
-  email: 'info@textellar.com',
-  password: 'textellar@123',
+  id: 'c707e078-28af-4bf3-bd7f-2ea5be24c958',
+  name: 'Tecstellar Super Admin',
+  email: 'info@tecstellar.com',
+  password: 'tecstellar@123',
   crm_role: 'admin',
   access_type: 'full',
   allowed_modules: ALL_AVAILABLE_MODULES.map((m) => m.id),
@@ -163,8 +163,8 @@ function getLocalCrmUserAccounts(): CrmUserAccount[] {
              !RANDOM_EMPLOYEE_NAMES.includes((u.email || '').trim().toLowerCase().split('@')[0])
     );
 
-    // Ensure Super Admin info@textellar.com is present
-    if (!filtered.some((u) => u.email.toLowerCase() === 'info@textellar.com')) {
+    // Ensure Super Admin info@tecstellar.com is present
+    if (!filtered.some((u) => u.email.toLowerCase() === 'info@tecstellar.com')) {
       filtered.unshift(SUPER_ADMIN_ACCOUNT);
     }
 
