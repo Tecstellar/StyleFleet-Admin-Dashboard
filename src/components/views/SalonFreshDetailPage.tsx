@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { Shop, Profile, Staff, Customer, Bill, Payment, Appointment } from '../../types/database';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 
 interface SalonFreshDetailPageProps {
@@ -84,6 +85,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   onBack,
   onRefresh,
 }) => {
+  const { user } = useAuth();
   const [services, setServices] = useState<SalonService[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
 
@@ -101,7 +103,13 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     const now = new Date();
     return now.toISOString().slice(0, 16);
   });
-  const [reportedBy, setReportedBy] = useState('Support');
+  const [reportedBy, setReportedBy] = useState(() => user?.name || user?.email || 'Support');
+
+  useEffect(() => {
+    if (user?.name && (reportedBy === 'Support' || !reportedBy)) {
+      setReportedBy(user.name);
+    }
+  }, [user]);
   const [scheduleFollowUp, setScheduleFollowUp] = useState(true);
   const [followUpDate, setFollowUpDate] = useState(() => {
     const tomorrow = new Date();
@@ -531,16 +539,23 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     // Database safe follow-up date (strictly YYYY-MM-DD or null for PostgreSQL DATE type)
     const dbFollowUpDate = scheduleFollowUp && followUpDate ? followUpDate.slice(0, 10) : null;
 
-    // Rich notes capturing call details, timer, customer feedback, and follow-up
+    const currentEmployeeName = reportedBy.trim() || user?.name || user?.email || 'Support';
+    const currentEmployeeEmail = user?.email || '';
+
+    // Rich notes capturing call details, employee, email, timer, customer feedback, and follow-up
     const notesParts: string[] = [];
     if (callStatus === 'Answered') {
       notesParts.push(`[${responseSentiment.toUpperCase()}]`);
+      notesParts.push(`Employee: ${currentEmployeeName}`);
+      if (currentEmployeeEmail) notesParts.push(`Email: ${currentEmployeeEmail}`);
       if (leadSource) notesParts.push(`Source: ${leadSource}`);
       if (demoStatus) notesParts.push(`Demo: ${demoStatus}`);
       if (serviceType) notesParts.push(`Service: ${serviceType}`);
       if (customerFeedback.trim()) notesParts.push(`Feedback: "${customerFeedback.trim()}"`);
     } else {
       notesParts.push(`[NEGATIVE - ${callStatus.toUpperCase()}]`);
+      notesParts.push(`Employee: ${currentEmployeeName}`);
+      if (currentEmployeeEmail) notesParts.push(`Email: ${currentEmployeeEmail}`);
     }
 
     if (responseNotes.trim()) {
@@ -559,14 +574,14 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       date: responseDate,
       type: callStatus,
       outcome: responseSentiment,
-      contactPerson: reportedBy,
+      contactPerson: currentEmployeeName,
       notes: combinedNotes,
       customerFeedback: customerFeedback.trim() || undefined,
       leadSource: leadSource || undefined,
       demoStatus: demoStatus || undefined,
       serviceType: serviceType || undefined,
       followUpDate: followUpCombined,
-      recordedBy: reportedBy,
+      recordedBy: currentEmployeeName,
       duration: durationStr,
       priority: followUpPriority,
     };
@@ -581,10 +596,10 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             date: new Date(responseDate).toISOString(),
             type: callStatus,
             outcome: responseSentiment,
-            contact_person: reportedBy,
+            contact_person: currentEmployeeName,
             notes: combinedNotes,
             follow_up_date: dbFollowUpDate,
-            recorded_by: reportedBy,
+            recorded_by: currentEmployeeName,
           },
         ])
         .select()
@@ -595,7 +610,7 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       }
 
       // 2. Also write to support_messages as fail-safe fallback
-      const formattedNote = `[Admin Call Note | ${callStatus} | ${responseSentiment} | By: ${reportedBy}${durationStr ? ` | Timer: ${durationStr}` : ''}] ${combinedNotes}`;
+      const formattedNote = `[Admin Call Note | ${callStatus} | ${responseSentiment} | By: ${currentEmployeeName}${durationStr ? ` | Timer: ${durationStr}` : ''}] ${combinedNotes}`;
       await supabase.from('support_messages').insert([
         {
           shop_id: shop.id,
@@ -763,11 +778,11 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border font-mono shadow-2xs ${
                         callResponses[0].outcome === 'Positive'
-                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                          : 'bg-rose-100 text-rose-800 border-rose-300'
+                          ? 'bg-[#071952] text-white border-[#071952]'
+                          : 'bg-[#F8F3F0] text-black border-[#071952]/30'
                       }`}
                     >
-                      {callResponses[0].outcome === 'Positive' ? '✓ Positive' : '✗ Negative'}
+                      {callResponses[0].outcome === 'Positive' ? 'Positive' : 'Negative'}
                     </span>
                   )}
                 </div>
@@ -808,11 +823,11 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
               <div
                 className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono border shadow-2xs ${
                   callResponses[0].outcome === 'Positive'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                    : 'bg-rose-50 text-rose-800 border-rose-300'
+                    ? 'bg-[#071952] text-white border-[#071952]'
+                    : 'bg-[#F8F3F0] text-black border-[#071952]/30'
                 }`}
               >
-                <span>{callResponses[0].outcome === 'Positive' ? '✓ Positive Customer' : '✗ Negative Customer'}</span>
+                <span>{callResponses[0].outcome === 'Positive' ? 'Positive Customer' : 'Negative Customer'}</span>
               </div>
             )}
             <span className="text-[11px] font-mono text-black/70">
@@ -1062,8 +1077,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono ${
                         cr.outcome === 'Positive'
-                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                          : 'bg-rose-100 text-rose-800 border border-rose-300'
+                          ? 'bg-[#071952] text-white border border-[#071952]'
+                          : 'bg-[#F8F3F0] text-black border border-[#071952]/30'
                       }`}
                     >
                       {cr.outcome || (cr.type === 'Answered' ? 'Positive' : 'Negative')}
@@ -1436,8 +1451,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                 cr.outcome === 'Positive'
-                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                                  : 'bg-rose-100 text-rose-800 border border-rose-300'
+                                  ? 'bg-[#071952] text-white border border-[#071952]'
+                                  : 'bg-[#F8F3F0] text-black border border-[#071952]/30'
                               }`}
                             >
                               {cr.outcome || (cr.type === 'Answered' ? 'Positive' : 'Negative')}
@@ -1502,8 +1517,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                             onClick={() => setResponseSentiment('Positive')}
                             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                               responseSentiment === 'Positive'
-                                ? 'bg-emerald-600 text-white border border-emerald-600 shadow-xs'
-                                : 'bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50'
+                                ? 'bg-[#071952] text-white border border-[#071952] shadow-xs'
+                                : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
                             }`}
                           >
                             Positive
@@ -1513,8 +1528,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                             onClick={() => setResponseSentiment('Negative')}
                             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                               responseSentiment === 'Negative'
-                                ? 'bg-rose-600 text-white border border-rose-600 shadow-xs'
-                                : 'bg-white text-rose-800 border border-rose-300 hover:bg-rose-50'
+                                ? 'bg-[#071952] text-white border border-[#071952] shadow-xs'
+                                : 'bg-white text-black border border-[#071952]/30 hover:border-[#071952]'
                             }`}
                           >
                             Negative
@@ -1674,8 +1689,13 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                       <select
                         value={reportedBy}
                         onChange={(e) => setReportedBy(e.target.value)}
-                        className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer"
+                        className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-white text-black focus:outline-none focus:border-[#071952] cursor-pointer font-medium"
                       >
+                        {user?.name && <option value={user.name}>{user.name} (You)</option>}
+                        <option value="Sankarajothi">Sankarajothi</option>
+                        <option value="Kesavan">Kesavan</option>
+                        <option value="Jagadeswari">Jagadeswari</option>
+                        <option value="Kamalesh">Kamalesh</option>
                         <option value="Support">Support</option>
                         <option value="Admin">Admin</option>
                         <option value="Sales">Sales</option>

@@ -514,8 +514,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'positive_response' ? 'all' : 'positive_response')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'positive_response'
-                ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
-                : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400'
+                ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Positive Response <span className="font-mono ml-1 font-bold">{pillCounts.positiveResponse}</span>
@@ -526,8 +526,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onClick={() => setActivePillFilter(activePillFilter === 'negative_response' ? 'all' : 'negative_response')}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
               activePillFilter === 'negative_response'
-                ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
-                : 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100 hover:border-rose-400'
+                ? 'bg-[#071952] text-white border-[#071952] shadow-xs'
+                : 'bg-white text-black border-[#071952]/25 hover:bg-[#F8F3F0]/50 hover:border-[#071952]/60'
             }`}
           >
             Negative Response <span className="font-mono ml-1 font-bold">{pillCounts.negativeResponse}</span>
@@ -917,11 +917,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       {/* 8b. RESPONSE (Positive / Negative pill) */}
                       <td className="px-3 py-2.5 whitespace-nowrap text-center">
                         {s.latestOutcome === 'Positive' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono shadow-2xs">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#071952] text-white border border-[#071952] font-mono shadow-2xs">
                             Positive
                           </span>
                         ) : s.latestOutcome === 'Negative' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 font-mono shadow-2xs">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F8F3F0] text-black border border-[#071952]/30 font-mono shadow-2xs">
                             Negative
                           </span>
                         ) : (

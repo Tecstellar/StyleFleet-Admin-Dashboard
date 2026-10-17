@@ -672,6 +672,7 @@ export const App: React.FC = () => {
               customers={customers}
               shops={shops}
               bills={bills}
+              profiles={profiles}
               loading={loading}
               onSelectSalon={handleSelectSalonDrilldown}
             />
