@@ -27,6 +27,7 @@ import {
   Tag,
   ChevronRight,
   Trash2,
+  MessageCircle,
 } from 'lucide-react';
 import { Shop, Profile, Staff, Customer, Bill, Payment, Appointment } from '../../types/database';
 import { supabase } from '../../services/supabase';
@@ -63,6 +64,8 @@ interface CallResponse {
   notes: string;
   followUpDate?: string;
   recordedBy: string;
+  duration?: string;
+  priority?: string;
 }
 
 export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
@@ -80,18 +83,46 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   const [services, setServices] = useState<SalonService[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
 
-  // Add Response / Call Notes Modal State
+  // Add Response Modal State (styled according to operations console response form)
   const [isAddResponseOpen, setIsAddResponseOpen] = useState(false);
+  const [callStatus, setCallStatus] = useState<'Answered' | 'No Answer' | 'Not Reachable'>('Answered');
+  const [responseNotes, setResponseNotes] = useState('');
+  const [timerSeconds, setTimerSeconds] = useState(15);
   const [responseDate, setResponseDate] = useState(() => {
     const now = new Date();
     return now.toISOString().slice(0, 16);
   });
-  const [responseType, setResponseType] = useState('Phone Call');
-  const [responseOutcome, setResponseOutcome] = useState('Connected & Discussed');
-  const [responseContact, setResponseContact] = useState('');
-  const [responseNotes, setResponseNotes] = useState('');
-  const [responseFollowUp, setResponseFollowUp] = useState('');
+  const [reportedBy, setReportedBy] = useState('Support');
+  const [scheduleFollowUp, setScheduleFollowUp] = useState(true);
+  const [followUpDate, setFollowUpDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().slice(0, 10);
+  });
+  const [followUpHour, setFollowUpHour] = useState('10 AM');
+  const [followUpMin, setFollowUpMin] = useState('00');
+  const [followUpPriority, setFollowUpPriority] = useState('Medium');
   const [isSavingResponse, setIsSavingResponse] = useState(false);
+
+  // Timer: count seconds when modal is open
+  useEffect(() => {
+    let interval: any;
+    if (isAddResponseOpen) {
+      setTimerSeconds(0);
+      interval = setInterval(() => {
+        setTimerSeconds((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isAddResponseOpen]);
+
+  const formatTimer = (totalSeconds: number) => {
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   // Call Responses saved in persistent local storage and synced with database
   const storageKey = `stylefleet_call_responses_${shop.id}`;
@@ -454,18 +485,24 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
   // Handle Saving New Call Response / Notes
   const handleSaveResponse = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!responseNotes.trim()) return;
 
     setIsSavingResponse(true);
+    const durationStr = formatTimer(timerSeconds);
+    const followUpCombined = scheduleFollowUp && followUpDate
+      ? `${followUpDate}${followUpHour ? ` ${followUpHour}` : ''}${followUpMin ? `:${followUpMin}` : ''} [${followUpPriority}]`.trim()
+      : undefined;
+
     const newEntry: CallResponse = {
       id: `resp-${Date.now()}`,
       date: responseDate,
-      type: responseType,
-      outcome: responseOutcome,
-      contactPerson: responseContact || ownerProfile?.full_name || shop.name,
-      notes: responseNotes.trim(),
-      followUpDate: responseFollowUp || undefined,
-      recordedBy: 'Admin Team',
+      type: callStatus,
+      outcome: callStatus,
+      contactPerson: reportedBy,
+      notes: responseNotes.trim() || `Call Status: ${callStatus}`,
+      followUpDate: followUpCombined,
+      recordedBy: reportedBy,
+      duration: durationStr,
+      priority: followUpPriority,
     };
 
     try {
@@ -476,12 +513,14 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
           {
             shop_id: shop.id,
             date: new Date(responseDate).toISOString(),
-            type: responseType,
-            outcome: responseOutcome,
-            contact_person: responseContact || ownerProfile?.full_name || shop.name,
-            notes: responseNotes.trim(),
-            follow_up_date: responseFollowUp || null,
-            recorded_by: 'Admin Team',
+            type: callStatus,
+            outcome: callStatus,
+            contact_person: reportedBy,
+            notes: responseNotes.trim()
+              ? `${responseNotes.trim()} (Duration: ${durationStr})`
+              : `Call Status: ${callStatus} (Duration: ${durationStr})`,
+            follow_up_date: followUpCombined || null,
+            recorded_by: reportedBy,
           },
         ])
         .select()
@@ -492,12 +531,12 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
       }
 
       // 2. Also write to support_messages as fail-safe fallback
-      const formattedNote = `[Admin Call Note | ${responseType} - ${responseOutcome}] ${responseNotes.trim()}${responseFollowUp ? ` | Follow-up: ${responseFollowUp}` : ''}`;
+      const formattedNote = `[Admin Call Note | ${callStatus} | By: ${reportedBy} | Timer: ${durationStr}] ${responseNotes.trim()}${followUpCombined ? ` | Follow-up: ${followUpCombined}` : ''}`;
       await supabase.from('support_messages').insert([
         {
           shop_id: shop.id,
           message: formattedNote,
-          contact_info: responseContact || ownerProfile?.full_name || shop.name,
+          contact_info: ownerProfile?.phone || shop.phone || shop.name,
           status: 'open',
           created_at: new Date(responseDate).toISOString(),
         },
@@ -510,7 +549,6 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
     setIsSavingResponse(false);
     setIsAddResponseOpen(false);
     setResponseNotes('');
-    setResponseFollowUp('');
   };
 
   // Delete Call Response
@@ -601,14 +639,11 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           {/* Add Response Button */}
           <button
-            onClick={() => {
-              setResponseContact(ownerProfile?.full_name || shop.name);
-              setIsAddResponseOpen(true);
-            }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            onClick={() => setIsAddResponseOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#00a389] hover:bg-[#008f78] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
             <PhoneCall className="w-3.5 h-3.5 text-white" />
-            <span>+ Add Response</span>
+            <span>Add Response</span>
           </button>
 
           {/* Report Builder Button */}
@@ -910,11 +945,8 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
             </h3>
           </div>
           <button
-            onClick={() => {
-              setResponseContact(ownerProfile?.full_name || shop.name);
-              setIsAddResponseOpen(true);
-            }}
-            className="inline-flex items-center gap-1 px-3 py-1 bg-[#071952] hover:bg-[#0b2575] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+            onClick={() => setIsAddResponseOpen(true)}
+            className="inline-flex items-center gap-1 px-3 py-1 bg-[#00a389] hover:bg-[#008f78] text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>Add Response</span>
@@ -1235,133 +1267,292 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
         </div>
       </div>
 
-      {/* 5. ADD RESPONSE / CALL NOTE MODAL */}
-      {isAddResponseOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-[#F8F3F0] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#071952]/20">
-            <div className="flex items-center justify-between pb-3 border-b border-[#071952]/15 mb-4">
-              <div>
-                <h3 className="text-base font-bold text-black">Record Call Response / Note</h3>
-                <p className="text-xs text-black/60">
-                  Log your conversation with {shop.name} owner ({ownerProfile?.phone || shop.phone || 'No phone'})
-                </p>
-              </div>
-              <button
-                onClick={() => setIsAddResponseOpen(false)}
-                className="p-1 rounded-lg text-black/40 hover:text-black transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* 5. ADD RESPONSE / CALL NOTE MODAL (MATCHING OPERATIONS CONSOLE UI) */}
+      {isAddResponseOpen && (() => {
+        const displayPhone = ownerProfile?.phone || shop.phone || '';
+        const cleanPhoneDigits = displayPhone.replace(/\D/g, '').slice(-10);
+        const displayId = `TS${shop.id.replace(/[^0-9]/g, '').slice(0, 10) || shop.id.slice(0, 8).toUpperCase()}`;
 
-            <form onSubmit={handleSaveResponse} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Date & Time */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-black/80 font-mono">Date &amp; Time *</label>
-                  <input
-                    type="datetime-local"
-                    required
-                    value={responseDate}
-                    onChange={(e) => setResponseDate(e.target.value)}
-                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] font-mono"
-                  />
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+            <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-gray-200 overflow-hidden flex flex-col">
+              {/* Modal Header */}
+              <div className="bg-[#00a389] px-6 py-3.5 flex items-center justify-between">
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                    Add response
+                  </h3>
+                  <div className="flex items-center gap-2 text-white/95 text-xs font-semibold mt-0.5 flex-wrap">
+                    <span>{shop.name.toUpperCase()}</span>
+                    <span className="opacity-75">•</span>
+                    <span>{displayPhone || 'No phone'}</span>
+                    {cleanPhoneDigits && (
+                      <a
+                        href={`https://wa.me/91${cleanPhoneDigits}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500/80 hover:bg-emerald-600 text-white transition-colors"
+                        title="Chat on WhatsApp"
+                      >
+                        <MessageCircle className="w-3 h-3 fill-white text-white" />
+                      </a>
+                    )}
+                    <span className="opacity-75">•</span>
+                    <span className="font-mono text-[11px] opacity-90">
+                      {displayId}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Interaction Type */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-black/80 font-mono">Interaction Type *</label>
-                  <select
-                    value={responseType}
-                    onChange={(e) => setResponseType(e.target.value)}
-                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
-                  >
-                    <option value="Phone Call">Phone Call</option>
-                    <option value="WhatsApp Chat">WhatsApp Chat</option>
-                    <option value="In-Person Visit">In-Person Visit</option>
-                    <option value="Follow-Up Call">Follow-Up Call</option>
-                    <option value="Email">Email</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Call Outcome */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-black/80 font-mono">Call Outcome *</label>
-                  <select
-                    value={responseOutcome}
-                    onChange={(e) => setResponseOutcome(e.target.value)}
-                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] cursor-pointer"
-                  >
-                    <option value="Connected & Discussed">Connected &amp; Discussed</option>
-                    <option value="Interested in Pro Plan">Interested in Pro Plan</option>
-                    <option value="Requested Follow-Up">Requested Follow-Up</option>
-                    <option value="Support / Help Requested">Support / Help Requested</option>
-                    <option value="Feature Request">Feature Request</option>
-                    <option value="Did Not Answer">Did Not Answer / Busy</option>
-                    <option value="General Check-In">General Check-In</option>
-                  </select>
-                </div>
-
-                {/* Contact Person */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-black/80 font-mono">Spoke With</label>
-                  <input
-                    type="text"
-                    value={responseContact}
-                    onChange={(e) => setResponseContact(e.target.value)}
-                    placeholder="Owner / Manager name"
-                    className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
-                  />
-                </div>
-              </div>
-
-              {/* Discussion Notes */}
-              <div className="space-y-1">
-                <label className="font-semibold text-black/80 font-mono">Discussion Notes &amp; Feedback *</label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Summarize what was discussed during the call with the owner..."
-                  value={responseNotes}
-                  onChange={(e) => setResponseNotes(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952]"
-                />
-              </div>
-
-              {/* Optional Next Follow-Up Date */}
-              <div className="space-y-1">
-                <label className="font-semibold text-black/80 font-mono">Next Follow-Up Date (Optional)</label>
-                <input
-                  type="date"
-                  value={responseFollowUp}
-                  onChange={(e) => setResponseFollowUp(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-[#071952]/30 bg-[#F8F3F0] text-black focus:outline-none focus:border-[#071952] focus:ring-1 focus:ring-[#071952] font-mono cursor-pointer"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-3 border-t border-[#071952]/15 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddResponseOpen(false)}
-                  className="px-3.5 py-1.5 rounded-lg border border-[#071952]/30 hover:bg-[#071952]/10 text-black/70 font-medium transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
+                  title="Close"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSavingResponse}
-                  className="px-4 py-1.5 rounded-lg bg-[#071952] hover:bg-[#0b2575] text-white font-semibold transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  {isSavingResponse ? 'Saving...' : 'Save Response'}
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-            </form>
+
+              {/* Modal Body: Two Columns */}
+              <div className="p-6 flex flex-col md:flex-row gap-6 bg-white text-xs">
+                {/* Left Column: Preview */}
+                <div className="w-full md:w-56 shrink-0 flex flex-col">
+                  <label className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2 block">
+                    Preview
+                  </label>
+                  <div className="flex-1 bg-white rounded-xl border border-gray-200 p-3.5 min-h-[280px] max-h-[380px] overflow-y-auto flex flex-col justify-start space-y-3">
+                    {callResponses.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center my-auto">
+                        No previous responses yet.
+                      </p>
+                    ) : (
+                      callResponses.slice(0, 5).map((cr) => (
+                        <div
+                          key={cr.id}
+                          className="p-2.5 rounded-lg border border-gray-100 bg-gray-50 text-xs space-y-1.5"
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                cr.type === 'Answered'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : cr.type === 'No Answer'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-rose-100 text-rose-800'
+                              }`}
+                            >
+                              {cr.type}
+                            </span>
+                            <span className="text-[10px] text-gray-500 font-mono">
+                              {new Date(cr.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-700 leading-snug line-clamp-3">
+                            {cr.notes}
+                          </p>
+                          <div className="text-[10px] text-gray-500 flex items-center justify-between">
+                            <span>By {cr.recordedBy || 'Support'}</span>
+                            {cr.duration && <span>⏱ {cr.duration}</span>}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Column: Form Fields */}
+                <form onSubmit={handleSaveResponse} className="flex-1 space-y-4">
+                  {/* CALL STATUS * */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1">
+                      <span>CALL STATUS</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {(['Answered', 'No Answer', 'Not Reachable'] as const).map((status) => {
+                        const isSelected = callStatus === status;
+                        return (
+                          <button
+                            key={status}
+                            type="button"
+                            onClick={() => setCallStatus(status)}
+                            className={`px-4 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#00a389] text-white border border-[#00a389] shadow-xs'
+                                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* NOTES & RESPONSE TIMER */}
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 space-y-1">
+                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                        NOTES
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="Optional notes"
+                        value={responseNotes}
+                        onChange={(e) => setResponseNotes(e.target.value)}
+                        className="w-full p-2.5 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] resize-none"
+                      />
+                    </div>
+
+                    <div className="w-28 shrink-0 space-y-1">
+                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block whitespace-nowrap">
+                        RESPONSE TIMER
+                      </label>
+                      <div className="w-full py-2 px-3 rounded-lg border border-gray-300 bg-gray-50 text-center font-mono font-bold text-xs text-gray-800 shadow-2xs">
+                        {formatTimer(timerSeconds)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RESPONSE DATE & REPORTED BY */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                        RESPONSE DATE
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={responseDate}
+                        onChange={(e) => setResponseDate(e.target.value)}
+                        className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                        REPORTED BY
+                      </label>
+                      <select
+                        value={reportedBy}
+                        onChange={(e) => setReportedBy(e.target.value)}
+                        className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] cursor-pointer"
+                      >
+                        <option value="Support">Support</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Founder">Founder</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* SCHEDULE FOLLOW-UP SECTION */}
+                  <div className="rounded-xl border border-gray-200 bg-gray-50/70 p-3.5 space-y-3">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={scheduleFollowUp}
+                        onChange={(e) => setScheduleFollowUp(e.target.checked)}
+                        className="w-4 h-4 rounded text-[#00a389] accent-[#00a389] focus:ring-[#00a389] cursor-pointer"
+                      />
+                      <span className="text-xs font-bold text-gray-800">Schedule follow-up</span>
+                    </label>
+
+                    {scheduleFollowUp && (
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-1">
+                        <div className="sm:col-span-5 space-y-1">
+                          <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">
+                            FOLLOW-UP DATE
+                          </label>
+                          <input
+                            type="date"
+                            value={followUpDate}
+                            onChange={(e) => setFollowUpDate(e.target.value)}
+                            className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] focus:ring-1 focus:ring-[#00a389] cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-4 space-y-1">
+                          <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">
+                            TIME
+                          </label>
+                          <div className="flex items-center gap-1.5">
+                            <select
+                              value={followUpHour}
+                              onChange={(e) => setFollowUpHour(e.target.value)}
+                              className="flex-1 p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] cursor-pointer"
+                            >
+                              <option value="">Hour</option>
+                              <option value="09 AM">09 AM</option>
+                              <option value="10 AM">10 AM</option>
+                              <option value="11 AM">11 AM</option>
+                              <option value="12 PM">12 PM</option>
+                              <option value="01 PM">01 PM</option>
+                              <option value="02 PM">02 PM</option>
+                              <option value="03 PM">03 PM</option>
+                              <option value="04 PM">04 PM</option>
+                              <option value="05 PM">05 PM</option>
+                              <option value="06 PM">06 PM</option>
+                              <option value="07 PM">07 PM</option>
+                              <option value="08 PM">08 PM</option>
+                            </select>
+                            <select
+                              value={followUpMin}
+                              onChange={(e) => setFollowUpMin(e.target.value)}
+                              className="w-16 p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] cursor-pointer"
+                            >
+                              <option value="">Min</option>
+                              <option value="00">00</option>
+                              <option value="15">15</option>
+                              <option value="30">30</option>
+                              <option value="45">45</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="sm:col-span-3 space-y-1">
+                          <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">
+                            PRIORITY
+                          </label>
+                          <select
+                            value={followUpPriority}
+                            onChange={(e) => setFollowUpPriority(e.target.value)}
+                            className="w-full p-2 text-xs rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-[#00a389] cursor-pointer"
+                          >
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Urgent">Urgent</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* FOOTER ACTIONS */}
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddResponseOpen(false)}
+                      className="px-5 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingResponse}
+                      className="px-6 py-2 rounded-lg text-xs font-bold text-white bg-[#00a389] hover:bg-[#008f78] shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {isSavingResponse ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
