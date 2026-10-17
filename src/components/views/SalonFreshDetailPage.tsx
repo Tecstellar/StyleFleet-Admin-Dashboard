@@ -759,6 +759,17 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
                       Free Plan
                     </span>
                   )}
+                  {callResponses.length > 0 && (
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border font-mono shadow-2xs ${
+                        callResponses[0].outcome === 'Positive'
+                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                          : 'bg-rose-100 text-rose-800 border-rose-300'
+                      }`}
+                    >
+                      {callResponses[0].outcome === 'Positive' ? '✓ Positive' : '✗ Negative'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-xs text-black/70 mt-1 flex-wrap">
                   <span className="inline-flex items-center gap-1 font-medium">
@@ -793,6 +804,17 @@ export const SalonFreshDetailPage: React.FC<SalonFreshDetailPageProps> = ({
               <CheckCircle2 className="w-3.5 h-3.5 text-white" />
               <span>{isSubscriber ? 'PRO SUBSCRIBER' : 'FREE TIER (100 LIMIT)'}</span>
             </div>
+            {callResponses.length > 0 && (
+              <div
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono border shadow-2xs ${
+                  callResponses[0].outcome === 'Positive'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    : 'bg-rose-50 text-rose-800 border-rose-300'
+                }`}
+              >
+                <span>{callResponses[0].outcome === 'Positive' ? '✓ Positive Customer' : '✗ Negative Customer'}</span>
+              </div>
+            )}
             <span className="text-[11px] font-mono text-black/70">
               GST: {shop.gstin ? shop.gstin : 'Not Registered'}
             </span>

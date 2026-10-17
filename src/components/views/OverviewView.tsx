@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   RotateCcw,
   Search,
@@ -17,6 +17,7 @@ import { ExportButton } from '../common/ExportButton';
 import { useDateFilter } from '../../context/DateFilterContext';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 import { formatDate, filterByDateRange } from '../../utils/dateUtils';
+import { supabase } from '../../services/supabase';
 import {
   Shop,
   Profile,
@@ -49,6 +50,8 @@ interface OverviewViewProps {
 
 type PillFilterType =
   | 'all'
+  | 'positive_response'
+  | 'negative_response'
   | 'active'
   | 'inactive'
   | 'free_plan'
@@ -94,6 +97,74 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [viewingFreshSalon, setViewingFreshSalon] = useState<Shop | null>(null);
+  const [shopResponses, setShopResponses] = useState<Record<string, { outcome: 'Positive' | 'Negative'; date: string; notes: string }>>({});
+
+  // Load latest responses from Supabase admin_responses and localStorage cache
+  useEffect(() => {
+    let isMounted = true;
+    async function loadResponses() {
+      try {
+        const { data, error } = await supabase
+          .from('admin_responses')
+          .select('shop_id, outcome, type, date, notes, created_at')
+          .order('date', { ascending: false });
+
+        const map: Record<string, { outcome: 'Positive' | 'Negative'; date: string; notes: string }> = {};
+
+        if (!error && data && data.length > 0) {
+          data.forEach((row: any) => {
+            if (row.shop_id && !map[row.shop_id]) {
+              const isAns = (row.type || '').toLowerCase().includes('answer') && !(row.type || '').toLowerCase().includes('no');
+              const defaultOutcome = isAns ? 'Positive' : 'Negative';
+              const rawOutcome = (row.outcome || '').trim();
+              const outcome = rawOutcome.toLowerCase().includes('pos')
+                ? 'Positive'
+                : rawOutcome.toLowerCase().includes('neg')
+                ? 'Negative'
+                : defaultOutcome;
+
+              map[row.shop_id] = {
+                outcome,
+                date: row.date || row.created_at,
+                notes: row.notes || '',
+              };
+            }
+          });
+        }
+
+        // Also check localStorage for local responses cache
+        shops.forEach((s) => {
+          if (!map[s.id]) {
+            try {
+              const saved = localStorage.getItem(`stylefleet_call_responses_${s.id}`);
+              if (saved) {
+                const list = JSON.parse(saved);
+                if (list && list.length > 0) {
+                  const first = list[0];
+                  map[s.id] = {
+                    outcome: first.outcome === 'Positive' ? 'Positive' : 'Negative',
+                    date: first.date,
+                    notes: first.notes || '',
+                  };
+                }
+              }
+            } catch {}
+          }
+        });
+
+        if (isMounted) {
+          setShopResponses(map);
+        }
+      } catch (err) {
+        console.warn('Error fetching shop responses in OverviewView:', err);
+      }
+    }
+
+    loadResponses();
+    return () => {
+      isMounted = false;
+    };
+  }, [shops]);
 
   // Filter scoped data by selected date range
   const scopedBills = useMemo(() => {
@@ -181,6 +252,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       const ownerName = owner?.full_name?.trim() || 'Salon Owner';
       const ownerPhone = owner?.phone || s.phone || '—';
 
+      // Call response status (Positive / Negative / None)
+      const resp = shopResponses[s.id];
+      const latestOutcome: 'Positive' | 'Negative' | 'none' = resp ? resp.outcome : 'none';
+      const latestResponseDate = resp ? resp.date : null;
+
       return {
         ...s,
         shopObj: s,
@@ -199,13 +275,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         totalCustomerCount: totalSalonCustomers.length,
         ownerName,
         ownerPhone,
+        latestOutcome,
+        latestResponseDate,
       };
     });
-  }, [shops, scopedBills, scopedPayments, staff, scopedCustomers, customers, bills, profiles, subscriptions, payments]);
+  }, [shops, scopedBills, scopedPayments, staff, scopedCustomers, customers, bills, profiles, subscriptions, payments, shopResponses]);
 
   // Derived Pill Counts for all buttons (strictly database-driven)
   const pillCounts = useMemo(() => {
     const total = salonPerformance.length;
+    const positiveResponse = salonPerformance.filter((s) => s.latestOutcome === 'Positive').length;
+    const negativeResponse = salonPerformance.filter((s) => s.latestOutcome === 'Negative').length;
     const active = salonPerformance.filter((s) => s.lifetimeSalesCount > 0).length;
     const inactive = salonPerformance.filter((s) => s.lifetimeSalesCount === 0).length;
     const freePlan = salonPerformance.filter((s) => !s.isPro).length;
@@ -221,6 +301,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
     return {
       total,
+      positiveResponse,
+      negativeResponse,
       active,
       inactive,
       freePlan,
@@ -258,7 +340,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
       // 3. Pill Filter Match
       let matchesPill = true;
-      if (activePillFilter === 'active') matchesPill = s.lifetimeSalesCount > 0;
+      if (activePillFilter === 'positive_response') matchesPill = s.latestOutcome === 'Positive';
+      else if (activePillFilter === 'negative_response') matchesPill = s.latestOutcome === 'Negative';
+      else if (activePillFilter === 'active') matchesPill = s.lifetimeSalesCount > 0;
       else if (activePillFilter === 'inactive') matchesPill = s.lifetimeSalesCount === 0;
       else if (activePillFilter === 'free_plan') matchesPill = !s.isPro;
       else if (activePillFilter === 'pro_plan') matchesPill = s.isPro;
@@ -423,6 +507,30 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             }`}
           >
             Registered <span className="font-mono ml-1">{pillCounts.total}</span>
+          </button>
+
+          {/* Positive Response Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'positive_response' ? 'all' : 'positive_response')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'positive_response'
+                ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400'
+            }`}
+          >
+            Positive Response <span className="font-mono ml-1 font-bold">{pillCounts.positiveResponse}</span>
+          </button>
+
+          {/* Negative Response Pill */}
+          <button
+            onClick={() => setActivePillFilter(activePillFilter === 'negative_response' ? 'all' : 'negative_response')}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              activePillFilter === 'negative_response'
+                ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
+                : 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100 hover:border-rose-400'
+            }`}
+          >
+            Negative Response <span className="font-mono ml-1 font-bold">{pillCounts.negativeResponse}</span>
           </button>
 
           {/* Active Pill */}
@@ -679,6 +787,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 <th className="px-3 py-2.5 text-center">PLATFORM</th>
                 <th className="px-3 py-2.5 text-center">ACTIVITY</th>
                 <th className="px-3 py-2.5 text-center">PLAN</th>
+                <th className="px-3 py-2.5 text-center">RESPONSE</th>
                 <th className="px-3 py-2.5 min-w-[130px]">FREE 100 SALES QUOTA</th>
                 <th
                   onClick={() => handleSort('lifetimeSalesCount')}
@@ -704,7 +813,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <tbody className="divide-y divide-[#F8F3F0]/70 font-sans text-black">
               {displayedSalons.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="px-4 py-12 text-center text-xs text-neutral-400">
+                  <td colSpan={13} className="px-4 py-12 text-center text-xs text-neutral-400">
                     No shops match your active filters. Click "Reset Filters" to view all.
                   </td>
                 </tr>
@@ -802,6 +911,21 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#F8F3F0] text-black border border-[#071952]/25 font-mono">
                             FREE
                           </span>
+                        )}
+                      </td>
+
+                      {/* 8b. RESPONSE (Positive / Negative pill) */}
+                      <td className="px-3 py-2.5 whitespace-nowrap text-center">
+                        {s.latestOutcome === 'Positive' ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono shadow-2xs">
+                            Positive
+                          </span>
+                        ) : s.latestOutcome === 'Negative' ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 font-mono shadow-2xs">
+                            Negative
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-neutral-400 font-mono">—</span>
                         )}
                       </td>
 
