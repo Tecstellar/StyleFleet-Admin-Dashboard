@@ -544,7 +544,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         shop: s,
         id: s.id,
         name: s.name,
-        city: s.city || 'Tamil Nadu',
+        city: s.city || 'Coimbatore',
         tier,
         planName,
         tierBadge,
@@ -1109,7 +1109,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </tr>
                 ) : (
                   paginatedBills.map((b) => {
-                    const shop = b.shop || shops.find((s) => s.id === b.shop_id);
+                    const fullShop = shops.find((s) => s.id === b.shop_id);
+                    const shopName = b.shop?.name || fullShop?.name || 'Salon';
+                    const shopCity = b.shop?.city || fullShop?.city || 'Coimbatore';
                     const payment = paymentByBillId.get(b.id);
                     return (
                       <tr key={b.id} className="hover:bg-slate-50 transition-colors">
@@ -1118,8 +1120,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         </td>
 
                         <td className="px-4 py-3.5">
-                          <span className="font-semibold text-slate-900 block">{shop?.name || 'Salon'}</span>
-                          <span className="text-[11px] text-slate-500">{shop?.city || 'Kalugumalai'}</span>
+                          <span className="font-semibold text-slate-900 block">{shopName}</span>
+                          <span className="text-[11px] text-slate-500">{shopCity}</span>
                         </td>
 
                         <td className="px-4 py-3.5">

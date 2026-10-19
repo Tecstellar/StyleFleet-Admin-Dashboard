@@ -5,7 +5,7 @@ export async function fetchBills(): Promise<{ data: Bill[]; error: string | null
   try {
     const { data, error } = await supabase
       .from('bills')
-      .select('*, shop:shops(id, name), customer:customers(id, name, phone), bill_items(id, quantity, service_name_snapshot, line_total_minor)')
+      .select('*, shop:shops(id, name, city, address, phone), customer:customers(id, name, phone), bill_items(id, quantity, service_name_snapshot, line_total_minor)')
       .not('shop_id', 'is', null)
       .order('issued_at', { ascending: false });
 
@@ -21,7 +21,7 @@ export async function fetchPayments(): Promise<{ data: Payment[]; error: string 
   try {
     const { data, error } = await supabase
       .from('payments')
-      .select('*, shop:shops(id, name), bill:bills(id, invoice_number, total_minor, status)')
+      .select('*, shop:shops(id, name, city, address, phone), bill:bills(id, invoice_number, total_minor, status)')
       .not('shop_id', 'is', null)
       .order('paid_at', { ascending: false });
 

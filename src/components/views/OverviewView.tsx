@@ -554,7 +554,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               'Owner Name': s.ownerName,
               'Shop Name': s.name,
               'Phone': s.phone || s.ownerPhone || '—',
-              'Location': `${s.city || 'Kalugumalai'}, Tamil Nadu`,
+              'Location': `${s.city || 'Coimbatore'}, Tamil Nadu`,
               'Registered Date': s.created_at ? formatDate(s.created_at) : '—',
               'Activity': s.lifetimeSalesCount > 0 ? 'Live' : 'Inactive',
               'Plan': s.isPro ? 'PRO' : 'FREE',
@@ -979,7 +979,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       {/* 4. LOCATION (City & State) */}
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="text-[11px] leading-tight">
-                          <div className="font-medium text-black">{s.city || 'Kalugumalai'}</div>
+                          <div className="font-medium text-black">{s.city || 'Coimbatore'}</div>
                           <div className="text-neutral-400 text-[10px]">Tamil Nadu</div>
                         </div>
                       </td>
