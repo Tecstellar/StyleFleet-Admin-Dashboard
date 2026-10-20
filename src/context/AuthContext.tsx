@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchCrmUserAccounts, CrmUserAccount } from '../services/crmUserService';
+import { sendSuperAdminOtp } from '../services/otpService';
 
 export interface AdminUser {
   id?: string;
@@ -14,7 +15,6 @@ export interface AdminUser {
 interface LoginResult {
   success: boolean;
   requireOtp?: boolean;
-  generatedOtp?: string;
   error?: string;
 }
 
@@ -23,6 +23,7 @@ interface AuthContextType {
   isMasterAdmin: boolean;
   user: AdminUser | null;
   login: (email: string, pass: string, otp?: string) => Promise<LoginResult>;
+  resendOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateAdminPassword: (newPass: string, currentPass?: string) => { success: boolean; error?: string };
   canAccessModule: (moduleId: string) => boolean;
@@ -34,6 +35,7 @@ const ADMIN_PASS_KEY = 'stylefleet_admin_custom_pwd';
 const MASTER_EMAILS = [
   'info@tecstellar.com',
   'info@textellar.com',
+  'info@textallot.com',
   'info@textlar.com',
   'stylefleet@tecstellar.com',
 ];
@@ -83,32 +85,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: 'Invalid password for super admin.' };
       }
 
-      // If OTP was not submitted, challenge with 2FA OTP
+      // If OTP was not submitted, challenge with 2FA OTP and send real email via Resend
       if (!otp) {
         // Generate a 6-digit OTP code for verification
         const generatedCode = String(Math.floor(100000 + Math.random() * 900000));
         sessionStorage.setItem('stylefleet_pending_otp', generatedCode);
         sessionStorage.setItem('stylefleet_pending_email', cleanEmail);
+        sessionStorage.setItem('stylefleet_pending_otp_timestamp', String(Date.now()));
+
+        const sendRes = await sendSuperAdminOtp(cleanEmail, generatedCode);
+        if (!sendRes.success) {
+          console.warn('Resend OTP dispatch warning:', sendRes.error);
+        }
+
         return {
           success: false,
           requireOtp: true,
-          generatedOtp: generatedCode,
         };
       }
 
-      // Verify OTP
-      const pendingOtp = sessionStorage.getItem('stylefleet_pending_otp') || '849201';
-      if (otp.trim() !== pendingOtp.trim() && otp.trim() !== '849201' && otp.trim() !== '123456') {
-        return { success: false, requireOtp: true, error: 'Incorrect 6-digit OTP code. Please try again.' };
+      // Verify OTP (10-minute validity)
+      const pendingOtp = sessionStorage.getItem('stylefleet_pending_otp');
+      const timestamp = Number(sessionStorage.getItem('stylefleet_pending_otp_timestamp') || '0');
+      const isExpired = Date.now() - timestamp > 10 * 60 * 1000;
+
+      if (isExpired) {
+        return {
+          success: false,
+          requireOtp: true,
+          error: 'Your 6-digit OTP code has expired (10 min limit). Please click "Resend OTP" for a new code.',
+        };
+      }
+
+      if (!pendingOtp || otp.trim() !== pendingOtp.trim()) {
+        return {
+          success: false,
+          requireOtp: true,
+          error: 'Incorrect 6-digit OTP code. Please enter the OTP sent to info@tecstellar.com.',
+        };
       }
 
       // OTP Succeeded!
       sessionStorage.removeItem('stylefleet_pending_otp');
       sessionStorage.removeItem('stylefleet_pending_email');
+      sessionStorage.removeItem('stylefleet_pending_otp_timestamp');
 
       const adminUser: AdminUser = {
-        email: cleanEmail,
-        name: cleanEmail.includes('tecstellar') ? 'Tecstellar Super Admin' : 'Textellar Super Admin',
+        email: 'info@tecstellar.com',
+        name: 'Tecstellar Super Admin',
         role: 'Super Admin',
         access_type: 'full',
         allowed_modules: [],
@@ -150,6 +174,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const resendOtp = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!MASTER_EMAILS.includes(cleanEmail)) {
+      return { success: false, error: 'OTP is only required for Super Admin accounts.' };
+    }
+    const generatedCode = String(Math.floor(100000 + Math.random() * 900000));
+    sessionStorage.setItem('stylefleet_pending_otp', generatedCode);
+    sessionStorage.setItem('stylefleet_pending_email', cleanEmail);
+    sessionStorage.setItem('stylefleet_pending_otp_timestamp', String(Date.now()));
+
+    const sendRes = await sendSuperAdminOtp(cleanEmail, generatedCode);
+    if (!sendRes.success) {
+      return { success: false, error: sendRes.error || 'Failed to dispatch email' };
+    }
+    return { success: true };
+  };
+
   const updateAdminPassword = (newPass: string, currentPass?: string) => {
     const currentSaved = localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_PASSWORD;
     if (currentPass && currentPass.trim() !== currentSaved) {
@@ -165,6 +206,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     sessionStorage.removeItem('stylefleet_pending_otp');
+    sessionStorage.removeItem('stylefleet_pending_email');
+    sessionStorage.removeItem('stylefleet_pending_otp_timestamp');
     setUser(null);
   };
 
@@ -175,6 +218,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isMasterAdmin,
         user,
         login,
+        resendOtp,
         logout,
         updateAdminPassword,
         canAccessModule,
