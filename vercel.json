@@ -2,7 +2,7 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "^/b/(?<file>[^/]+\\.pdf)$",
+      "source": "/b/:file(.*\\.pdf)",
       "destination": "https://nqwgxkdpwpgqkezaqsrx.supabase.co/storage/v1/object/public/invoices/:file"
     },
     {
